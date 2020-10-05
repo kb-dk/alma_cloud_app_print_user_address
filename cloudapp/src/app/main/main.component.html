@@ -1,0 +1,39 @@
+<section>
+  <h1>
+    Welcome!
+  </h1>
+  <p>Use this sample app to get you started. The app includes the following:</p>
+  <ul>
+    <li>Listener for the <code>onPageLoad</code> event</li>
+    <li>Performs an API call using the <code>restService</code> service</li>
+    <li>Updates the object using the <code>restService</code> service</li>
+    <li>Refreshes the page in Alma</li>
+  </ul>
+  <p>Use these building blocks to be on your way to developing your own CloudApp.</p>
+</section>
+
+<section>
+  <mat-card class="example-card">
+    <mat-card-header>
+      <mat-card-title>Page Entity</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <pre>{{ pageEntities | json }}</pre>
+    </mat-card-content>
+  </mat-card>
+</section>
+
+<section>
+  <mat-card class="example-card">
+    <mat-card-header>
+      <mat-card-title>API Result</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <textarea #apiResultArea [value]="apiResult | json"></textarea>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="update(apiResultArea.value)"
+        [disabled]="!hasApiResult || loading">Update</button>
+    </mat-card-actions>
+  </mat-card>
+</section>
