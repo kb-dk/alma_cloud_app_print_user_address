@@ -21,10 +21,8 @@ export class MainComponent implements OnInit, OnDestroy {
 
     private pageLoad$: Subscription;
     pageEntities: Entity[];
-    private _apiResult: any;
 
-    hasApiResult: boolean = false;
-    private usersInfo: UserAddressInfo[] = [];
+    private usersAddress: UserAddressInfo[] = [];
 
     constructor(private restService: CloudAppRestService,
                 private eventsService: CloudAppEventsService,
@@ -42,21 +40,21 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     onListChanged = (e) => {
-        this.usersInfo[e.source.value].checked = e.checked;
+        this.usersAddress[e.source.value].checked = e.checked;
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
     };
 
     onAddressChanged = (e) => {
         let id, addressType;
         [id, addressType] = e.source.value.split('_');
-        this.usersInfo[id].desiredAddress = addressType;
+        this.usersAddress[id].desiredAddress = addressType;
     };
 
     onPrintPreviewNewTab = () => {
         console.log('hej');
         let innerHtml: string = "";
         let printButton: string = "Print";
-        this.usersInfo.forEach(userInfo => {
+        this.usersAddress.forEach(userInfo => {
             if (userInfo.checked) {
                 innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + '</p></div>';
             }
@@ -80,13 +78,13 @@ export class MainComponent implements OnInit, OnDestroy {
 
     onClearSelected = () => {
         this.numRecordsToPrint = 0;
-        this.usersInfo.forEach(userInfo => {
+        this.usersAddress.forEach(userInfo => {
             userInfo.checked = false;
         });
     };
 
     onPageLoad = (pageInfo: PageInfo) => {
         this.pageEntities = pageInfo.entities;
-        this.usersInfo = this.userAddressInfoService.getUsersInfo(this.pageEntities);
+        this.usersAddress = this.userAddressInfoService.getUsersInfo(this.pageEntities);
     };
 }
