@@ -16,11 +16,9 @@ export class UserAddressInfoService {
     ) {
     }
 
-    getUsersInfo = (entities) => {
-        return entities.filter(entity => entity.link.includes('users'))
-            .map(entity => entity.link)
-            .map((link, index) => this.getUserInfoFromLink(link, index));
-    };
+    getUsersInfo = (entities:any) => entities.filter(entity => entity.link.includes('users'))
+                                       .map(entity => entity.link)
+                                       .map((link, index) => this.getUserInfoFromLink(link, index));
 
     private getUserInfoFromLink = (link, index) => {
         let user: UserAddressInfo = this.emptyUserInfo();
@@ -31,7 +29,7 @@ export class UserAddressInfoService {
             id = (response.hasOwnProperty('user_id')) ? response.user_id : id;
 
             if (id !== '') {
-                return this.getUserInfo(id).subscribe(response => {
+                this.getUserInfo(id).subscribe(response => {
                     if (response.full_name || []) {
                         user.name = response.full_name;
                     }
@@ -49,13 +47,9 @@ export class UserAddressInfoService {
         return user;
     };
 
-    private getUserRequestInfo = (link) => {
-        return this.restService.call(link);
-    };
+    private getUserRequestInfo = link => this.restService.call(link);
 
-    private getUserInfo = (id) => {
-        return this.restService.call(`/users/${id}`);
-    };
+    private getUserInfo = id => this.restService.call(`/users/${id}`);
 
     private getAddress = (addressObj: Address) => {
         let desiredFields = {
