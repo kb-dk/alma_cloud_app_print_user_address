@@ -16,19 +16,19 @@ export class UserAddressInfoService {
     ) {
     }
 
-    getUsersInfo(entities):UserAddressInfo[]{
+    getUsersInfo = (entities) => {
         return entities.filter(entity => entity.link.includes('users'))
-                       .map(entity => entity.link)
-                       .map((link, index) => this.getUserInfoFromLink(link, index));
-    }
+            .map(entity => entity.link)
+            .map((link, index) => this.getUserInfoFromLink(link, index));
+    };
 
-    getUserInfoFromLink(link, index): UserAddressInfo {
+    private getUserInfoFromLink = (link, index) => {
         let user: UserAddressInfo = this.emptyUserInfo();
         user.id = index;
         this.getUserRequestInfo(link).subscribe(response => {
             let id = '';
-            id = (response.hasOwnProperty('user_primary_id'))?response.user_primary_id:id;
-            id = (response.hasOwnProperty('user_id'))?response.user_id:id;
+            id = (response.hasOwnProperty('user_primary_id')) ? response.user_primary_id : id;
+            id = (response.hasOwnProperty('user_id')) ? response.user_id : id;
 
             if (id !== '') {
                 return this.getUserInfo(id).subscribe(response => {
@@ -47,17 +47,17 @@ export class UserAddressInfoService {
             }
         });
         return user;
-    }
+    };
 
-    getUserRequestInfo(link) {
+    private getUserRequestInfo = (link) => {
         return this.restService.call(link);
-    }
+    };
 
-    getUserInfo(id) {
+    private getUserInfo = (id) => {
         return this.restService.call(`/users/${id}`);
-    }
+    };
 
-    getAddress(addressObj: Address) {
+    private getAddress = (addressObj: Address) => {
         let desiredFields = {
             "address": ['line1', 'line2', 'line3', 'line4', 'line5'],
             "city": ['city', 'state_province', 'postal_code']
@@ -72,11 +72,11 @@ export class UserAddressInfoService {
         });
         address = addressObj.country.desc ? address.concat(addressObj.country.desc) : address;
         return address;
-    }
+    };
 
-    private emptyUserInfo(){
+    private emptyUserInfo = () => {
         return {
-            "id":0,
+            "id": 0,
             "name": "",
             "homeAddress": "",
             "workAddress": "",
@@ -84,11 +84,9 @@ export class UserAddressInfoService {
             "desiredAddress": "home",
             "checked": false
         };
-    }
+    };
 
-    private handleError(err: any) {
-        // in a real world app, we may send the server to some remote logging infrastructure
-        // instead of just logging it to the console
+    private handleError = (err: any) => {
         let errorMessage: string;
         if (err.error instanceof ErrorEvent) {
             // A client-side or network error occurred. Handle it accordingly.
@@ -100,5 +98,5 @@ export class UserAddressInfoService {
         }
         console.error(err);
         return throwError(errorMessage);
-    }
+    };
 }
