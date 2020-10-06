@@ -9,6 +9,8 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MainComponent } from './main/main.component';
 
+import {UserAddressInfoService} from './userAddressInfo.service';
+
 export function getToastrModule() {
   return ToastrModule.forRoot({
     positionClass: 'toast-top-right',
@@ -30,7 +32,7 @@ export function getToastrModule() {
     getTranslateModule(),
     getToastrModule()
   ],
-  providers: [],
+  providers: [UserAddressInfoService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
