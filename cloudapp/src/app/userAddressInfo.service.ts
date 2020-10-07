@@ -33,8 +33,8 @@ export class UserAddressInfoService {
                     if (response.full_name || []) {
                         user.name = response.full_name;
                     }
-
-                    response.contact_info.address.forEach(address => {
+                    
+                    response.contact_info.address.map(address => {
                         let address_type = address.address_type[0].value + 'Address';
                         if (address.preferred) {
                             user.desiredAddress = address_type;
