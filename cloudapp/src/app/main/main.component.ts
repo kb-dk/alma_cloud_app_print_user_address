@@ -20,7 +20,6 @@ export class MainComponent implements OnInit, OnDestroy {
     private numRecordsToPrint: number = 0;
 
     private pageLoad$: Subscription;
-    pageEntities: Entity[];
 
     private usersAddress: UserAddressInfo[] = [];
 
@@ -32,12 +31,14 @@ export class MainComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.pageLoad$ = this.eventsService.onPageLoad(this.onPageLoad);
+        this.pageLoad$ = this.eventsService.onPageLoad((pageInfo: PageInfo) => {
+            this.usersAddress = this.userAddressInfoService.getUsersInfo(pageInfo.entities);
+        });
     }
 
-    ngOnDestroy = () => {
+    ngOnDestroy(){
         this.pageLoad$.unsubscribe();
-    };
+    }
 
     onListChanged = (e) => {
         this.usersAddress[e.source.value].checked = e.checked;
@@ -81,10 +82,5 @@ export class MainComponent implements OnInit, OnDestroy {
         this.usersAddress.forEach(userInfo => {
             userInfo.checked = false;
         });
-    };
-
-    onPageLoad = (pageInfo: PageInfo) => {
-        this.pageEntities = pageInfo.entities;
-        this.usersAddress = this.userAddressInfoService.getUsersInfo(this.pageEntities);
     };
 }
