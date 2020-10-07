@@ -13,19 +13,19 @@
       <th>Name</th>
       <th>Address</th>
     </tr>
-    <tr *ngFor="let userInfo of usersAddress" id="tr_{{userInfo.id}}">
-      <td style="width: 2%">{{userInfo.id + 1}}</td>
+    <tr *ngFor="let userAddress of usersAddress" id="tr_{{userAddress.id}}">
+      <td style="width: 2%">{{userAddress.id + 1}}</td>
       <td style="width: 23%">
-        <mat-checkbox [value]="userInfo.id"
+        <mat-checkbox [value]="userAddress.id"
                       (change)="onListChanged($event)"
-                      [checked]="userInfo.checked"
-        >{{userInfo.name}}</mat-checkbox>
+                      [checked]="userAddress.checked"
+        >{{userAddress.name}}</mat-checkbox>
       </td>
       <td style="width: 75%" >
         <mat-radio-group aria-label="Select an option">
-          <mat-radio-button (change)="onAddressChanged($event)" [checked]="(userInfo.desiredAddress =='homeAddress')" *ngIf="userInfo.homeAddress" value="{{userInfo.id}}_homeAddress"><b>Home: </b>{{userInfo.homeAddress}}</mat-radio-button>
-          <mat-radio-button (change)="onAddressChanged($event)" [checked]="(userInfo.desiredAddress =='workAddress')" *ngIf="userInfo.workAddress" value="{{userInfo.id}}_workAddress"><b>Work: </b>{{userInfo.workAddress}}</mat-radio-button>
-          <mat-radio-button (change)="onAddressChanged($event)" [checked]="(userInfo.desiredAddress =='alternativeAddress')" *ngIf="userInfo.alternativeAddress" value="{{userInfo.id}}_alternativeAddress"><b>Alternative: </b>{{userInfo.alternativeAddress}}</mat-radio-button>
+          <mat-radio-button (change)="onAddressChanged($event)" [checked]="(userAddress.desiredAddress =='homeAddress')" *ngIf="userAddress.homeAddress" value="{{userAddress.id}}_homeAddress"><b>Home: </b>{{userAddress.homeAddress}}</mat-radio-button>
+          <mat-radio-button (change)="onAddressChanged($event)" [checked]="(userAddress.desiredAddress =='workAddress')" *ngIf="userAddress.workAddress" value="{{userAddress.id}}_workAddress"><b>Work: </b>{{userAddress.workAddress}}</mat-radio-button>
+          <mat-radio-button (change)="onAddressChanged($event)" [checked]="(userAddress.desiredAddress =='alternativeAddress')" *ngIf="userAddress.alternativeAddress" value="{{userAddress.id}}_alternativeAddress"><b>Alternative: </b>{{userAddress.alternativeAddress}}</mat-radio-button>
         </mat-radio-group>
       </td>
     </tr>
