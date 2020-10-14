@@ -52,7 +52,6 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     onPrintPreviewNewTab = () => {
-        console.log('hej');
         let innerHtml: string = "";
         let printButton: string = "Print";
         this.usersAddress.forEach(userInfo => {

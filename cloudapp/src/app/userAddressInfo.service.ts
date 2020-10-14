@@ -70,13 +70,13 @@ export class UserAddressInfoService {
 
     private emptyUserInfo = () => {
         return {
-            "id": 0,
-            "name": "",
-            "homeAddress": "",
-            "workAddress": "",
-            "alternativeAddress": "",
-            "desiredAddress": "home",
-            "checked": false
+            id: 0,
+            name: "",
+            homeAddress: "",
+            workAddress: "",
+            alternativeAddress: "",
+            desiredAddress: "home",
+            checked: false
         };
     };
 
