@@ -1,10 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
 import {UserAddressInfo} from "./userAddressInfo";
-import {CloudAppRestService} from "@exlibris/exl-cloudapp-angular-lib";
+import {CloudAppRestService, PageInfo} from "@exlibris/exl-cloudapp-angular-lib";
 import {from, Observable, throwError} from "rxjs";
-import {mergeMap, pluck, toArray} from "rxjs/operators";
+import {filter, map, mergeMap, pluck, tap, toArray} from "rxjs/operators";
 import {MatCheckboxChange} from "@angular/material/checkbox";
+import {pageEntity} from "./pageEntity";
 
 @Injectable({
     providedIn: 'root'
@@ -16,9 +17,14 @@ export class UserAddressInfoService {
     ) {
     }
 
-    getUsersInfo = (entities:any) => entities.filter(entity => entity.link.includes('users'))
-                                       .map(entity => entity.link)
-                                       .map((link, index) => this.getUserInfoFromLink(link, index));
+    getUsersInfo(entities:pageEntity[]) {
+    return from(entities).pipe(
+        filter(entity => entity.link.includes('users')),
+        map(entity => entity.link),
+        map((link, index) => this.getUserInfoFromLink(link, index)),
+        toArray()
+    );
+}
 
     private getUserInfoFromLink = (link, index) => {
         let user: UserAddressInfo = this.emptyUserInfo();

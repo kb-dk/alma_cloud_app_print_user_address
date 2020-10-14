@@ -9,6 +9,7 @@ import {
     PageInfo,
 } from '@exlibris/exl-cloudapp-angular-lib';
 import {UserAddressInfo} from "../userAddressInfo";
+import {tap} from "rxjs/operators";
 
 @Component({
     selector: 'app-main',
@@ -21,7 +22,8 @@ export class MainComponent implements OnInit, OnDestroy {
 
     private pageLoad$: Subscription;
 
-    private usersAddress: UserAddressInfo[] = [];
+    private usersAddress ;
+    private usersAddressTest;
 
     constructor(private restService: CloudAppRestService,
                 private eventsService: CloudAppEventsService,
@@ -32,7 +34,12 @@ export class MainComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.pageLoad$ = this.eventsService.onPageLoad((pageInfo: PageInfo) => {
-            this.usersAddress = this.userAddressInfoService.getUsersInfo(pageInfo.entities);
+            this.userAddressInfoService.getUsersInfo(pageInfo.entities).subscribe(
+                usersAddress => {
+                    this.usersAddress = usersAddress;
+                },
+                error => console.log('Error happend', error)
+            );
         });
     }
 
