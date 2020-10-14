@@ -23,7 +23,6 @@ export class MainComponent implements OnInit, OnDestroy {
     private pageLoad$: Subscription;
 
     private usersAddress ;
-    private usersAddressTest;
 
     constructor(private restService: CloudAppRestService,
                 private eventsService: CloudAppEventsService,
