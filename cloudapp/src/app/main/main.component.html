@@ -5,7 +5,7 @@
   <button class="float-right" mat-stroked-button color="primary" (click)="onClearSelected()">Clear</button>
 </div>
 
-<div *ngIf="usersAddress$ | async as usersAddress">
+<div *ngIf="usersAddress$ | async">
   <h3>Select record(s) to print:</h3>
   <table style="width: 100%; margin-top: 10px; font-size: 0.8em;" border="1px">
     <tr>
@@ -13,7 +13,7 @@
       <th>Name</th>
       <th>Address</th>
     </tr>
-    <tr *ngFor="let userAddress of usersAddress" id="tr_{{userAddress.id}}">
+    <tr *ngFor="let userAddress of usersAddress$ | async" id="tr_{{userAddress.id}}">
       <td style="width: 2%">{{userAddress.id + 1}}</td>
       <td style="width: 23%">
         <mat-checkbox [value]="userAddress.id"

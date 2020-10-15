@@ -9,7 +9,7 @@ import {
     PageInfo,
 } from '@exlibris/exl-cloudapp-angular-lib';
 import {UserAddressInfo} from "../userAddressInfo";
-import {catchError, map, switchMap, tap} from "rxjs/operators";
+import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
 
 @Component({
     selector: 'app-main',
@@ -32,24 +32,39 @@ export class MainComponent{
         .pipe(
             catchError(err => EMPTY),
             map(pageInfo => pageInfo.entities),
-            switchMap(entities => this.userAddressInfoService.usersAddress$(entities))
+            switchMap(entities => this.userAddressInfoService.usersAddress$(entities)),
+            tap(item => console.log(item))
         );
 
     onListChanged = (e) => {
-        this.usersAddress$[e.source.value].checked = e.checked;
+        this.usersAddress$.pipe(
+            map(usersAddress => usersAddress[e.source.value].checked = e.checked),
+            tap(usersAddress => console.log(usersAddress))
+        );
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
     };
 
     onAddressChanged = (e) => {
         let id, addressType;
         [id, addressType] = e.source.value.split('_');
-        this.usersAddress$[id].desiredAddress = addressType;
+        this.usersAddress$.pipe(
+            map(usersAddress => usersAddress[id].desiredAddress = addressType)
+        );
     };
 
+    innerHtml$ = this.usersAddress$.pipe(
+        tap(items=> console.log('innerhtml:',items)),
+        map(usersInfo => usersInfo.filter(userInfo => userInfo.checked)),
+        map(usersInfo => usersInfo.map( userInfo =>
+            this.innerHtml$ + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + "</p></div>"
+        )),
+    );
+
     onPrintPreviewNewTab = () => {
-        console.log('hej');
-        let innerHtml: string = "";
+        //let innerHtml: string = "";
         let printButton: string = "Print";
+
+        console.log(this.innerHtml$);
         // this.usersAddress$.forEach(userInfo => {
         //     if (userInfo.checked) {
         //         innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + '</p></div>';
@@ -59,11 +74,11 @@ export class MainComponent{
         content += "<style>";
         content += "@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}";
         content += "</style>";
-        content += "<body>";
+        content += "<body onload='window.print()'>";
         content += "<button class='hidden-print' onclick='window.print()'>";
         content += printButton;
         content += "</button>";
-        content += innerHtml;
+        content += this.innerHtml$;
         content += "</body>";
         content += "</html>";
 
