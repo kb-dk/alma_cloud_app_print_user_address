@@ -1,6 +1,6 @@
-import {Subscription} from 'rxjs';
+import {EMPTY, Observable, Subscription} from 'rxjs';
 import {ToastrService} from 'ngx-toastr';
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {UserAddressInfoService} from '../userAddressInfo.service';
 import {
     CloudAppEventsService,
@@ -9,20 +9,17 @@ import {
     PageInfo,
 } from '@exlibris/exl-cloudapp-angular-lib';
 import {UserAddressInfo} from "../userAddressInfo";
-import {tap} from "rxjs/operators";
+import {catchError, map, switchMap, tap} from "rxjs/operators";
 
 @Component({
     selector: 'app-main',
     templateUrl: './main.component.html',
-    styleUrls: ['./main.component.scss']
+    styleUrls: ['./main.component.scss'],
+    //changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MainComponent implements OnInit, OnDestroy {
+export class MainComponent{
 
     private numRecordsToPrint: number = 0;
-
-    private pageLoad$: Subscription;
-
-    private usersAddress ;
 
     constructor(private restService: CloudAppRestService,
                 private eventsService: CloudAppEventsService,
@@ -31,41 +28,33 @@ export class MainComponent implements OnInit, OnDestroy {
     ) {
     }
 
-    ngOnInit() {
-        this.pageLoad$ = this.eventsService.onPageLoad((pageInfo: PageInfo) => {
-            this.userAddressInfoService.getUsersInfo(pageInfo.entities).subscribe(
-                usersAddress => {
-                    this.usersAddress = usersAddress;
-                },
-                error => console.log('Error happend', error)
-            );
-        });
-    }
-
-    ngOnDestroy(){
-        this.pageLoad$.unsubscribe();
-    }
+    usersAddress$ = this.eventsService.getPageMetadata()
+        .pipe(
+            catchError(err => EMPTY),
+            map(pageInfo => pageInfo.entities),
+            switchMap(entities => this.userAddressInfoService.usersAddress$(entities))
+        );
 
     onListChanged = (e) => {
-        this.usersAddress[e.source.value].checked = e.checked;
+        this.usersAddress$[e.source.value].checked = e.checked;
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
     };
 
     onAddressChanged = (e) => {
         let id, addressType;
         [id, addressType] = e.source.value.split('_');
-        this.usersAddress[id].desiredAddress = addressType;
+        this.usersAddress$[id].desiredAddress = addressType;
     };
 
     onPrintPreviewNewTab = () => {
         console.log('hej');
         let innerHtml: string = "";
         let printButton: string = "Print";
-        this.usersAddress.forEach(userInfo => {
-            if (userInfo.checked) {
-                innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + '</p></div>';
-            }
-        });
+        // this.usersAddress$.forEach(userInfo => {
+        //     if (userInfo.checked) {
+        //         innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + '</p></div>';
+        //     }
+        // });
         var content = "<html>";
         content += "<style>";
         content += "@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}";
@@ -84,9 +73,9 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     onClearSelected = () => {
-        this.numRecordsToPrint = 0;
-        this.usersAddress.forEach(userInfo => {
-            userInfo.checked = false;
-        });
+        // this.numRecordsToPrint = 0;
+        // this.usersAddress$.forEach(userInfo => {
+        //     userInfo.checked = false;
+        // });
     };
 }

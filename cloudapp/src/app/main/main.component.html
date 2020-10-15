@@ -5,7 +5,7 @@
   <button class="float-right" mat-stroked-button color="primary" (click)="onClearSelected()">Clear</button>
 </div>
 
-<div *ngIf="usersAddress">
+<div *ngIf="usersAddress$ | async as usersAddress">
   <h3>Select record(s) to print:</h3>
   <table style="width: 100%; margin-top: 10px; font-size: 0.8em;" border="1px">
     <tr>
