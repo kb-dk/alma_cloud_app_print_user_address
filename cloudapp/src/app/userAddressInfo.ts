@@ -2,9 +2,10 @@
 export interface UserAddressInfo {
     id?: number;
     name?: string;
-    homeAddress?: string;
-    workAddress?: string;
-    alternativeAddress?: string;
-    desiredAddress?:string;
+    desiredAddress?: string;
+    addresses?: [{
+        type:string;
+        address:string;
+    }];
     checked?: boolean;
 }
