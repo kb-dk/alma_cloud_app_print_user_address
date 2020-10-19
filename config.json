@@ -1,0 +1,7 @@
+{
+   "title": "Print user address",
+   "description": "It gives the opportunity to select one or more users and print their addresses.",
+   "env": "https://kbdk-kgl-psb.alma.exlibrisgroup.com/institution/45KBDK_KGL",
+   "port": 4200,
+   "name": "print-user-address"
+}
