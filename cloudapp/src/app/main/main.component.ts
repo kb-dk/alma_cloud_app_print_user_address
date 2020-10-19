@@ -1,4 +1,4 @@
-import {EMPTY, Observable, Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, EMPTY, from, Observable, Subscription} from 'rxjs';
 import {ToastrService} from 'ngx-toastr';
 import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
 import {UserAddressInfoService} from '../userAddressInfo.service';
@@ -9,7 +9,7 @@ import {
     PageInfo,
 } from '@exlibris/exl-cloudapp-angular-lib';
 import {UserAddressInfo} from "../userAddressInfo";
-import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
+import {catchError, concatMap, filter, map, mergeMap, switchMap, tap, toArray} from "rxjs/operators";
 
 @Component({
     selector: 'app-main',
@@ -17,9 +17,41 @@ import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
     styleUrls: ['./main.component.scss'],
     //changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MainComponent{
+export class MainComponent {
 
     private numRecordsToPrint: number = 0;
+
+    usersAddress$ = this.eventsService.getPageMetadata()
+        .pipe(
+            map(pageInfo => pageInfo.entities),
+            concatMap(entities => this.userAddressInfoService.usersAddress$(entities)),
+            toArray(),
+        );
+
+    private clickedUserNameSubject = new BehaviorSubject<number>(-1);
+    clickedUserNameAction$ = this.clickedUserNameSubject.asObservable();
+
+    private clickedAddressSubject = new BehaviorSubject<[number, string]>([-1, '']);
+    clickedAddressAction$ = this.clickedAddressSubject.asObservable();
+
+    userAddressWithPrintInfo$ = combineLatest([
+        this.usersAddress$,
+        this.clickedUserNameAction$,
+        this.clickedAddressAction$
+    ])
+        .pipe(
+            map(([usersAddress, selectedUserId, selectedUserIdAndAddressType]) =>
+                usersAddress.map(userAddress => ({
+                    ...userAddress,
+                    desiredAddress: userAddress.id === selectedUserIdAndAddressType[0]? userAddress.desiredAddress = selectedUserIdAndAddressType[1] :userAddress.desiredAddress,
+                    checked: userAddress.id === selectedUserId? !userAddress.checked:userAddress.checked,
+                }) as UserAddressInfo),
+                toArray(),
+            ),
+            tap(),
+            tap(i => console.log(i)),
+            catchError(err => EMPTY),
+        );
 
     constructor(private restService: CloudAppRestService,
                 private eventsService: CloudAppEventsService,
@@ -28,43 +60,31 @@ export class MainComponent{
     ) {
     }
 
-    usersAddress$ = this.eventsService.getPageMetadata()
-        .pipe(
-            catchError(err => EMPTY),
-            map(pageInfo => pageInfo.entities),
-            switchMap(entities => this.userAddressInfoService.usersAddress$(entities)),
-            tap(item => console.log(item))
-        );
-
-    onListChanged = (e) => {
-        this.usersAddress$.pipe(
-            map(usersAddress => usersAddress[e.source.value].checked = e.checked),
-            tap(usersAddress => console.log(usersAddress))
-        );
+    onUserNameClick = (e) => {
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
+        this.clickedUserNameSubject.next(+e.source.value);
     };
 
-    onAddressChanged = (e) => {
-        let id, addressType;
+    onAddressClick = (e) => {
+         let id, addressType;
         [id, addressType] = e.source.value.split('_');
-        this.usersAddress$.pipe(
-            map(usersAddress => usersAddress[id].desiredAddress = addressType)
-        );
+        this.clickedAddressSubject.next([+id, addressType]);
     };
 
-    innerHtml$ = this.usersAddress$.pipe(
-        tap(items=> console.log('innerhtml:',items)),
-        map(usersInfo => usersInfo.filter(userInfo => userInfo.checked)),
-        map(usersInfo => usersInfo.map( userInfo =>
-            this.innerHtml$ + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + "</p></div>"
-        )),
-    );
+    // innerHtml$ = this.usersAddress$.pipe(
+    //     tap(items=> console.log('innerhtml:',items)),
+    //     map(usersInfo => usersInfo.filter(userInfo => userInfo.checked)),
+    //     map(usersInfo => usersInfo.map( userInfo =>
+    //         this.innerHtml$ + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + "</p></div>"
+    //     )),
+    // );
+
+
 
     onPrintPreviewNewTab = () => {
-        //let innerHtml: string = "";
+        let innerHtml: string = "";
         let printButton: string = "Print";
 
-        console.log(this.innerHtml$);
         // this.usersAddress$.forEach(userInfo => {
         //     if (userInfo.checked) {
         //         innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + '</p></div>';
@@ -78,7 +98,7 @@ export class MainComponent{
         content += "<button class='hidden-print' onclick='window.print()'>";
         content += printButton;
         content += "</button>";
-        content += this.innerHtml$;
+        content += innerHtml;
         content += "</body>";
         content += "</html>";
 
