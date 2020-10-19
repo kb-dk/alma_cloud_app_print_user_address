@@ -41,8 +41,7 @@ export class UserAddressInfoService {
                     checked: false
                 };
             }),
-            toArray(),
-            tap(i => console.log(this.index, i)),
+            //tap(i => console.log(this.index, i)),
         );
     };
 
