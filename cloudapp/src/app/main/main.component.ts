@@ -20,15 +20,17 @@ import {catchError, concatMap, filter, map, mergeMap, switchMap, tap, toArray} f
 export class MainComponent {
 
     private numRecordsToPrint: number = 0;
+    private currentState;
 
     usersAddress$ = this.eventsService.getPageMetadata()
         .pipe(
             map(pageInfo => pageInfo.entities),
             concatMap(entities => this.userAddressInfoService.usersAddress$(entities)),
             toArray(),
+            tap(currentInfo => this.currentState = currentInfo)
         );
 
-    private clickedUserNameSubject = new BehaviorSubject<number>(-1);
+    private clickedUserNameSubject = new BehaviorSubject<[number, boolean]>([-1, false]);
     clickedUserNameAction$ = this.clickedUserNameSubject.asObservable();
 
     private clickedAddressSubject = new BehaviorSubject<[number, string]>([-1, '']);
@@ -40,16 +42,15 @@ export class MainComponent {
         this.clickedAddressAction$
     ])
         .pipe(
-            map(([usersAddress, selectedUserId, selectedUserIdAndAddressType]) =>
-                usersAddress.map(userAddress => ({
+            map(([usersAddress, selectedUserInfo, selectedUserIdAndAddressType]) =>
+                usersAddress.map((userAddress, index) => ({
                     ...userAddress,
-                    desiredAddress: userAddress.id === selectedUserIdAndAddressType[0]? userAddress.desiredAddress = selectedUserIdAndAddressType[1] :userAddress.desiredAddress,
-                    checked: userAddress.id === selectedUserId? !userAddress.checked:userAddress.checked,
+                    desiredAddress: userAddress.id === selectedUserIdAndAddressType[0]? selectedUserIdAndAddressType[1] :this.currentState[index].desiredAddress,
+                    checked: userAddress.id === selectedUserInfo[0]? selectedUserInfo[1]:this.currentState[index].checked,
                 }) as UserAddressInfo),
                 toArray(),
             ),
-            tap(),
-            tap(i => console.log(i)),
+            tap(currentInfo => this.currentState = currentInfo),
             catchError(err => EMPTY),
         );
 
@@ -62,7 +63,7 @@ export class MainComponent {
 
     onUserNameClick = (e) => {
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
-        this.clickedUserNameSubject.next(+e.source.value);
+        this.clickedUserNameSubject.next([e.source.value, e.checked]);
     };
 
     onAddressClick = (e) => {
@@ -71,26 +72,17 @@ export class MainComponent {
         this.clickedAddressSubject.next([+id, addressType]);
     };
 
-    // innerHtml$ = this.usersAddress$.pipe(
-    //     tap(items=> console.log('innerhtml:',items)),
-    //     map(usersInfo => usersInfo.filter(userInfo => userInfo.checked)),
-    //     map(usersInfo => usersInfo.map( userInfo =>
-    //         this.innerHtml$ + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + "</p></div>"
-    //     )),
-    // );
-
-
-
     onPrintPreviewNewTab = () => {
         let innerHtml: string = "";
         let printButton: string = "Print";
 
-        // this.usersAddress$.forEach(userInfo => {
-        //     if (userInfo.checked) {
-        //         innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + '</p></div>';
-        //     }
-        // });
-        var content = "<html>";
+        this.currentState.map(userInfo => {
+            if (userInfo.checked) {
+                innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo.addresses.find(address => address.type === userInfo.desiredAddress).address + '</p></div>';
+            }
+        });
+
+        let content = "<html>";
         content += "<style>";
         content += "@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}";
         content += "</style>";
@@ -108,9 +100,9 @@ export class MainComponent {
     };
 
     onClearSelected = () => {
-        // this.numRecordsToPrint = 0;
-        // this.usersAddress$.forEach(userInfo => {
-        //     userInfo.checked = false;
-        // });
+        this.numRecordsToPrint = 0;
+        this.currentState.map(userInfo => {
+            userInfo.checked = false;
+        });
     };
 }
