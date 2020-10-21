@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
-import {CloudAppRestService} from "@exlibris/exl-cloudapp-angular-lib";
+import {CloudAppRestService, Entity} from "@exlibris/exl-cloudapp-angular-lib";
 import {from, throwError} from "rxjs";
-import {catchError, concatMap, filter, map, tap, toArray} from "rxjs/operators";
-import {pageEntity} from "./pageEntity";
+import {catchError, concatMap, filter, map, toArray} from "rxjs/operators";
 
 @Injectable({
     providedIn: 'root'
@@ -11,37 +10,17 @@ import {pageEntity} from "./pageEntity";
 export class UserAddressInfoService {
     private index:number[]=[];
 
-    usersAddress$ = (entities: pageEntity[]) => {
+    usersAddress$ = (entities: Entity[]) => {
         return from(entities).pipe(
             catchError(err => this.handleError(err)),
-            filter((entity, index) => {
-                if (entity.link.includes('users')){
-                    this.index.push(index);
-                    return true;
-                }else{
-                    return false;
-                }
-            }),
+            filter((entity, index) => this.returnIfUser(entity, index)),
             map(entity => entity.link),
             concatMap(link => this.getUserRequestInfo(link)),
             filter(userRequestInfo => userRequestInfo.hasOwnProperty('user_primary_id') || userRequestInfo.hasOwnProperty('user_id')),
             map(userRequestInfo => userRequestInfo.hasOwnProperty('user_primary_id') ? userRequestInfo.user_primary_id : userRequestInfo.user_id),
             concatMap(id => this.getUserInfo(id)),
-            map((userInfo, index) => {
-                return {
-                    id: this.index[index],
-                    name: userInfo.full_name.search('null ')==0?userInfo.full_name.replace('null ', ''):userInfo.full_name,
-                    addresses: userInfo.contact_info.address.map(
-                        address => ({
-                            type: address.address_type[0].value,
-                            address: this.getAddress(address)
-                        })
-                    ),
-                    desiredAddress: userInfo.contact_info.address.find(address => address.preferred == true).address_type[0].value,
-                    checked: false
-                };
-            }),
-            //tap(i => console.log(this.index, i)),
+            map((userInfo, index) => this.convertUserInfoToAddress(userInfo, index)),
+            toArray(),
         );
     };
 
@@ -49,6 +28,30 @@ export class UserAddressInfoService {
         private restService: CloudAppRestService,
     ) {
     }
+
+    private returnIfUser = (entity, index) => {
+        if (entity.link.includes('users')) {
+            this.index.push(index);
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    private convertUserInfoToAddress = (userInfo, index) => {
+        return {
+            id: this.index[index],
+            name: userInfo.full_name.search('null ')==0?userInfo.full_name.replace('null ', ''):userInfo.full_name,
+            addresses: userInfo.contact_info.address.map(
+                address => ({
+                    type: address.address_type[0].value,
+                    address: this.getAddress(address)
+                })
+            ),
+            desiredAddress: userInfo.contact_info.address.find(address => address.preferred == true).address_type[0].value,
+            checked: false
+        };
+    };
 
     private getUserRequestInfo = link => this.restService.call(link);
 

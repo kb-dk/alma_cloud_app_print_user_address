@@ -1,6 +1,6 @@
-import {BehaviorSubject, combineLatest, EMPTY, from, Observable, Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
 import {ToastrService} from 'ngx-toastr';
-import {ChangeDetectionStrategy, Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserAddressInfoService} from '../userAddressInfo.service';
 import {
     CloudAppEventsService,
@@ -9,26 +9,24 @@ import {
     PageInfo,
 } from '@exlibris/exl-cloudapp-angular-lib';
 import {UserAddressInfo} from "../userAddressInfo";
-import {catchError, concatMap, filter, map, mergeMap, switchMap, tap, toArray} from "rxjs/operators";
+import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 @Component({
     selector: 'app-main',
     templateUrl: './main.component.html',
     styleUrls: ['./main.component.scss'],
-    //changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MainComponent {
+export class MainComponent implements OnInit, OnDestroy{
 
     private numRecordsToPrint: number = 0;
     private currentState;
+    private pageLoad$:Subscription;
 
-    usersAddress$ = this.eventsService.getPageMetadata()
-        .pipe(
-            map(pageInfo => pageInfo.entities),
-            concatMap(entities => this.userAddressInfoService.usersAddress$(entities)),
-            toArray(),
-            tap(currentInfo => this.currentState = currentInfo)
-        );
+    private pageEntitiesSubject = new Subject<Entity[]>();
+    pageEntitiesAction$ = this.pageEntitiesSubject.asObservable().pipe(
+        concatMap(entities => this.userAddressInfoService.usersAddress$(entities)),
+        tap(currentInfo => this.currentState = currentInfo)
+    );
 
     private clickedUserNameSubject = new BehaviorSubject<[number, boolean]>([-1, false]);
     clickedUserNameAction$ = this.clickedUserNameSubject.asObservable();
@@ -37,7 +35,7 @@ export class MainComponent {
     clickedAddressAction$ = this.clickedAddressSubject.asObservable();
 
     userAddressWithPrintInfo$ = combineLatest([
-        this.usersAddress$,
+        this.pageEntitiesAction$,
         this.clickedUserNameAction$,
         this.clickedAddressAction$
     ])
@@ -60,6 +58,18 @@ export class MainComponent {
                 private userAddressInfoService: UserAddressInfoService
     ) {
     }
+
+    ngOnInit(): void {
+        this.pageLoad$ = this.eventsService.onPageLoad(this.onPageLoad);
+    }
+
+    ngOnDestroy(): void {
+        this.pageLoad$.unsubscribe();
+    }
+
+    onPageLoad = (pageInfo: PageInfo) => {
+        this.pageEntitiesSubject.next(pageInfo.entities);
+    };
 
     onUserNameClick = (e) => {
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
