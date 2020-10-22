@@ -82,27 +82,30 @@ export class MainComponent implements OnInit, OnDestroy{
 
     onPrint = () => {
         let innerHtml: string = "";
-        let printButton: string = "Print";
 
         this.currentUserActions.map(user => {
             if (user.checked) {
-                innerHtml = innerHtml + "<div class='pageBreak'><p>" + user.name + "</p><p>" + user.addresses.find(address => address.type === user.selectedAddress).address + '</p></div>';
+                innerHtml =  innerHtml.concat(
+                             `<div class='pageBreak'>
+                              <p>${user.name}</p>
+                              <p>${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
+                              </div>`);
             }
         });
 
-        let content = "<html>";
-        content += "<style>";
-        content += "@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}";
-        content += "</style>";
-        content += "<body onload='window.print()'>";
-        content += "<button class='hidden-print' onclick='window.print()'>";
-        content += printButton;
-        content += "</button>";
-        content += innerHtml;
-        content += "</body>";
-        content += "</html>";
+        let content = `<html>
+                       <style>
+                       @media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}
+                       </style>
+                       <body onload='window.print()'>
+                       <button class='hidden-print' onclick='window.print()'>
+                       print
+                       </button>
+                       ${innerHtml}
+                       </body>
+                       </html>`;
 
-        var win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
+        let win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
         win.document.write(content);
         win.document.close();
     };
