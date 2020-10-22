@@ -18,36 +18,36 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 export class MainComponent implements OnInit, OnDestroy{
 
     private numRecordsToPrint: number = 0;
-    private currentState;
+    private currentUserActions;
     private pageLoadSubscription:Subscription;
 
-    private pageEntitiesSubject = new Subject<Entity[]>();
-    pageLoadAction$ = this.pageEntitiesSubject.asObservable().pipe(
-        concatMap(entities => this.userService.usersAddress$(entities)),
-        tap(currentInfo => this.currentState = currentInfo)
+    private pageLoadedSubject = new Subject<Entity[]>();
+    pageLoadedAction$ = this.pageLoadedSubject.asObservable().pipe(
+        concatMap(entities => this.userService.user$(entities)),
+        tap(currentUserAction => this.currentUserActions = currentUserAction)
     );
 
-    private clickedUserNameSubject = new BehaviorSubject<{id:number, checked:boolean}>({id:-1, checked:false});
-    clickedUserNameAction$ = this.clickedUserNameSubject.asObservable();
+    private userToggledSubject = new BehaviorSubject<{id:number, checked:boolean}>({id:-1, checked:false});
+    userToggledAction$ = this.userToggledSubject.asObservable();
 
-    private clickedAddressSubject = new BehaviorSubject<{id:number, value:string}>({id:-1, value:''});
-    clickedAddressAction$ = this.clickedAddressSubject.asObservable();
+    private addressSelectedSubject = new BehaviorSubject<{id:number, value:string}>({id:-1, value:''});
+    addressSelectedAction$ = this.addressSelectedSubject.asObservable();
 
-    userAddressWithPrintInfo$ = combineLatest([
-        this.pageLoadAction$,
-        this.clickedUserNameAction$,
-        this.clickedAddressAction$
+    userActions$ = combineLatest([
+        this.pageLoadedAction$,
+        this.userToggledAction$,
+        this.addressSelectedAction$
     ])
         .pipe(
             map(([users, selectedUser, selectedAddressType]) =>
                 users.map((user, requestIndex) => ({
                     ...user,
-                    selectedAddress: user.id === selectedAddressType.id? selectedAddressType.value :this.currentState[requestIndex].selectedAddress,
-                    checked: user.id === selectedUser.id? selectedUser.checked:this.currentState[requestIndex].checked,
+                    selectedAddress: user.id === selectedAddressType.id? selectedAddressType.value :this.currentUserActions[requestIndex].selectedAddress,
+                    checked: user.id === selectedUser.id? selectedUser.checked:this.currentUserActions[requestIndex].checked,
                 }) as User),
                 toArray(),
             ),
-            tap(currentInfo => this.currentState = currentInfo),
+            tap(currentUserActions => this.currentUserActions = currentUserActions),
             catchError(err => EMPTY),
         );
 
@@ -66,28 +66,27 @@ export class MainComponent implements OnInit, OnDestroy{
     }
 
     onPageLoad = (pageInfo: PageInfo) => {
-        this.pageEntitiesSubject.next(pageInfo.entities);
+        this.pageLoadedSubject.next(pageInfo.entities);
     };
 
     onUserToggled = (e) => {
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
-        this.clickedUserNameSubject.next({id:e.source.value, checked: e.checked});
+        this.userToggledSubject.next({id:e.source.value, checked: e.checked});
     };
 
     onAddressSelected = (e) => {
          let selectedId, selectedAddressType;
         [selectedId, selectedAddressType] = e.source.value.split('_');
-        this.clickedAddressSubject.next({id:+selectedId, value:selectedAddressType});
+        this.addressSelectedSubject.next({id:+selectedId, value:selectedAddressType});
     };
 
     onPrint = () => {
         let innerHtml: string = "";
         let printButton: string = "Print";
 
-        console.log(typeof this.currentState);
-        this.currentState.map(userInfo => {
-            if (userInfo.checked) {
-                innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo.addresses.find(address => address.type === userInfo.selectedAddress).address + '</p></div>';
+        this.currentUserActions.map(user => {
+            if (user.checked) {
+                innerHtml = innerHtml + "<div class='pageBreak'><p>" + user.name + "</p><p>" + user.addresses.find(address => address.type === user.selectedAddress).address + '</p></div>';
             }
         });
 
@@ -110,8 +109,8 @@ export class MainComponent implements OnInit, OnDestroy{
 
     onClear = () => {
         this.numRecordsToPrint = 0;
-        this.currentState.map(userInfo => {
-            userInfo.checked = false;
+        this.currentUserActions.map(user => {
+            user.checked = false;
         });
     };
 }

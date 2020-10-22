@@ -10,19 +10,18 @@ import {catchError, concatMap, filter, map, toArray} from "rxjs/operators";
 export class UserService {
     private requestIndexes:number[]=[];
 
-    usersAddress$ = (entities: Entity[]) => {
+    user$ = (entities: Entity[]) => {
         return from(entities).pipe(
             catchError(err => this.handleError(err)),
             filter((entity, index) => this.returnIfUser(entity, index)),
             map(entity => entity.link),
-            concatMap(link => this.getRequest(link)),
+            concatMap(link => this.getRequestFromAlma(link)),
             filter(userRequestInfo => this.returnIfUserIdExists(userRequestInfo)),
             map(userRequestInfo => userRequestInfo.hasOwnProperty('user_primary_id') ? userRequestInfo.user_primary_id : userRequestInfo.user_id),
-            concatMap(id => this.getUser(id)),
-            map((userInfo, index) => this.convertUserInfoToAddress(userInfo, index)),
+            concatMap(id => this.getUserFromAlma(id)),
+            map((almaUser, index) => this.extractUserFromAlmaUser(almaUser, index)),
             toArray(),
         );
-
     };
 
     constructor(
@@ -40,24 +39,24 @@ export class UserService {
         }
     };
 
-    private convertUserInfoToAddress = (userInfo, index) => {
+    private extractUserFromAlmaUser = (almaUser, index) => {
         return {
             id: this.requestIndexes[index],
-            name: userInfo.full_name.search('null ')==0?userInfo.full_name.replace('null ', ''):userInfo.full_name,
-            addresses: userInfo.contact_info.address.map(
+            name: almaUser.full_name.search('null ')==0?almaUser.full_name.replace('null ', ''):almaUser.full_name,
+            addresses: almaUser.contact_info.address.map(
                 address => ({
                     type: address.address_type[0].value,
                     address: this.convertToPrintableAddress(address)
                 })
             ),
-            selectedAddress: userInfo.contact_info.address.find(address => address.preferred == true).address_type[0].value,
+            selectedAddress: almaUser.contact_info.address.find(address => address.preferred == true).address_type[0].value,
             checked: false
         };
     };
 
-    private getRequest = link => this.restService.call(link);
+    private getRequestFromAlma = link => this.restService.call(link);
 
-    private getUser = id => this.restService.call(`/users/${id}`);
+    private getUserFromAlma = id => this.restService.call(`/users/${id}`);
 
     private convertToPrintableAddress = (addressObj: Address) => {
         let neededFields = {
