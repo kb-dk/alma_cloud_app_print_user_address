@@ -1,8 +1,8 @@
 <div>
-  <button class="float-right" mat-stroked-button color="primary" (click)="onPrintPreviewNewTab()">
+  <button class="float-right" mat-stroked-button color="primary" (click)="onPrint()">
     Print {{numRecordsToPrint}} records
   </button>
-  <button class="float-right" mat-stroked-button color="primary" (click)="onClearSelected()">Clear</button>
+  <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear</button>
 </div>
 
 <div *ngIf="userAddressWithPrintInfo$ | async as usersAddress">
@@ -18,15 +18,15 @@
       <td style="width: 23%">
         <div style="display: block"><mat-checkbox style="display: block"
                       [value]="userInfo.id"
-                      (change)="onUserNameClick($event)"
+                      (change)="onUserToggled($event)"
                       [checked]="userInfo.checked"
         >{{userInfo.name}}</mat-checkbox></div>
       </td>
       <td style="width: 75%" >
         <mat-radio-group aria-label="Select an option">
           <mat-radio-button *ngFor="let userAddress of userInfo.addresses"
-                            (change)="onAddressClick($event)"
-                            [checked]="(userInfo.desiredAddress == userAddress.type)"
+                            (change)="onAddressSelected($event)"
+                            [checked]="(userInfo.selectedAddress == userAddress.type)"
                             value="{{userInfo.id}}_{{userAddress.type}}"
           ><b>{{userAddress.type}}: </b>{{userAddress.address}}</mat-radio-button>
         </mat-radio-group>

@@ -1,8 +1,8 @@
-/* Defines the UserAddressInfo entity */
-export interface UserAddressInfo {
+/* Defines the User entity */
+export interface User {
     id?: number;
     name?: string;
-    desiredAddress?: string;
+    selectedAddress?: string;
     addresses?: [{
         type:string;
         address:string;

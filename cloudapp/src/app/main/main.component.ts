@@ -1,14 +1,13 @@
 import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
-import {ToastrService} from 'ngx-toastr';
 import {Component, OnDestroy, OnInit} from '@angular/core';
-import {UserAddressInfoService} from '../userAddressInfo.service';
+import { UserService } from '../user.service';
 import {
     CloudAppEventsService,
     CloudAppRestService,
     Entity,
     PageInfo,
 } from '@exlibris/exl-cloudapp-angular-lib';
-import {UserAddressInfo} from "../userAddressInfo";
+import {User} from "../user";
 import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 @Component({
@@ -20,11 +19,11 @@ export class MainComponent implements OnInit, OnDestroy{
 
     private numRecordsToPrint: number = 0;
     private currentState;
-    private pageLoad$:Subscription;
+    private pageLoadSubscription:Subscription;
 
     private pageEntitiesSubject = new Subject<Entity[]>();
-    pageEntitiesAction$ = this.pageEntitiesSubject.asObservable().pipe(
-        concatMap(entities => this.userAddressInfoService.usersAddress$(entities)),
+    pageLoadAction$ = this.pageEntitiesSubject.asObservable().pipe(
+        concatMap(entities => this.userService.usersAddress$(entities)),
         tap(currentInfo => this.currentState = currentInfo)
     );
 
@@ -35,17 +34,17 @@ export class MainComponent implements OnInit, OnDestroy{
     clickedAddressAction$ = this.clickedAddressSubject.asObservable();
 
     userAddressWithPrintInfo$ = combineLatest([
-        this.pageEntitiesAction$,
+        this.pageLoadAction$,
         this.clickedUserNameAction$,
         this.clickedAddressAction$
     ])
         .pipe(
-            map(([usersAddress, selectedUserInfo, selectedUserIdAndAddressType]) =>
-                usersAddress.map((userAddress, index) => ({
-                    ...userAddress,
-                    desiredAddress: userAddress.id === selectedUserIdAndAddressType[0]? selectedUserIdAndAddressType[1] :this.currentState[index].desiredAddress,
-                    checked: userAddress.id === selectedUserInfo[0]? selectedUserInfo[1]:this.currentState[index].checked,
-                }) as UserAddressInfo),
+            map(([users, selectedUser, selectedAddressType]) =>
+                users.map((user, requestIndex) => ({
+                    ...user,
+                    selectedAddress: user.id === selectedAddressType[0]? selectedAddressType[1] :this.currentState[requestIndex].selectedAddress,
+                    checked: user.id === selectedUser[0]? selectedUser[1]:this.currentState[requestIndex].checked,
+                }) as User),
                 toArray(),
             ),
             tap(currentInfo => this.currentState = currentInfo),
@@ -54,41 +53,41 @@ export class MainComponent implements OnInit, OnDestroy{
 
     constructor(private restService: CloudAppRestService,
                 private eventsService: CloudAppEventsService,
-                private toastr: ToastrService,
-                private userAddressInfoService: UserAddressInfoService
+                private userService: UserService
     ) {
     }
 
     ngOnInit(): void {
-        this.pageLoad$ = this.eventsService.onPageLoad(this.onPageLoad);
+        this.pageLoadSubscription = this.eventsService.onPageLoad(this.onPageLoad);
     }
 
     ngOnDestroy(): void {
-        this.pageLoad$.unsubscribe();
+        this.pageLoadSubscription.unsubscribe();
     }
 
     onPageLoad = (pageInfo: PageInfo) => {
         this.pageEntitiesSubject.next(pageInfo.entities);
     };
 
-    onUserNameClick = (e) => {
+    onUserToggled = (e) => {
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
         this.clickedUserNameSubject.next([e.source.value, e.checked]);
     };
 
-    onAddressClick = (e) => {
-         let id, addressType;
-        [id, addressType] = e.source.value.split('_');
-        this.clickedAddressSubject.next([+id, addressType]);
+    onAddressSelected = (e) => {
+         let selectedId, selectedAddressType;
+        [selectedId, selectedAddressType] = e.source.value.split('_');
+        this.clickedAddressSubject.next([selectedId, selectedAddressType]);
     };
 
-    onPrintPreviewNewTab = () => {
+    onPrint = () => {
         let innerHtml: string = "";
         let printButton: string = "Print";
 
+        console.log(typeof this.currentState);
         this.currentState.map(userInfo => {
             if (userInfo.checked) {
-                innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo.addresses.find(address => address.type === userInfo.desiredAddress).address + '</p></div>';
+                innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo.addresses.find(address => address.type === userInfo.selectedAddress).address + '</p></div>';
             }
         });
 
@@ -109,7 +108,7 @@ export class MainComponent implements OnInit, OnDestroy{
         win.document.close();
     };
 
-    onClearSelected = () => {
+    onClear = () => {
         this.numRecordsToPrint = 0;
         this.currentState.map(userInfo => {
             userInfo.checked = false;

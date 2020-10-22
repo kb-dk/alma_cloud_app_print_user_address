@@ -7,31 +7,33 @@ import {catchError, concatMap, filter, map, toArray} from "rxjs/operators";
 @Injectable({
     providedIn: 'root'
 })
-export class UserAddressInfoService {
-    private index:number[]=[];
+export class UserService {
+    private requestIndexes:number[]=[];
 
     usersAddress$ = (entities: Entity[]) => {
         return from(entities).pipe(
             catchError(err => this.handleError(err)),
             filter((entity, index) => this.returnIfUser(entity, index)),
             map(entity => entity.link),
-            concatMap(link => this.getUserRequestInfo(link)),
-            filter(userRequestInfo => userRequestInfo.hasOwnProperty('user_primary_id') || userRequestInfo.hasOwnProperty('user_id')),
+            concatMap(link => this.getRequest(link)),
+            filter(userRequestInfo => this.returnIfUserIdExists(userRequestInfo)),
             map(userRequestInfo => userRequestInfo.hasOwnProperty('user_primary_id') ? userRequestInfo.user_primary_id : userRequestInfo.user_id),
-            concatMap(id => this.getUserInfo(id)),
+            concatMap(id => this.getUser(id)),
             map((userInfo, index) => this.convertUserInfoToAddress(userInfo, index)),
             toArray(),
         );
+
     };
 
     constructor(
         private restService: CloudAppRestService,
-    ) {
-    }
+    ){}
+
+    private returnIfUserIdExists = (userRequestInfo) =>  userRequestInfo.hasOwnProperty('user_primary_id') || userRequestInfo.hasOwnProperty('user_id');
 
     private returnIfUser = (entity, index) => {
         if (entity.link.includes('users')) {
-            this.index.push(index);
+            this.requestIndexes.push(index);
             return true;
         } else {
             return false;
@@ -40,34 +42,34 @@ export class UserAddressInfoService {
 
     private convertUserInfoToAddress = (userInfo, index) => {
         return {
-            id: this.index[index],
+            id: this.requestIndexes[index],
             name: userInfo.full_name.search('null ')==0?userInfo.full_name.replace('null ', ''):userInfo.full_name,
             addresses: userInfo.contact_info.address.map(
                 address => ({
                     type: address.address_type[0].value,
-                    address: this.getAddress(address)
+                    address: this.convertToPrintableAddress(address)
                 })
             ),
-            desiredAddress: userInfo.contact_info.address.find(address => address.preferred == true).address_type[0].value,
+            selectedAddress: userInfo.contact_info.address.find(address => address.preferred == true).address_type[0].value,
             checked: false
         };
     };
 
-    private getUserRequestInfo = link => this.restService.call(link);
+    private getRequest = link => this.restService.call(link);
 
-    private getUserInfo = id => this.restService.call(`/users/${id}`);
+    private getUser = id => this.restService.call(`/users/${id}`);
 
-    private getAddress = (addressObj: Address) => {
-        let desiredFields = {
+    private convertToPrintableAddress = (addressObj: Address) => {
+        let neededFields = {
             address: ['line1', 'line2', 'line3', 'line4', 'line5'],
             city: ['city', 'state_province', 'postal_code']
         };
         let address: string = '';
-        desiredFields.address.map(field => {
+        neededFields.address.map(field => {
             address = addressObj[field] ? address.concat(addressObj[field]).concat(' ') : address;
         });
         address = address + '<br/>';
-        desiredFields.city.map(field => {
+        neededFields.city.map(field => {
             address = addressObj[field] ? address.concat(addressObj[field]).concat(' ') : address;
         });
         address = addressObj.country.desc ? address.concat(addressObj.country.desc) : address;
