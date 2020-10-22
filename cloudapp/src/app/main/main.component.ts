@@ -27,10 +27,10 @@ export class MainComponent implements OnInit, OnDestroy{
         tap(currentInfo => this.currentState = currentInfo)
     );
 
-    private clickedUserNameSubject = new BehaviorSubject<[number, boolean]>([-1, false]);
+    private clickedUserNameSubject = new BehaviorSubject<{id:number, checked:boolean}>({id:-1, checked:false});
     clickedUserNameAction$ = this.clickedUserNameSubject.asObservable();
 
-    private clickedAddressSubject = new BehaviorSubject<[number, string]>([-1, '']);
+    private clickedAddressSubject = new BehaviorSubject<{id:number, value:string}>({id:-1, value:''});
     clickedAddressAction$ = this.clickedAddressSubject.asObservable();
 
     userAddressWithPrintInfo$ = combineLatest([
@@ -42,8 +42,8 @@ export class MainComponent implements OnInit, OnDestroy{
             map(([users, selectedUser, selectedAddressType]) =>
                 users.map((user, requestIndex) => ({
                     ...user,
-                    selectedAddress: user.id === selectedAddressType[0]? selectedAddressType[1] :this.currentState[requestIndex].selectedAddress,
-                    checked: user.id === selectedUser[0]? selectedUser[1]:this.currentState[requestIndex].checked,
+                    selectedAddress: user.id === selectedAddressType.id? selectedAddressType.value :this.currentState[requestIndex].selectedAddress,
+                    checked: user.id === selectedUser.id? selectedUser.checked:this.currentState[requestIndex].checked,
                 }) as User),
                 toArray(),
             ),
@@ -71,13 +71,13 @@ export class MainComponent implements OnInit, OnDestroy{
 
     onUserToggled = (e) => {
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
-        this.clickedUserNameSubject.next([e.source.value, e.checked]);
+        this.clickedUserNameSubject.next({id:e.source.value, checked: e.checked});
     };
 
     onAddressSelected = (e) => {
          let selectedId, selectedAddressType;
         [selectedId, selectedAddressType] = e.source.value.split('_');
-        this.clickedAddressSubject.next([selectedId, selectedAddressType]);
+        this.clickedAddressSubject.next({id:+selectedId, value:selectedAddressType});
     };
 
     onPrint = () => {
