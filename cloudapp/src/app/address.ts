@@ -20,5 +20,5 @@ export interface Address {
             value: string;
             desc: string;
         }
-        ]
+    ]
 }

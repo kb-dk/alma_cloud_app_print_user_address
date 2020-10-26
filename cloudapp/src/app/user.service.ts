@@ -7,6 +7,7 @@ import {catchError, concatMap, filter, map, toArray} from "rxjs/operators";
 @Injectable({
     providedIn: 'root'
 })
+
 export class UserService {
     private requestIndexes:number[]=[];
 
@@ -24,9 +25,7 @@ export class UserService {
         );
     };
 
-    constructor(
-        private restService: CloudAppRestService,
-    ){}
+    constructor(private restService: CloudAppRestService){}
 
     private returnIfUserIdExists = (userRequestInfo) =>  userRequestInfo.hasOwnProperty('user_primary_id') || userRequestInfo.hasOwnProperty('user_id');
 

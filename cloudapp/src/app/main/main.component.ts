@@ -1,27 +1,23 @@
-import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import { BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
+import { Component, OnDestroy, OnInit} from '@angular/core';
 import { UserService } from '../user.service';
-import {
-    CloudAppEventsService,
-    CloudAppRestService,
-    Entity,
-    PageInfo,
-} from '@exlibris/exl-cloudapp-angular-lib';
-import {User} from "../user";
-import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
+import { CloudAppEventsService, CloudAppRestService, Entity, PageInfo} from '@exlibris/exl-cloudapp-angular-lib';
+import { User} from "../user";
+import { catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 @Component({
     selector: 'app-main',
     templateUrl: './main.component.html',
     styleUrls: ['./main.component.scss'],
 })
+
 export class MainComponent implements OnInit, OnDestroy{
 
     private numRecordsToPrint: number = 0;
     private currentUserActions;
     private pageLoadSubscription:Subscription;
-
     private pageLoadedSubject = new Subject<Entity[]>();
+
     pageLoadedAction$ = this.pageLoadedSubject.asObservable().pipe(
         concatMap(entities => this.userService.user$(entities)),
         tap(currentUserAction => this.currentUserActions = currentUserAction)
@@ -51,11 +47,7 @@ export class MainComponent implements OnInit, OnDestroy{
             catchError(err => EMPTY),
         );
 
-    constructor(private restService: CloudAppRestService,
-                private eventsService: CloudAppEventsService,
-                private userService: UserService
-    ) {
-    }
+    constructor(private restService: CloudAppRestService, private eventsService: CloudAppEventsService, private userService: UserService) { }
 
     ngOnInit(): void {
         this.pageLoadSubscription = this.eventsService.onPageLoad(this.onPageLoad);
@@ -86,23 +78,19 @@ export class MainComponent implements OnInit, OnDestroy{
         this.currentUserActions.map(user => {
             if (user.checked) {
                 innerHtml =  innerHtml.concat(
-                             `<div class='pageBreak'>
-                              <p>${user.name}</p>
-                              <p>${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
-                              </div>`);
+                 `<div class='pageBreak'>
+                      <p>${user.name}</p>
+                      <p>${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
+                  </div>`);
             }
         });
 
         let content = `<html>
-                       <style>
-                       @media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}
-                       </style>
-                       <body onload='window.print()'>
-                       <button class='hidden-print' onclick='window.print()'>
-                       print
-                       </button>
-                       ${innerHtml}
-                       </body>
+                       <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}</style>
+                           <body onload='window.print()'>
+                               <button class='hidden-print' onclick='window.print()'>print</button>
+                               ${innerHtml}
+                           </body>
                        </html>`;
 
         let win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
