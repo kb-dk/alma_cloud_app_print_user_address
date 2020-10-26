@@ -13,7 +13,7 @@ import { catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 export class MainComponent implements OnInit, OnDestroy{
 
-    private numRecordsToPrint: number = 0;
+    numRecordsToPrint: number = 0;
     private currentUserActions;
     private pageLoadSubscription:Subscription;
     private pageLoadedSubject = new Subject<Entity[]>();
