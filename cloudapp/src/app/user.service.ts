@@ -36,10 +36,8 @@ export class UserService {
     private returnIfUserAndSaveTheRowNumbers = (entity, index) => {
         if (entity.link.includes('users')) {
             this.requestIndexes.push(index);
-            return true;
-        } else {
-            return false;
         }
+        return entity.link.includes('users');
     };
 
     private extractUserFromAlmaUser = (almaUser, index) => {
