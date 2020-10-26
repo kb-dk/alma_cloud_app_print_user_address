@@ -19,8 +19,8 @@ export class MainComponent implements OnInit, OnDestroy{
     private pageLoadedSubject = new Subject<Entity[]>();
 
     pageLoadedAction$ = this.pageLoadedSubject.asObservable().pipe(
-        concatMap(entities => this.userService.user$(entities)),
-        tap(currentUserAction => this.currentUserActions = currentUserAction)
+        concatMap(entities => this.userService.users$(entities)),
+        tap(currentUserAction => this.currentUserActions = currentUserAction),
     );
 
     private userToggledSubject = new BehaviorSubject<{id:number, checked:boolean}>({id:-1, checked:false});
