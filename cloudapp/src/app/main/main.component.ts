@@ -1,90 +1,107 @@
-import {Subscription} from 'rxjs';
-import {ToastrService} from 'ngx-toastr';
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {UserAddressInfoService} from '../userAddressInfo.service';
-import {
-    CloudAppEventsService,
-    CloudAppRestService,
-    Entity,
-    PageInfo,
-} from '@exlibris/exl-cloudapp-angular-lib';
-import {UserAddressInfo} from "../userAddressInfo";
+import { BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
+import { Component, OnDestroy, OnInit} from '@angular/core';
+import { UserService } from '../user.service';
+import { CloudAppEventsService, CloudAppRestService, Entity, PageInfo} from '@exlibris/exl-cloudapp-angular-lib';
+import { User} from "../user";
+import { catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 @Component({
     selector: 'app-main',
     templateUrl: './main.component.html',
-    styleUrls: ['./main.component.scss']
+    styleUrls: ['./main.component.scss'],
 })
-export class MainComponent implements OnInit, OnDestroy {
+
+export class MainComponent implements OnInit, OnDestroy{
 
     private numRecordsToPrint: number = 0;
+    private currentUserActions;
+    private pageLoadSubscription:Subscription;
+    private pageLoadedSubject = new Subject<Entity[]>();
 
-    private pageLoad$: Subscription;
-    pageEntities: Entity[];
+    pageLoadedAction$ = this.pageLoadedSubject.asObservable().pipe(
+        concatMap(entities => this.userService.user$(entities)),
+        tap(currentUserAction => this.currentUserActions = currentUserAction)
+    );
 
-    private usersAddress: UserAddressInfo[] = [];
+    private userToggledSubject = new BehaviorSubject<{id:number, checked:boolean}>({id:-1, checked:false});
+    userToggledAction$ = this.userToggledSubject.asObservable();
 
-    constructor(private restService: CloudAppRestService,
-                private eventsService: CloudAppEventsService,
-                private toastr: ToastrService,
-                private userAddressInfoService: UserAddressInfoService
-    ) {
+    private addressSelectedSubject = new BehaviorSubject<{id:number, value:string}>({id:-1, value:''});
+    addressSelectedAction$ = this.addressSelectedSubject.asObservable();
+
+    userActions$ = combineLatest([
+        this.pageLoadedAction$,
+        this.userToggledAction$,
+        this.addressSelectedAction$
+    ])
+        .pipe(
+            map(([users, selectedUser, selectedAddressType]) =>
+                users.map((user, requestIndex) => ({
+                    ...user,
+                    selectedAddress: user.id === selectedAddressType.id? selectedAddressType.value :this.currentUserActions[requestIndex].selectedAddress,
+                    checked: user.id === selectedUser.id? selectedUser.checked:this.currentUserActions[requestIndex].checked,
+                }) as User),
+                toArray(),
+            ),
+            tap(currentUserActions => this.currentUserActions = currentUserActions),
+            catchError(err => EMPTY),
+        );
+
+    constructor(private restService: CloudAppRestService, private eventsService: CloudAppEventsService, private userService: UserService) { }
+
+    ngOnInit(): void {
+        this.pageLoadSubscription = this.eventsService.onPageLoad(this.onPageLoad);
     }
 
-    ngOnInit() {
-        this.pageLoad$ = this.eventsService.onPageLoad(this.onPageLoad);
+    ngOnDestroy(): void {
+        this.pageLoadSubscription.unsubscribe();
     }
 
-    ngOnDestroy = () => {
-        this.pageLoad$.unsubscribe();
+    onPageLoad = (pageInfo: PageInfo) => {
+        this.pageLoadedSubject.next(pageInfo.entities);
     };
 
-    onListChanged = (e) => {
-        this.usersAddress[e.source.value].checked = e.checked;
+    onUserToggled = (e) => {
         this.numRecordsToPrint = (e.checked) ? this.numRecordsToPrint + 1 : this.numRecordsToPrint - 1;
+        this.userToggledSubject.next({id:e.source.value, checked: e.checked});
     };
 
-    onAddressChanged = (e) => {
-        let id, addressType;
-        [id, addressType] = e.source.value.split('_');
-        this.usersAddress[id].desiredAddress = addressType;
+    onAddressSelected = (e) => {
+         let selectedId, selectedAddressType;
+        [selectedId, selectedAddressType] = e.source.value.split('_');
+        this.addressSelectedSubject.next({id:+selectedId, value:selectedAddressType});
     };
 
-    onPrintPreviewNewTab = () => {
-        console.log('hej');
+    onPrint = () => {
         let innerHtml: string = "";
-        let printButton: string = "Print";
-        this.usersAddress.forEach(userInfo => {
-            if (userInfo.checked) {
-                innerHtml = innerHtml + "<div class='pageBreak'><p>" + userInfo.name + "</p><p>" + userInfo[userInfo.desiredAddress] + '</p></div>';
+
+        this.currentUserActions.map(user => {
+            if (user.checked) {
+                innerHtml =  innerHtml.concat(
+                 `<div class='pageBreak'>
+                      <p>${user.name}</p>
+                      <p>${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
+                  </div>`);
             }
         });
-        var content = "<html>";
-        content += "<style>";
-        content += "@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}";
-        content += "</style>";
-        content += "<body>";
-        content += "<button class='hidden-print' onclick='window.print()'>";
-        content += printButton;
-        content += "</button>";
-        content += innerHtml;
-        content += "</body>";
-        content += "</html>";
 
-        var win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
+        let content = `<html>
+                       <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}</style>
+                           <body onload='window.print()'>
+                               <button class='hidden-print' onclick='window.print()'>print</button>
+                               ${innerHtml}
+                           </body>
+                       </html>`;
+
+        let win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
         win.document.write(content);
         win.document.close();
     };
 
-    onClearSelected = () => {
+    onClear = () => {
         this.numRecordsToPrint = 0;
-        this.usersAddress.forEach(userInfo => {
-            userInfo.checked = false;
+        this.currentUserActions.map(user => {
+            user.checked = false;
         });
-    };
-
-    onPageLoad = (pageInfo: PageInfo) => {
-        this.pageEntities = pageInfo.entities;
-        this.usersAddress = this.userAddressInfoService.getUsersInfo(this.pageEntities);
     };
 }

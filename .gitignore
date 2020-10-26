@@ -48,4 +48,3 @@ Thumbs.db
 .ng
 build
 cloudapp/src/assets/manifest*.json
-config.json
