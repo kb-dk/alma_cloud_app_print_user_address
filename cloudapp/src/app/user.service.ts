@@ -9,8 +9,12 @@ import {catchError, concatMap, filter, map, toArray} from "rxjs/operators";
 })
 
 export class UserService {
-    private requestIndexes:number[]=[];
+    private requestIndexes:number[]=[]; // Keeps the record number in the page
 
+    // To get the user address from the page entities
+    // there is the need for two more API call (There might be other ways)
+    // get the requests from the link string in the entity object (if there is user info in it)
+    // then get the user info from the user_primary_id or user_id field and extract the address from the response
     user$ = (entities: Entity[]) => {
         return from(entities).pipe(
             catchError(err => this.handleError(err)),

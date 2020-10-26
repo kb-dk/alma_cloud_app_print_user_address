@@ -1,4 +1,5 @@
-/* Defines the Address entity */
+/* Defines the Address entity
+(this is the shape of the extracted address from the user api call response) */
 export interface Address {
     line1: string;
     line2: string;
