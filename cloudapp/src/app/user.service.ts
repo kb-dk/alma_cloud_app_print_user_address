@@ -15,7 +15,7 @@ export class UserService {
     // there is the need for two more API call (There might be other ways)
     // get the requests from the link string in the entity object (if there is user info in it)
     // then get the user info from the user_primary_id or user_id field and extract the address from the response
-    user$ = (entities: Entity[]) => {
+    users$ = (entities: Entity[]) => {
         return from(entities).pipe(
             catchError(err => this.handleError(err)),
             filter((entity, index) => this.returnIfUser(entity, index)),
@@ -25,7 +25,7 @@ export class UserService {
             map(userRequestInfo => userRequestInfo.hasOwnProperty('user_primary_id') ? userRequestInfo.user_primary_id : userRequestInfo.user_id),
             concatMap(id => this.getUserFromAlma(id)),
             map((almaUser, index) => this.extractUserFromAlmaUser(almaUser, index)),
-            toArray(),
+            toArray()
         );
     };
 
