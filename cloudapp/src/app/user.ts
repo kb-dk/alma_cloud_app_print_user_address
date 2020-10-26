@@ -1,4 +1,4 @@
-/* Defines the User entity */
+/* Defines the User entity (the ultimate user object shape) */
 export interface User {
     id?: number;
     name?: string;
