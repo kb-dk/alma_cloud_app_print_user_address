@@ -9,7 +9,7 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { MainComponent } from './main/main.component';
 
-import {UserAddressInfoService} from './userAddressInfo.service';
+import {UserService} from './user.service';
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -32,7 +32,7 @@ export function getToastrModule() {
     getTranslateModule(),
     getToastrModule()
   ],
-  providers: [UserAddressInfoService],
+  providers: [UserService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
