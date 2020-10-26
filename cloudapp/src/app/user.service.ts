@@ -18,7 +18,7 @@ export class UserService {
     users$ = (entities: Entity[]) => {
         return from(entities).pipe(
             catchError(err => this.handleError(err)),
-            filter((entity, index) => this.returnIfUser(entity, index)),
+            filter((entity, index) => this.returnIfUserAndSaveTheRowNumbers(entity, index)),
             map(entity => entity.link),
             concatMap(link => this.getRequestFromAlma(link)),
             filter(userRequestInfo => this.returnIfUserIdExists(userRequestInfo)),
@@ -33,7 +33,7 @@ export class UserService {
 
     private returnIfUserIdExists = (userRequestInfo) =>  userRequestInfo.hasOwnProperty('user_primary_id') || userRequestInfo.hasOwnProperty('user_id');
 
-    private returnIfUser = (entity, index) => {
+    private returnIfUserAndSaveTheRowNumbers = (entity, index) => {
         if (entity.link.includes('users')) {
             this.requestIndexes.push(index);
             return true;
