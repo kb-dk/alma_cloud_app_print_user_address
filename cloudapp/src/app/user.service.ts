@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
 import {CloudAppRestService, Entity} from "@exlibris/exl-cloudapp-angular-lib";
-import {from, throwError, EMPTY} from "rxjs";
-import {catchError, concatMap, filter, map, tap, toArray} from "rxjs/operators";
+import {from, throwError} from "rxjs";
+import {catchError, concatMap, filter, map, toArray} from "rxjs/operators";
 
 @Injectable({
     providedIn: 'root'
