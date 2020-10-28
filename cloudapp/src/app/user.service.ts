@@ -48,9 +48,7 @@ export class UserService {
 
     private returnIfUserIdExists = (request) =>  request.hasOwnProperty('user_primary_id') || request.hasOwnProperty('user_id');
 
-    private returnIfUser = (entity) => {
-        return entity.link.includes('users');
-    };
+    private returnIfUser = (entity) => entity.link.includes('users');
 
     private extractUserFromAlmaUser = (almaUser, index) => {
         return {
