@@ -1,29 +1,26 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
 import {CloudAppRestService, Entity} from "@exlibris/exl-cloudapp-angular-lib";
-import {from, throwError} from "rxjs";
-import {catchError, concatMap, filter, map, toArray} from "rxjs/operators";
+import {from, throwError, EMPTY} from "rxjs";
+import {catchError, concatMap, filter, map, tap, toArray} from "rxjs/operators";
 
 @Injectable({
     providedIn: 'root'
 })
 
 export class UserService {
-    private requestIndexes:number[]=[]; // Keeps the record number in the page
+    private usersRowNumber:number[]=[]; // Keeps the record number in the page
 
     // To get the user address from the page entities
     // there is the need for two more API call (There might be other ways)
     // get the requests from the link string in the entity object (if there is user info in it)
     // then get the user info from the user_primary_id or user_id field and extract the address from the response
     users$ = (entities: Entity[]) => {
+        this.saveUsersRowNumber(entities);
         return from(entities).pipe(
             catchError(err => this.handleError(err)),
-            filter((entity, index) => this.returnIfUserAndSaveTheRowNumbers(entity, index)),
-            map(entity => entity.link),
-            concatMap(link => this.getRequestFromAlma(link)),
-            filter(userRequestInfo => this.returnIfUserIdExists(userRequestInfo)),
-            map(userRequestInfo => userRequestInfo.hasOwnProperty('user_primary_id') ? userRequestInfo.user_primary_id : userRequestInfo.user_id),
-            concatMap(id => this.getUserFromAlma(id)),
+            concatMap(entity => this.getRequest(entity)),
+            concatMap(request => this.getUser(request)),
             map((almaUser, index) => this.extractUserFromAlmaUser(almaUser, index)),
             toArray()
         );
@@ -31,18 +28,33 @@ export class UserService {
 
     constructor(private restService: CloudAppRestService){}
 
-    private returnIfUserIdExists = (userRequestInfo) =>  userRequestInfo.hasOwnProperty('user_primary_id') || userRequestInfo.hasOwnProperty('user_id');
+    private saveUsersRowNumber = (entities) =>  entities.map((entity, index)=> {
+            if (entity.link.includes('users')) {
+                this.usersRowNumber.push(index);
+            }
+        });
 
-    private returnIfUserAndSaveTheRowNumbers = (entity, index) => {
-        if (entity.link.includes('users')) {
-            this.requestIndexes.push(index);
-        }
+    private getRequest = (entity: Entity) => from([entity]).pipe(
+        filter(entity => this.returnIfUser(entity)),
+        map(entity => entity.link),
+        concatMap(link => this.getRequestFromAlma(link))
+    );
+
+    private getUser = (request) => from([request]).pipe(
+        filter(request => this.returnIfUserIdExists(request)),
+        map(request => request.hasOwnProperty('user_primary_id') ? request.user_primary_id : request.user_id),
+        concatMap(id => this.getUserFromAlma(id))
+    );
+
+    private returnIfUserIdExists = (request) =>  request.hasOwnProperty('user_primary_id') || request.hasOwnProperty('user_id');
+
+    private returnIfUser = (entity) => {
         return entity.link.includes('users');
     };
 
     private extractUserFromAlmaUser = (almaUser, index) => {
         return {
-            id: this.requestIndexes[index],
+            id: this.usersRowNumber[index],
             name: almaUser.full_name.search('null ')==0?almaUser.full_name.replace('null ', ''):almaUser.full_name,
             addresses: almaUser.contact_info.address.map(
                 address => ({
