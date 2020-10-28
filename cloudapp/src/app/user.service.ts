@@ -19,8 +19,8 @@ export class UserService {
         this.saveUsersRowNumber(entities);
         return from(entities).pipe(
             catchError(err => this.handleError(err)),
-            concatMap(entity => this.getRequest(entity)),
-            concatMap(request => this.getUser(request)),
+            concatMap(entity => this.getAlmaRequest(entity)),
+            concatMap(request => this.getAlmaUser(request)),
             map((almaUser, index) => this.extractUserFromAlmaUser(almaUser, index)),
             toArray()
         );
@@ -34,13 +34,13 @@ export class UserService {
             }
         });
 
-    private getRequest = (entity: Entity) => from([entity]).pipe(
+    private getAlmaRequest = (entity: Entity) => from([entity]).pipe(
         filter(entity => this.returnIfUser(entity)),
         map(entity => entity.link),
         concatMap(link => this.getRequestFromAlma(link))
     );
 
-    private getUser = (request) => from([request]).pipe(
+    private getAlmaUser = (request) => from([request]).pipe(
         filter(request => this.returnIfUserIdExists(request)),
         map(request => request.hasOwnProperty('user_primary_id') ? request.user_primary_id : request.user_id),
         concatMap(id => this.getUserFromAlma(id))
