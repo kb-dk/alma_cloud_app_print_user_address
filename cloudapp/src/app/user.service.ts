@@ -9,7 +9,7 @@ import {catchError, concatMap, filter, map, toArray} from "rxjs/operators";
 })
 
 export class UserService {
-    usersRowNumber:number[]=[]; // Keeps the record number in the page
+    usersRowNumber: number[] = []; // Keeps the record number in the page
 
     // To get the user address from the page entities
     // there is the need for two more API call (There might be other ways)
@@ -26,13 +26,14 @@ export class UserService {
         );
     };
 
-    constructor(private restService: CloudAppRestService){}
+    constructor(private restService: CloudAppRestService) {
+    }
 
-    private saveUsersRowNumber = (entities) =>  entities.map((entity, index)=> {
-            if (entity.link.includes('users')) {
-                this.usersRowNumber.push(index);
-            }
-        });
+    private saveUsersRowNumber = (entities) => entities.map((entity, index) => {
+        if (entity.link.includes('users')) {
+            this.usersRowNumber.push(index);
+        }
+    });
 
     private getAlmaRequest = (entity: Entity) => from([entity]).pipe(
         filter(entity => this.returnIfUser(entity)),
@@ -46,14 +47,14 @@ export class UserService {
         concatMap(id => this.getUserFromAlma(id))
     );
 
-    private returnIfUserIdExists = (request) =>  request.hasOwnProperty('user_primary_id') || request.hasOwnProperty('user_id');
+    private returnIfUserIdExists = (request) => request.hasOwnProperty('user_primary_id') || request.hasOwnProperty('user_id');
 
     private returnIfUser = (entity) => entity.link.includes('users');
 
     private extractUserFromAlmaUser = (almaUser, index) => {
         return {
             id: this.usersRowNumber[index],
-            name: almaUser.full_name.search('null ')==0?almaUser.full_name.replace('null ', ''):almaUser.full_name,
+            name: almaUser.full_name.search('null ') === 0 ? almaUser.full_name.replace('null ', '') : almaUser.full_name,
             addresses: almaUser.contact_info.address.map(
                 address => ({
                     type: address.address_type[0].value,
