@@ -9,7 +9,7 @@ import {catchError, concatMap, filter, map, toArray} from "rxjs/operators";
 })
 
 export class UserService {
-    private usersRowNumber:number[]=[]; // Keeps the record number in the page
+    usersRowNumber:number[]=[]; // Keeps the record number in the page
 
     // To get the user address from the page entities
     // there is the need for two more API call (There might be other ways)

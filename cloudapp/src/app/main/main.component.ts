@@ -14,6 +14,7 @@ import { catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 export class MainComponent implements OnInit, OnDestroy{
 
     numRecordsToPrint: number = 0;
+    pageLoaded: boolean = false;
     private currentUserActions;
     private pageLoadSubscription:Subscription;
     private pageLoadedSubject = new Subject<Entity[]>();
@@ -21,6 +22,7 @@ export class MainComponent implements OnInit, OnDestroy{
     pageLoadedAction$ = this.pageLoadedSubject.asObservable().pipe(
         concatMap(entities => this.userService.users$(entities)),
         tap(currentUserAction => this.currentUserActions = currentUserAction),
+        tap(() => this.pageLoaded=true),
     );
 
     private userToggledSubject = new BehaviorSubject<{id:number, checked:boolean}>({id:-1, checked:false});
@@ -58,7 +60,21 @@ export class MainComponent implements OnInit, OnDestroy{
     }
 
     onPageLoad = (pageInfo: PageInfo) => {
+        this.onClear();
+        this.pageLoaded = false;
+        this.userService.usersRowNumber = [];
         this.pageLoadedSubject.next(pageInfo.entities);
+    };
+
+    onClear = () => {
+        this.numRecordsToPrint = 0;
+        this.addressSelectedSubject.next({id:-1, value:''});
+        this.userToggledSubject.next({id:-1, checked: false});
+        if (typeof this.currentUserActions !== 'undefined') {
+            this.currentUserActions.map(user => {
+                user.checked = false;
+            });
+        }
     };
 
     onUserToggled = (e) => {
@@ -96,12 +112,5 @@ export class MainComponent implements OnInit, OnDestroy{
         let win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
         win.document.write(content);
         win.document.close();
-    };
-
-    onClear = () => {
-        this.numRecordsToPrint = 0;
-        this.currentUserActions.map(user => {
-            user.checked = false;
-        });
     };
 }
