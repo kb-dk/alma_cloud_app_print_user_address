@@ -17,6 +17,7 @@ export class MainComponent implements OnInit, OnDestroy {
     pageLoaded: boolean = false;
     private currentUserActions;
     private pageLoadSubscription: Subscription;
+    private pageMetadataSubscription: Subscription;
     private pageLoadedSubject = new Subject<Entity[]>();
 
     pageLoadedAction$ = this.pageLoadedSubject.asObservable().pipe(
@@ -53,11 +54,13 @@ export class MainComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        this.pageMetadataSubscription = this.eventsService.getPageMetadata().subscribe(this.onPageLoad);
         this.pageLoadSubscription = this.eventsService.onPageLoad(this.onPageLoad);
     }
 
     ngOnDestroy(): void {
         this.pageLoadSubscription.unsubscribe();
+        this.pageMetadataSubscription.unsubscribe();
     }
 
     onPageLoad = (pageInfo: PageInfo) => {
