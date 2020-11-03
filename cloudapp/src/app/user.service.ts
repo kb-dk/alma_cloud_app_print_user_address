@@ -14,7 +14,7 @@ export class UserService {
     // To get the user address from the page entities
     // there is the need for two more API call (There might be other ways)
     // get the requests from the link string in the entity object (if there is user info in it)
-    // then get the user info from the user_primary_id or user_id field and extract the address from the response
+    // then get the user info from the user_primary_id or user_id or primary_id field and extract the address from the response
     users$ = (entities: Entity[]) => {
         this.saveUsersRowNumber(entities);
         return from(entities).pipe(
@@ -38,16 +38,25 @@ export class UserService {
     private getAlmaRequest = (entity: Entity) => from([entity]).pipe(
         filter(entity => this.returnIfUser(entity)),
         map(entity => entity.link),
-        concatMap(link => this.getRequestFromAlma(link))
+        concatMap(link => this.getRequestFromAlma(link)),
+        //tap(res => console.log(res))
     );
 
     private getAlmaUser = (request) => from([request]).pipe(
         filter(request => this.returnIfUserIdExists(request)),
-        map(request => request.hasOwnProperty('user_primary_id') ? request.user_primary_id : request.user_id),
+        map(request => this.returnUserId(request)),
         concatMap(id => this.getUserFromAlma(id))
     );
 
-    private returnIfUserIdExists = (request) => request.hasOwnProperty('user_primary_id') || request.hasOwnProperty('user_id');
+    private returnIfUserIdExists = (request) =>
+        request.hasOwnProperty('user_primary_id') ||
+        request.hasOwnProperty('user_id') ||
+        request.hasOwnProperty('primary_id');
+
+    private returnUserId = (request) =>
+        request.user_primary_id |
+        request.user_id |
+        request.primary_id;
 
     private returnIfUser = (entity) => entity.link.includes('users');
 
