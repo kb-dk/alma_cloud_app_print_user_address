@@ -22,6 +22,7 @@
                                       [value]="user.id"
                                       (change)="onUserToggled($event)"
                                       [checked]="user.checked"
+                                      [disabled]="user.addresses.length==0"
                         >{{user.name}}</mat-checkbox>
                     </div>
                 </td>
