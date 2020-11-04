@@ -13,7 +13,8 @@
    },
    "entities": [
       "LOAN",
-      "USERS"
+      "USER",
+      "REQUEST"
    ],
    "contentSecurity": {
       "sandbox": {

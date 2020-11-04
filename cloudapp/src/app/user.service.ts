@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
-import {CloudAppRestService, Entity} from "@exlibris/exl-cloudapp-angular-lib";
+import {CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
 import {forkJoin, from, throwError} from "rxjs";
 import {catchError, concatMap, filter, map, switchMap} from "rxjs/operators";
 
@@ -16,8 +16,17 @@ export class UserService {
     // get the requests from the link string in the entity object (if there is user info in it)
     // then get the user info from the user_primary_id or user_id or primary_id field and extract the address from the response
     users$ = (entities: Entity[]) => {
-        let calls = entities.filter(e=>['LOAN','USER'].includes(e.type))
-        .map(e=>e.type=='LOAN' ? this.userFromLoan(e.link) : this.getRequestFromAlma(e.link))
+        let calls = entities.filter(e=>[EntityType.LOAN, EntityType.USER, EntityType.REQUEST].includes(e.type))
+        .map(e=>{
+            switch (e.type) {
+                case EntityType.LOAN:
+                    return this.userFromLoan(e.link);
+                case EntityType.REQUEST:
+                    return this.userFromRequest(e.link);
+                case EntityType.USER:
+                    return this.getRequestFromAlma(e.link);
+            }
+        })
         this.saveUsersRowNumber(entities);
         return forkJoin(calls).pipe(
             catchError(err => this.handleError(err)),
@@ -28,6 +37,12 @@ export class UserService {
     userFromLoan(link) {
         return this.getRequestFromAlma(link).pipe(
             switchMap(loan=>this.getRequestFromAlma(`/users/${loan.user_id}`))
+        )
+    }
+
+    userFromRequest(link) {
+        return this.getRequestFromAlma(link).pipe(
+            switchMap(request=>this.getRequestFromAlma(`/users/${request.user_primary_id}`))
         )
     }
 
