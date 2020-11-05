@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
 import {CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
-import {forkJoin, from, throwError} from "rxjs";
+import {of, forkJoin, from, iif, throwError} from "rxjs";
 import {catchError, concatMap, filter, map, switchMap} from "rxjs/operators";
 
 @Injectable({
@@ -42,7 +42,10 @@ export class UserService {
 
     userFromRequest(link) {
         return this.getRequestFromAlma(link).pipe(
-            switchMap(request=>this.getRequestFromAlma(`/users/${request.user_primary_id}`))
+            switchMap(request=>iif(()=>request.user_primary_id!=undefined,
+                this.getRequestFromAlma(`/users/${request.user_primary_id}`),
+                of(null)
+            ))
         )
     }
 
@@ -80,7 +83,8 @@ export class UserService {
     private returnIfUser = (entity) => entity.link.includes('users');
 
     private extractUserFromAlmaUser = (almaUser, index) => {
-        return {
+        return almaUser==null ? { id: index, name: 'N/A', addresses: [] } : 
+        {
             id: index, //this.usersRowNumber[index],
             name: almaUser.full_name.search('null ') === 0 ? almaUser.full_name.replace('null ', '') : almaUser.full_name,
             addresses: almaUser.contact_info.address.map(
