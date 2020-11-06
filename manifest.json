@@ -1,11 +1,11 @@
 {
    "id": "print-user-address",
    "title": "Print user address",
-   "author": "KB DK",
    "description": "It gives the opportunity to select one or more users and print their addresses.",
+   "author": "Royal Danish library",
    "icon": {
       "type": "font",
-      "value": "fa fa-user"
+      "value": "fa fa-envelope"
    },
    "fullscreen": {
       "allow": true,
