@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
 import {CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
-import {of, forkJoin, from, iif, throwError} from "rxjs";
-import {catchError, concatMap, filter, map, switchMap} from "rxjs/operators";
+import {of, forkJoin, iif, throwError} from "rxjs";
+import {catchError, map, switchMap} from "rxjs/operators";
 
 @Injectable({
     providedIn: 'root'
@@ -15,71 +15,44 @@ export class UserService {
     // get the requests from the link string in the entity object (if there is user info in it)
     // then get the user info from the user_primary_id or user_id or primary_id field and extract the address from the response
     users$ = (entities: Entity[]) => {
-        let calls = entities.filter(e=>[EntityType.LOAN, EntityType.USER, EntityType.REQUEST].includes(e.type))
-        .map(e=>{
-            switch (e.type) {
-                case EntityType.LOAN:
-                    return this.userFromLoan(e.link);
-                case EntityType.REQUEST:
-                    return this.userFromRequest(e.link);
-                case EntityType.USER:
-                    return this.getRequestFromAlma(e.link);
-            }
-        });
 
-        //this.saveUsersRowNumber(entities);
-        return forkJoin(calls).pipe(
-            catchError(err => this.handleError(err)),
-            map(users => users.map((user,i)=>this.extractUserFromAlmaUser(user,i))),
-        );
+        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.USER, EntityType.REQUEST].includes(entity.type))
+            .map(entity => {
+                switch (entity.type) {
+                    case EntityType.LOAN:
+                        return this.userFromLoan(entity.link);
+                    case EntityType.REQUEST:
+                        return this.userFromRequest(entity.link);
+                    case EntityType.USER:
+                        return this.getRequestFromAlma(entity.link);
+                }
+            });
+        return (calls.length === 0) ?
+            of([]) :
+            forkJoin(calls).pipe(
+                catchError(err => this.handleError(err)),
+                map(users => users.map((user, index) => this.userFromAlmaUser(user, index))),
+            );
     };
 
-    userFromLoan(link) {
-        return this.getRequestFromAlma(link).pipe(
-            switchMap(loan=>this.getRequestFromAlma(`/users/${loan.user_id}`))
-        )
-    }
+    private userFromLoan = (link) => this.getRequestFromAlma(link).pipe(
+        switchMap(loan => this.getRequestFromAlma(`/users/${loan.user_id}`))
+    );
 
-    userFromRequest(link) {
-        return this.getRequestFromAlma(link).pipe(
-            switchMap(request=>iif(()=>request.user_primary_id!=undefined,
-                this.getRequestFromAlma(`/users/${request.user_primary_id}`),
-                of(null)
-            ))
-        )
-    }
+    private userFromRequest = (link) => this.getRequestFromAlma(link).pipe(
+        switchMap(request => iif(() => request.user_primary_id != undefined,
+            this.getRequestFromAlma(`/users/${request.user_primary_id}`),
+            of(null)
+        ))
+    );
 
     constructor(private restService: CloudAppRestService) {
     }
 
-    private getAlmaRequest = (entity: Entity) => from([entity]).pipe(
-        filter(entity => this.returnIfUser(entity)),
-        map(entity => entity.link),
-        concatMap(link => this.getRequestFromAlma(link)),
-    );
-
-    private getAlmaUser = (request) => from([request]).pipe(
-        filter(request => this.returnIfUserIdExists(request)),
-        map(request => this.returnUserId(request)),
-        concatMap(id => this.getUserFromAlma(id))
-    );
-
-    private returnIfUserIdExists = (request) =>
-        request.hasOwnProperty('user_primary_id') ||
-        request.hasOwnProperty('user_id') ||
-        request.hasOwnProperty('primary_id');
-
-    private returnUserId = (request) =>
-        request.user_primary_id |
-        request.user_id |
-        request.primary_id;
-
-    private returnIfUser = (entity) => entity.link.includes('users');
-
-    private extractUserFromAlmaUser = (almaUser, index) => {
-        return almaUser==null ? { id: index, name: 'N/A', addresses: [] } : 
+    private userFromAlmaUser = (almaUser, index) => almaUser == null ?
+        {id: index, name: 'N/A', addresses: []} :
         {
-            id: index, //this.usersRowNumber[index],
+            id: index,
             name: almaUser.full_name.search('null ') === 0 ? almaUser.full_name.replace('null ', '') : almaUser.full_name,
             addresses: almaUser.contact_info.address.map(
                 address => ({
@@ -87,16 +60,13 @@ export class UserService {
                     address: this.convertToPrintableAddress(address)
                 })
             ),
-            selectedAddress: almaUser.contact_info.address.some(address => address.preferred == true) 
-                ? almaUser.contact_info.address.find(address => address.preferred == true).address_type[0].value 
+            selectedAddress: almaUser.contact_info.address.some(address => address.preferred == true)
+                ? almaUser.contact_info.address.find(address => address.preferred == true).address_type[0].value
                 : almaUser.contact_info.address.length > 0 ? almaUser.contact_info.address[0].address_type[0].value : 'none',
             checked: false
         };
-    };
 
     private getRequestFromAlma = link => this.restService.call(link);
-
-    private getUserFromAlma = id => this.restService.call(`/users/${id}`);
 
     private convertToPrintableAddress = (addressObj: Address) => {
         let neededFields = {
