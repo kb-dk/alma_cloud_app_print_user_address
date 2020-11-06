@@ -66,7 +66,6 @@ export class MainComponent implements OnInit, OnDestroy {
     onPageLoad = (pageInfo: PageInfo) => {
         this.onClear();
         this.pageLoaded = false;
-        this.userService.usersRowNumber = [];
         this.pageLoadedSubject.next(pageInfo.entities);
     };
 

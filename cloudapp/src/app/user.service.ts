@@ -9,7 +9,6 @@ import {catchError, concatMap, filter, map, switchMap} from "rxjs/operators";
 })
 
 export class UserService {
-    usersRowNumber: number[] = []; // Keeps the record number in the page
 
     // To get the user address from the page entities
     // there is the need for two more API call (There might be other ways)
@@ -26,8 +25,9 @@ export class UserService {
                 case EntityType.USER:
                     return this.getRequestFromAlma(e.link);
             }
-        })
-        this.saveUsersRowNumber(entities);
+        });
+
+        //this.saveUsersRowNumber(entities);
         return forkJoin(calls).pipe(
             catchError(err => this.handleError(err)),
             map(users => users.map((user,i)=>this.extractUserFromAlmaUser(user,i))),
@@ -51,12 +51,6 @@ export class UserService {
 
     constructor(private restService: CloudAppRestService) {
     }
-
-    private saveUsersRowNumber = (entities) => entities.map((entity, index) => {
-        if (entity.link.includes('users')) {
-            this.usersRowNumber.push(index);
-        }
-    });
 
     private getAlmaRequest = (entity: Entity) => from([entity]).pipe(
         filter(entity => this.returnIfUser(entity)),
