@@ -1,6 +1,7 @@
 {
    "id": "print-user-address",
    "title": "Print user address",
+   "author": "KB DK",
    "description": "It gives the opportunity to select one or more users and print their addresses.",
    "icon": {
       "type": "font",
@@ -9,5 +10,15 @@
    "fullscreen": {
       "allow": true,
       "open": false
+   },
+   "entities": [
+      "LOAN",
+      "USER",
+      "REQUEST"
+   ],
+   "contentSecurity": {
+      "sandbox": {
+         "popups": true
+      }
    }
 }
