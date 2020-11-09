@@ -40,7 +40,7 @@ export class UserService {
     );
 
     private userFromRequest = (link) => this.getRequestFromAlma(link).pipe(
-        switchMap(request => iif(() => request.user_primary_id != undefined,
+        switchMap(request => iif(() => request.user_primary_id !== undefined,
             this.getRequestFromAlma(`/users/${request.user_primary_id}`),
             of(null)
         ))
@@ -49,7 +49,7 @@ export class UserService {
     constructor(private restService: CloudAppRestService) {
     }
 
-    private userFromAlmaUser = (almaUser, index) => almaUser == null ?
+    private userFromAlmaUser = (almaUser, index) => almaUser === null ?
         {id: index, name: 'N/A', addresses: []} :
         {
             id: index,
@@ -60,8 +60,8 @@ export class UserService {
                     address: this.convertToPrintableAddress(address)
                 })
             ),
-            selectedAddress: almaUser.contact_info.address.some(address => address.preferred == true)
-                ? almaUser.contact_info.address.find(address => address.preferred == true).address_type[0].value
+            selectedAddress: almaUser.contact_info.address.some(address => address.preferred === true)
+                ? almaUser.contact_info.address.find(address => address.preferred === true).address_type[0].value
                 : almaUser.contact_info.address.length > 0 ? almaUser.contact_info.address[0].address_type[0].value : 'none',
             checked: false
         };
