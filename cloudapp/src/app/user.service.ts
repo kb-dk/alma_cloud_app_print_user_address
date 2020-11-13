@@ -69,20 +69,22 @@ export class UserService {
     private getRequestFromAlma = link => this.restService.call(link);
 
     private convertToPrintableAddress = (addressObj: Address) => {
+        console.log(addressObj);
         let neededFields = {
             address: ['line1', 'line2', 'line3', 'line4', 'line5'],
-            city: ['city', 'state_province', 'postal_code']
+            city: ['state_province', 'postal_code', 'city']
         };
         let address: string = '';
         neededFields.address.map(field => {
-            address = addressObj[field] ? address.concat(addressObj[field]).concat(' ') : address;
+            address = addressObj[field] && !address.includes(addressObj[field]) ? address.concat(addressObj[field]).concat(' ') : address;
         });
         address = address + '<br/>';
         neededFields.city.map(field => {
             address = addressObj[field] ? address.concat(addressObj[field]).concat(' ') : address;
         });
-        address = addressObj.country.desc ? address.concat(addressObj.country.desc) : address;
-        return address;
+        address = address + '<br/>';
+        return addressObj.country.desc ? address.concat(addressObj.country.desc) : address;
+
     };
 
     private handleError = (err: any) => {

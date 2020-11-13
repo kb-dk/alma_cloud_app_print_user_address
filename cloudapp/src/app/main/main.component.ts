@@ -98,15 +98,16 @@ export class MainComponent implements OnInit, OnDestroy {
             if (user.checked) {
                 innerHtml = innerHtml.concat(
                     `<div class='pageBreak'>
-                      <p>${user.name}</p>
-                      <p>${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
+                      <br/><br/><br/>  
+                      <p>${user.name}<br/>
+                      ${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
                   </div>`);
             }
         });
 
         let content = `<html>
                        <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}</style>
-                           <body onload='window.print()'>
+                           <body onload='window.print()' style="font-size:80%">
                                <button class='hidden-print' onclick='window.print()'>print</button>
                                ${innerHtml}
                            </body>
