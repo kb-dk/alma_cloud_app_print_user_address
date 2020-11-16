@@ -10,6 +10,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { MainComponent } from './main/main.component';
 
 import {UserService} from './user.service';
+import {ConfigComponent} from './config/config.component';
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -21,7 +22,8 @@ export function getToastrModule() {
 @NgModule({
   declarations: [
     AppComponent,
-    MainComponent
+    MainComponent,
+    ConfigComponent
   ],
   imports: [
     MaterialModule,

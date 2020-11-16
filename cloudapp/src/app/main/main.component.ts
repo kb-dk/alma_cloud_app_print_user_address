@@ -1,7 +1,7 @@
 import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from '../user.service';
-import {CloudAppEventsService, CloudAppRestService, Entity, PageInfo} from '@exlibris/exl-cloudapp-angular-lib';
+import {CloudAppEventsService, CloudAppRestService, CloudAppConfigService, Entity, PageInfo} from '@exlibris/exl-cloudapp-angular-lib';
 import {User} from "../user";
 import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
@@ -50,7 +50,10 @@ export class MainComponent implements OnInit, OnDestroy {
             catchError(err => EMPTY),
         );
 
-    constructor(private restService: CloudAppRestService, private eventsService: CloudAppEventsService, private userService: UserService) {
+    constructor(private restService: CloudAppRestService,
+                private configService: CloudAppConfigService,
+                private eventsService: CloudAppEventsService,
+                private userService: UserService) {
     }
 
     ngOnInit(): void {

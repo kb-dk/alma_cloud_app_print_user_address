@@ -16,6 +16,9 @@
       "USER",
       "REQUEST"
    ],
+   "pages": {
+      "config": "/#/config"
+   },
    "contentSecurity": {
       "sandbox": {
          "popups": true
