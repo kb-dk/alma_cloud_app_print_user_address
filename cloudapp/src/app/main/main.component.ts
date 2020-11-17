@@ -22,6 +22,7 @@ export class MainComponent implements OnInit, OnDestroy {
     numRecordsToPrint: number = 0;
     pageLoaded: boolean = false;
     logoUrl: string = '';
+    printLogo: boolean = true;
 
     private currentUserActions;
     private pageLoadSubscription: Subscription;
@@ -87,6 +88,10 @@ export class MainComponent implements OnInit, OnDestroy {
         this.pageLoadedSubject.next(pageInfo.entities);
     };
 
+    onPrintLogoToggled = (e) => {
+        this.printLogo = e.checked;
+    };
+
     onClear = () => {
         this.numRecordsToPrint = 0;
         this.addressSelectedSubject.next({id: -1, value: ''});
@@ -114,9 +119,10 @@ export class MainComponent implements OnInit, OnDestroy {
 
         this.currentUserActions.map(user => {
             if (user.checked) {
+                let logo = this.printLogo&&this.logoUrl?`<div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>`:'';
                 innerHtml = innerHtml.concat(
                     `<div class='pageBreak'>
-                      <div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>  
+                      ${logo}  
                       <br/><br/><br/>
                       <p>${user.name}<br/>
                       ${user.addresses.find(address => address.type === user.selectedAddress).address}</p>

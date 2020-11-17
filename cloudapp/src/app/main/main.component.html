@@ -9,6 +9,12 @@
             </button>
             <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear</button>
         </div>
+        <h3 *ngIf="logoUrl">
+        <mat-checkbox style="display: block; color: black"
+                      (change)="onPrintLogoToggled($event)"
+                      [checked]=true
+        >Add institution logo to page</mat-checkbox>
+        </h3>
         <h3>Select record(s) to print:</h3>
         <table style="width: 100%; margin-top: 10px; font-size: 0.8em;" border="1px">
             <tr>
