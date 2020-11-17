@@ -16,7 +16,7 @@
         >Add institution logo to page</mat-checkbox>
         </h3>
         <h3>Select record(s) to print:</h3>
-        <table style="width: 100%; margin-top: 10px; font-size: 0.8em;" border="1px">
+        <table border="1px">
             <tr>
                 <th></th>
                 <th>Name</th>
@@ -25,9 +25,8 @@
             <tr *ngFor="let user of users" id="tr_{{user.id}}">
                 <td style="width: 2%">{{user.id + 1}}</td>
                 <td style="width: 23%">
-                    <div style="display: block">
-                        <mat-checkbox style="display: block"
-                                      [value]="user.id"
+                    <div>
+                        <mat-checkbox [value]="user.id"
                                       (change)="onUserToggled($event)"
                                       [checked]="user.checked"
                                       [disabled]="user.addresses.length==0"
