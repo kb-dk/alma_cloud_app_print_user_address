@@ -1,6 +1,5 @@
 <div class="title">
     <h1>Admin Configuration</h1>
-
     <a [routerLink]="['']">
         <button mat-raised-button>
             <mat-icon>arrow_back</mat-icon>
@@ -8,24 +7,21 @@
         </button>
     </a>
 </div>
-
 <div class="loading-shade" *ngIf="loading">
     <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
 <h1>Settings</h1>
 <hr>
 <h2>Logo</h2>
-<div style="margin: 4px">
-    <input type="file" id="logo" class="hidden" (change)="fileChangeEvent($event.target.files)"
-           accept=".gif, .jpg, .png"
-           style="display: none;"/>
+<div class="buttonsContainer">
+    <input type="file" id="logo" class="hidden"
+           (change)="onLogoChanged($event.target.files)"
+           accept=".gif, .jpg, .png"/>
     <label for="logo" class="mat-raised-button">Select a logo ...</label>
 
-    <input id="clear" class="hidden" (click)="clearLogo()"
-           style="display: none;"/>
+    <input id="clear" class="hidden" (click)="clearLogo()"/>
     <label for="clear" class="mat-raised-button">Clear logo</label>
-
 </div>
-<div style="border: 1px solid lightgray">
-    <img alt="No logo is selected" src="{{logoUrl}}" style="max-width: 100%;"/>
+<div class="logo">
+    <img alt="No logo is selected" src="{{logoUrl$ | async}}"/>
 </div>

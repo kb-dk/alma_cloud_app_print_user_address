@@ -36,3 +36,22 @@ textarea.xsl-edit {
 textarea.xml-record {
   height: 100px;
 }
+
+div.buttonsContainer{
+  margin: 4px;
+  label{
+    margin: 4px 4px 4px 0;
+  }
+}
+
+.hidden{
+  display: none;
+}
+
+div.logo{
+  border: 1px solid lightgray;
+  text-align: center;
+  img{
+    max-width: 100%;
+  }
+}

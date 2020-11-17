@@ -4,3 +4,10 @@
     color: mat-color(map-get($theme, primary), default-contrast);
   }
 }
+
+div.buttonsContainer{
+  margin: 4px;
+  button{
+    margin: 4px 4px 4px 0;
+  }
+}

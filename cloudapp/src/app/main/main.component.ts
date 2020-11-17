@@ -21,7 +21,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
     numRecordsToPrint: number = 0;
     pageLoaded: boolean = false;
-    logoUrl = '';
+    logoUrl: string = '';
 
     private currentUserActions;
     private pageLoadSubscription: Subscription;
@@ -55,7 +55,10 @@ export class MainComponent implements OnInit, OnDestroy {
                 toArray(),
             ),
             tap(currentUserActions => this.currentUserActions = currentUserActions),
-            catchError(err => EMPTY),
+            catchError(error => {
+                console.log('Error getting user action:', error);
+                return EMPTY;
+            }),
         );
 
     constructor(private restService: CloudAppRestService,

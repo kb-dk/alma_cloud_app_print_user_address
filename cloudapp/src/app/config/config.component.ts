@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {CloudAppConfigService} from '@exlibris/exl-cloudapp-angular-lib';
-import {finalize} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, EMPTY} from "rxjs";
 
 @Component({
     selector: 'app-config',
@@ -8,51 +9,59 @@ import {finalize} from 'rxjs/operators';
     styleUrls: ['./config.component.scss']
 })
 
-export class ConfigComponent implements OnInit {
+export class ConfigComponent{
 
-    config = {logo: ''};
-    loading = false;
+    loading:boolean = true;
+
+    logoFromConfig$ = this.configService.get().pipe(
+        map(config => config.logo),
+        tap(() => this.loading = false),
+        catchError(error => {
+            console.log('Error getting configuration:', error);
+            return EMPTY;
+        })
+    );
+
+    private logoChangedSubject = new BehaviorSubject<string>('logoHasNotChanged');
+    logoChangedAction$ = this.logoChangedSubject.asObservable();
+
+    logoUrl$ = combineLatest([
+        this.logoChangedAction$,
+        this.logoFromConfig$
+    ]).pipe(
+        map(([newLogo, configLogo]) => newLogo !== 'logoHasNotChanged'? newLogo : configLogo),
+        catchError(error => {
+            console.log('Error getting logo:', error);
+            return EMPTY;
+        }),
+    );
 
     constructor(private configService: CloudAppConfigService) {
     }
 
-    ngOnInit() {
-        this.loading = true;
-        this.configService.get().subscribe({
-            next: config => Object.assign(this.config, config),
-            complete: () => this.loading = false
-        });
-    }
-
-    get logoUrl() {
-        return this.config.logo;
-    }
-
-    fileChangeEvent(files: File[]) {
-        let file = files[0];
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            this.config.logo = reader.result.toString();
-            this.save();
+    onLogoChanged = (images: File[]) => {
+        let logo = images[0];
+        let logoReader = new FileReader();
+        logoReader.readAsDataURL(logo);
+        logoReader.onload = () => {
+            let logo = logoReader.result.toString();
+            this.logoChangedSubject.next(logo);
+            this.saveConfig({logo:logo});
         };
-        reader.onerror = error => console.log('Error reading image' + error);
-    }
+        logoReader.onerror = error => console.log('Error reading image' + error);
+    };
 
-    save() {
-        this.loading = true;
-        this.configService.set(this.config).pipe(
-            finalize(() => this.loading = false)
-        ).subscribe({
-            next: () => console.log('Configuration successfully saved'),
-            error: e => console.log('Error saving configuration')
-        })
-    }
+    saveConfig = (config) => {
+        this.configService.set(config).pipe(
+        ).subscribe(
+            () => console.log('Configuration successfully saved'),
+            error => console.log('Error saving configuration:', error)
+        )
+    };
 
     clearLogo = () => {
-        this.config = {logo: ''};
-        this.save();
+        this.logoChangedSubject.next('');
+        this.saveConfig({logo: ''});
         console.log('Logo cleared');
-    }
-
+    };
 }
