@@ -1,7 +1,13 @@
 import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from '../user.service';
-import {CloudAppEventsService, CloudAppRestService, CloudAppConfigService, Entity, PageInfo} from '@exlibris/exl-cloudapp-angular-lib';
+import {
+    CloudAppEventsService,
+    CloudAppRestService,
+    CloudAppConfigService,
+    Entity,
+    PageInfo
+} from '@exlibris/exl-cloudapp-angular-lib';
 import {User} from "../user";
 import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
@@ -15,6 +21,8 @@ export class MainComponent implements OnInit, OnDestroy {
 
     numRecordsToPrint: number = 0;
     pageLoaded: boolean = false;
+    logoUrl = '';
+
     private currentUserActions;
     private pageLoadSubscription: Subscription;
     private pageMetadataSubscription: Subscription;
@@ -59,6 +67,10 @@ export class MainComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.pageMetadataSubscription = this.eventsService.getPageMetadata().subscribe(this.onPageLoad);
         this.pageLoadSubscription = this.eventsService.onPageLoad(this.onPageLoad);
+
+        this.configService.get().subscribe(
+            config => this.logoUrl = config.logo,
+            err => console.log(err.message));
     }
 
     ngOnDestroy(): void {
@@ -101,7 +113,8 @@ export class MainComponent implements OnInit, OnDestroy {
             if (user.checked) {
                 innerHtml = innerHtml.concat(
                     `<div class='pageBreak'>
-                      <br/><br/><br/>  
+                      <div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>  
+                      <br/><br/><br/>
                       <p>${user.name}<br/>
                       ${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
                   </div>`);
@@ -110,7 +123,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
         let content = `<html>
                        <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}</style>
-                           <body onload='window.print()' style="font-size:80%">
+                           <body onload='window.print()' style="font-size:80%; font-family: sans-serif; font-weight:600;">
                                <button class='hidden-print' onclick='window.print()'>print</button>
                                ${innerHtml}
                            </body>

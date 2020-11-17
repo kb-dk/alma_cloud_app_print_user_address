@@ -69,7 +69,6 @@ export class UserService {
     private getRequestFromAlma = link => this.restService.call(link);
 
     private convertToPrintableAddress = (addressObj: Address) => {
-        console.log(addressObj);
         let neededFields = {
             address: ['line1', 'line2', 'line3', 'line4', 'line5'],
             city: ['state_province', 'postal_code', 'city']
