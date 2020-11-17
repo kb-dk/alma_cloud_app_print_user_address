@@ -1,6 +1,8 @@
 <div *ngIf="userActions$ | async as users">
-    <h3 *ngIf="!pageLoaded">Loading ...</h3>
-    <div *ngIf="pageLoaded">
+    <div class="loading-shade" *ngIf="!pageLoaded">
+        <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+    </div>
+    <div>
         <div>
             <button class="float-right" mat-stroked-button color="primary" (click)="onPrint()">
                 Print {{numRecordsToPrint}} records
