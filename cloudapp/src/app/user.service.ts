@@ -87,6 +87,7 @@ export class UserService {
     };
 
     private handleError = (err: any) => {
+        console.error(err);
         if (err.status === 401) {
             err.message = `It seems like you don't have the rights to see this page. 
                            Please contact your system administrator.`;
