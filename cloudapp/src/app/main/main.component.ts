@@ -132,8 +132,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
         let content = `<html>
                        <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}</style>
-                           <body onload='window.print()' style="font-size:80%; font-family: sans-serif; font-weight:600;">
-                               <button class='hidden-print' onclick='window.print()'>print</button>
+                           <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600;">
                                ${innerHtml}
                            </body>
                        </html>`;
