@@ -23,6 +23,7 @@ export class MainComponent implements OnInit, OnDestroy {
     pageLoaded: boolean = false;
     logoUrl: string = '';
     printLogo: boolean = true;
+    errorMsg: string = '';
 
     private currentUserActions;
     private pageLoadSubscription: Subscription;
@@ -57,7 +58,7 @@ export class MainComponent implements OnInit, OnDestroy {
             ),
             tap(currentUserActions => this.currentUserActions = currentUserActions),
             catchError(error => {
-                console.log('Error getting user action:', error);
+                this.errorMsg = error.message;
                 return EMPTY;
             }),
         );

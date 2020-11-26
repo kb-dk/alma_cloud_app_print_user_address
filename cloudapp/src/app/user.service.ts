@@ -87,15 +87,10 @@ export class UserService {
     };
 
     private handleError = (err: any) => {
-        let errorMessage: string;
-        if (err.error instanceof ErrorEvent) {
-            // A client-side or network error occurred.
-            errorMessage = `An error occurred: ${err.error.message}`;
-        } else {
-            // The backend returned an unsuccessful response code.
-            errorMessage = `Backend returned code ${err.status}: ${err.body.error}`;
+        if (err.status === 401) {
+            err.message = `It seems like you don't have the rights to see this page. 
+                           Please contact your system administrator.`;
         }
-        console.error(err);
-        return throwError(errorMessage);
+        return throwError(err);
     };
 }

@@ -1,3 +1,4 @@
+<div *ngIf="errorMsg" class="mat-error">{{ errorMsg }}</div>
 <div *ngIf="userActions$ | async as users">
     <div class="loading-shade" *ngIf="!pageLoaded">
         <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
