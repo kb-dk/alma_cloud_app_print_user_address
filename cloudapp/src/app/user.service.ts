@@ -16,7 +16,7 @@ export class UserService {
     // then get the user info from the user_primary_id or user_id or primary_id field and extract the address from the response
     users$ = (entities: Entity[]) => {
 
-        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.USER, EntityType.REQUEST].includes(entity.type))
+        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.USER, EntityType.REQUEST, EntityType.BORROWING_REQUEST].includes(entity.type))
             .map(entity => {
                 switch (entity.type) {
                     case EntityType.LOAN:
@@ -25,6 +25,8 @@ export class UserService {
                         return this.userFromRequest(entity.link);
                     case EntityType.USER:
                         return this.getRequestFromAlma(entity.link);
+                    case EntityType.BORROWING_REQUEST:
+                        return this.getRequesterFromAlma(entity.link);
                 }
             });
         return (calls.length === 0) ?
@@ -34,6 +36,13 @@ export class UserService {
                 map(users => users.map((user, index) => this.userFromAlmaUser(user, index))),
             );
     };
+
+    private getRequesterFromAlma = (link) => this.getRequestFromAlma(link).pipe(
+        switchMap(request => iif(() => request.requester !== null,
+            this.getRequestFromAlma(`/users/${request.requester.value}`),
+            of(null),
+            ))
+    );
 
     private userFromLoan = (link) => this.getRequestFromAlma(link).pipe(
         switchMap(loan => this.getRequestFromAlma(`/users/${loan.user_id}`))
