@@ -124,7 +124,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 innerHtml = innerHtml.concat(
                     `<div class='pageBreak'>
                       ${logo}  
-                      <br/><br/><br/>
+                      <br/><br/><br/><br/><br/>
                       <p>${user.name}<br/>
                       ${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
                   </div>`);
