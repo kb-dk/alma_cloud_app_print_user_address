@@ -124,16 +124,15 @@ export class MainComponent implements OnInit, OnDestroy {
                 innerHtml = innerHtml.concat(
                     `<div class='pageBreak'>
                       ${logo}  
-                      <br/><br/><br/><br/><br/>
-                      <p>${user.name}<br/>
+                      <p style="position: fixed; top:2cm;">${user.name}<br/>
                       ${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
                   </div>`);
             }
         });
 
         let content = `<html>
-                       <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}</style>
-                           <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600;">
+                       <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}@page {margin-top: 2cm;margin-bottom: 2cm;margin-left: 2cm;margin-right: 2cm;}</style>
+                           <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600; margin: 0;">
                                ${innerHtml}
                            </body>
                        </html>`;
