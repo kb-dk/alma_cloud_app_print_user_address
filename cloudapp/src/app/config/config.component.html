@@ -10,18 +10,34 @@
 <div class="loading-shade" *ngIf="loading">
     <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
-<h1>Settings</h1>
-<hr>
-<h2>Logo</h2>
-<div class="buttonsContainer">
-    <input type="file" id="logo" class="hidden"
-           (change)="onLogoChanged($event.target.files)"
-           accept=".gif, .jpg, .png"/>
-    <label for="logo" class="mat-raised-button">Select a logo ...</label>
 
-    <input id="clear" class="hidden" (click)="clearLogo()"/>
-    <label for="clear" class="mat-raised-button">Clear logo</label>
-</div>
-<div class="logo">
-    <img alt="No logo is selected" src="{{logoUrl$ | async}}"/>
-</div>
+<mat-tab-group>
+    <mat-tab label="Partners">
+        <h2>Sender's address</h2>
+
+        <form>
+            <mat-form-field>
+                <mat-label>Sender's address</mat-label>
+                <input matInput placeholder="" value="">
+                <input id="add_sender" class="hidden" (click)="add_sender()"/>
+                <label for="add_sender" class="mat-raised-button">Add to senders list</label>
+            </mat-form-field>
+        </form>
+
+    </mat-tab>
+    <mat-tab label="Users">
+        <h2>Logo</h2>
+        <div class="buttonsContainer">
+            <input type="file" id="logo" class="hidden"
+                   (change)="onLogoChanged($event.target.files)"
+                   accept=".gif, .jpg, .png"/>
+            <label for="logo" class="mat-raised-button">Select a logo ...</label>
+
+            <input id="clear" class="hidden" (click)="clearLogo()"/>
+            <label for="clear" class="mat-raised-button">Clear logo</label>
+        </div>
+        <div class="logo">
+            <img alt="No logo is selected" src="{{logoUrl$ | async}}"/>
+        </div>
+    </mat-tab>
+</mat-tab-group>

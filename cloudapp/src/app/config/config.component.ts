@@ -12,6 +12,7 @@ import {BehaviorSubject, combineLatest, EMPTY} from "rxjs";
 export class ConfigComponent{
 
     loading:boolean = true;
+    config = {user:{logo:''}, partner:{addresses:[]}};
 
     logoFromConfig$ = this.configService.get().pipe(
         map(config => config.logo),
@@ -46,13 +47,14 @@ export class ConfigComponent{
         logoReader.onload = () => {
             let logo = logoReader.result.toString();
             this.logoChangedSubject.next(logo);
-            this.saveConfig({logo:logo});
+            this.config.user.logo = logo;
+            this.saveConfig();
         };
         logoReader.onerror = error => console.log('Error reading image' + error);
     };
 
-    saveConfig = (config) => {
-        this.configService.set(config).pipe(
+    saveConfig = () => {
+        this.configService.set(this.config).pipe(
         ).subscribe(
             () => console.log('Configuration successfully saved'),
             error => console.log('Error saving configuration:', error)
@@ -61,7 +63,12 @@ export class ConfigComponent{
 
     clearLogo = () => {
         this.logoChangedSubject.next('');
-        this.saveConfig({logo: ''});
+        this.config.user.logo = '';
+        this.saveConfig();
         console.log('Logo cleared');
+    };
+
+    add_sender = () => {
+
     };
 }
