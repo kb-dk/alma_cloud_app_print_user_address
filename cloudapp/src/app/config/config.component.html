@@ -13,17 +13,20 @@
 
 <mat-tab-group>
     <mat-tab label="Partners">
-        <h2>Sender's address</h2>
+        <div>
+            <em>Sender's address(es):</em>
 
-        <form>
-            <mat-form-field>
-                <mat-label>Sender's address</mat-label>
-                <input matInput placeholder="" value="">
-                <input id="add_sender" class="hidden" (click)="add_sender()"/>
-                <label for="add_sender" class="mat-raised-button">Add to senders list</label>
-            </mat-form-field>
-        </form>
-
+            <form class="form-container">
+                <mat-form-field>
+                    <mat-label>Sender's address</mat-label>
+                    <input matInput placeholder="" value="">
+                </mat-form-field>
+                <!--<mat-form-field>-->
+                <!--<input id="add_sender" class="hidden" (click)="addSender()"/>-->
+                <!--<label for="add_sender" class="mat-raised-button">Add to senders list</label>-->
+                <!--</mat-form-field>-->
+            </form>
+        </div>
     </mat-tab>
     <mat-tab label="Users">
         <h2>Logo</h2>

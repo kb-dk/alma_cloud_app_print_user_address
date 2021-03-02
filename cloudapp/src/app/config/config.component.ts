@@ -68,7 +68,7 @@ export class ConfigComponent{
         console.log('Logo cleared');
     };
 
-    add_sender = () => {
+    addSender = () => {
 
     };
 }
