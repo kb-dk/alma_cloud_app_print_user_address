@@ -210,16 +210,45 @@ export class MainComponent implements OnInit, OnDestroy {
         this.currentPartnerActions.map(partner => {
             if (partner.checked) {
                 innerHtml = innerHtml.concat(
-                    `<div class='pageBreak'>  
-                      <p style="position: relative; top:0;">${partner.name}<br/>
-                      ${partner.receivers_addresses.find(address => address.type === partner.selectedAddress).address}</p>
-                      <p "position: relative; bottom:0;">${partner.senders_address}</p>
+                    `<div class='pageBreak' style="position:relative; border:solid black 1px; width: 10cm; height: 5.5cm; padding:0.15cm;">  
+                      <div class="recipient" style="position: relative;">${partner.name}<br/>
+                      ${partner.receivers_addresses.find(address => address.type === partner.selectedAddress).address}</div>
+                      <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;"><span style="font-size: 18px">Det Kgl. Bibliotek Aarhus</span><br/>Victor albecksvej 1<br/>DK-8000 Aarhus C<br/>Denmark</div>
+                      <!--<p style="position: absolute; bottom:0; left:0.8cm;">${partner.senders_address}</p>-->
                   </div>`);
             }
         });
 
         let content = `<html>
-                       <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}@page {margin-top: 0;margin-bottom: 0;margin-left: 0;margin-right: 0; width: 10cm;}</style>
+                       <style>
+                       @media print {
+                       .hidden-print {display: none !important;}
+                       } 
+                       div.pageBreak{
+                       page-break-after: always
+                       }
+                       @page{
+                       margin:0;
+                       }
+                       .sender:before{
+                       content:"";
+                       position:absolute;
+                       border-top:1px solid black;
+                       width:7cm;
+                       transform: rotate(13deg);
+                       transform-origin: 0% 0%;
+                       }
+                       .sender:after{
+                       content:"";
+                       position:absolute;
+                       left:0;
+                       bottom:0.1cm;
+                       border-bottom:1px solid black;
+                       width:7cm;
+                       transform: rotate(-13deg);
+                       transform-origin: 0% 0%;
+                       }
+                       </style>
                            <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600; margin: 0;">
                                ${innerHtml}
                            </body>
