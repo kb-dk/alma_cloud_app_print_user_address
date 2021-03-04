@@ -12,10 +12,12 @@ import {BehaviorSubject, combineLatest, EMPTY} from "rxjs";
 export class ConfigComponent{
 
     loading:boolean = true;
+    newSenderAddress: string = '';
     config = {user:{logo:''}, partner:{addresses:[]}};
 
     logoFromConfig$ = this.configService.get().pipe(
-        map(config => config.logo),
+        map(config => config.user.logo),
+        tap(logo => this.config.user.logo = logo),
         tap(() => this.loading = false),
         catchError(error => {
             console.log('Error getting configuration:', error);
@@ -68,7 +70,11 @@ export class ConfigComponent{
         console.log('Logo cleared');
     };
 
-    addSender = () => {
-
+    onAddSender = () => {
+        if(this.newSenderAddress){
+            this.config.partner.addresses.push(this.newSenderAddress);
+            this.newSenderAddress = '';
+            this.saveConfig();
+        }
     };
 }

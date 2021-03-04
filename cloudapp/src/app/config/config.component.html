@@ -13,19 +13,21 @@
 
 <mat-tab-group>
     <mat-tab label="Partners">
-        <div>
-            <em>Sender's address(es):</em>
-
-            <form class="form-container">
-                <mat-form-field>
-                    <mat-label>Sender's address</mat-label>
-                    <input matInput placeholder="" value="">
-                </mat-form-field>
-                <!--<mat-form-field>-->
-                <!--<input id="add_sender" class="hidden" (click)="addSender()"/>-->
-                <!--<label for="add_sender" class="mat-raised-button">Add to senders list</label>-->
-                <!--</mat-form-field>-->
-            </form>
+        <div class="padding-top">
+            <h3>Sender's address list:</h3>
+            <div *ngFor="let address of config.partner.addresses; let i = index">
+                {{i + 1}}- {{ address}}
+            </div>
+            <div *ngIf="!config.partner.addresses.length">No address is added.</div>
+            <h3  class="padding-top">Add to address list:</h3>
+            <mat-form-field>
+                <mat-label>Address (use comma (,) for line change)</mat-label>
+                <input matInput [(ngModel)]="newSenderAddress">
+            </mat-form-field>
+            <div mat-dialog-actions>
+                <button mat-raised-button color="primary" (click)="onAddSender()">Save sender's address</button>
+            </div>
+            <br>
         </div>
     </mat-tab>
     <mat-tab label="Users">
