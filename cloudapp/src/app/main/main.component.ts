@@ -23,6 +23,8 @@ export class MainComponent implements OnInit, OnDestroy {
     numUsersToPrint: number = 0;
     numPartnersToPrint: number = 0;
     logoUrl: string = '';
+    senderAddresses = [];
+    senderAddress : string = '';
     printLogo: boolean = true;
     errorMsg: string = '';
     selectedTab: string = "0";
@@ -67,15 +69,17 @@ export class MainComponent implements OnInit, OnDestroy {
         this.partnerAddressSelectedAction$
     ])
         .pipe(
+            // tap(([partners, selectedPartner, selectedAddressType]) => console.log([partners, selectedPartner])),
             map(([partners, selectedPartner, selectedAddressType]) =>
                     partners.map((partner, requestIndex) => ({
                         ...partner,
                         selectedAddress: partner.id === selectedAddressType.id ? selectedAddressType.value : this.currentPartnerActions[requestIndex].selectedAddress,
-                        checked: partner.id === selectedPartner.id ? selectedPartner.checked : this.currentPartnerActions[requestIndex].checked,
+                        checked: partner.id === selectedPartner.id ? selectedPartner.checked : partner.id === 0,
                     }) as User),
                 toArray(),
             ),
             tap(currentPartnerActions => this.currentPartnerActions = currentPartnerActions),
+            // tap(currentPartnerActions => console.log(currentPartnerActions)),
             catchError(error => {
                 this.errorMsg = error.message;
                 return EMPTY;
@@ -97,7 +101,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     }) as User),
                 toArray(),
             ),
-            tap(currentUserActions => console.log(currentUserActions)),
+            tap(currentUserActions => this.numPartnersToPrint = currentUserActions.length),
             tap(currentUserActions => this.currentUserActions = currentUserActions),
             catchError(error => {
                 this.errorMsg = error.message;
@@ -118,7 +122,11 @@ export class MainComponent implements OnInit, OnDestroy {
         this.pageLoadSubscription = this.eventsService.onPageLoad(this.onPageLoad);
 
         this.configService.get().subscribe(
-            config => this.logoUrl = config.user.logo,
+            config => {
+                this.logoUrl = config.user.logo;
+                this.senderAddresses = config.partner.addresses;
+                this.senderAddress = this.replaceComma(this.senderAddresses[0]);
+            },
             err => console.log(err.message));
     }
 
@@ -137,6 +145,10 @@ export class MainComponent implements OnInit, OnDestroy {
 
     onPrintLogoToggled = (e) => {
         this.printLogo = e.checked;
+    };
+
+    onPrintSenderAddress = (e) => {
+        this.senderAddress = this.replaceComma(e.value);
     };
 
     onClear = () => {
@@ -167,6 +179,7 @@ export class MainComponent implements OnInit, OnDestroy {
         this.numPartnersToPrint = (e.checked) ? this.numPartnersToPrint + 1 : this.numPartnersToPrint - 1;
         let partner, id;
         [partner, id] = e.source.value.split('_');
+        console.log(id , e.checked);
         this.partnerToggledSubject.next({id: +id, checked: e.checked});
     };
 
@@ -178,6 +191,13 @@ export class MainComponent implements OnInit, OnDestroy {
         } else {
             this.partnerAddressSelectedSubject.next({id: +selectedId, value: selectedAddressType});
         }
+    };
+
+    replaceComma = (string) => {
+        let title = string.substring(0, string.indexOf(','));
+        let address = string.substring(string.indexOf(','));
+        string = '<strong>'+title+'</strong>' + address;
+        return string.replaceAll(',', '<br/>')
     };
 
     onUserPrint = () => {
@@ -213,7 +233,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     `<div class='pageBreak' style="position:relative; border:solid black 1px; width: 10cm; height: 5.5cm; padding:0.15cm;">  
                       <div class="recipient" style="position: relative;">${partner.name}<br/>
                       ${partner.receivers_addresses.find(address => address.type === partner.selectedAddress).address}</div>
-                      <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;"><span style="font-size: 18px">Det Kgl. Bibliotek Aarhus</span><br/>Victor albecksvej 1<br/>DK-8000 Aarhus C<br/>Denmark</div>
+                      <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
                       <!--<p style="position: absolute; bottom:0; left:0.8cm;">${partner.senders_address}</p>-->
                   </div>`);
             }
@@ -229,6 +249,10 @@ export class MainComponent implements OnInit, OnDestroy {
                        }
                        @page{
                        margin:0;
+                       }
+                       .sender strong{
+                       font-weight: bold; 
+                       font-size: 18px;
                        }
                        .sender:before{
                        content:"";

@@ -15,13 +15,23 @@
                     <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear
                     </button>
                 </div>
-                <!--<h3 *ngIf="logoUrl">-->
-                    <!--<mat-checkbox style="display: block; color: black"-->
-                                  <!--(change)="onPrintLogoToggled($event)"-->
-                                  <!--[checked]=true-->
-                    <!--&gt;Add institution logo to page-->
-                    <!--</mat-checkbox>-->
-                <!--</h3>-->
+
+                <table>
+                    <mat-radio-group aria-label="Select a sender">
+                        <tr *ngFor="let address of senderAddresses; let i = index;">
+                            <td>
+                                <mat-radio-button style="display: block; color: black"
+                                                  (change)="onPrintSenderAddress($event)"
+                                                  [value]="address"
+                                                  checked="{{i===0}}"
+                                >
+                                </mat-radio-button>
+                            </td>
+                            <td>{{address}}</td>
+                        </tr>
+                    </mat-radio-group>
+                </table>
+
                 <h3>Select partner record(s) to print:</h3>
                 <table border="1px">
                     <tr>
@@ -29,7 +39,7 @@
                         <th>Name</th>
                         <th>Address</th>
                     </tr>
-                    <tr *ngFor="let partner of partners" id="tr_partner_{{partner.id}}">
+                    <tr *ngFor="let partner of partners; let i = index;" id="tr_partner_{{partner.id}}">
                         <td style="width: 2%">{{partner.id + 1}}</td>
                         <td style="width: 23%">
                             <div>

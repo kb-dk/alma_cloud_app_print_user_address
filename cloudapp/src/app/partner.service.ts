@@ -77,6 +77,7 @@ export class PartnerService {
 
     private getLoanFromAlma = link => this.restService.call(link);
     private getRequestFromLoan = loan => {
+        console.log(loan);
         return this.restService.call(loan.request_id.link);
         // res.user_id = loan.user_id;
         //
