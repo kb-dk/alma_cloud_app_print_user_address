@@ -11,28 +11,24 @@
     <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
 
-<mat-tab-group *ngIf="settings$ | async as settings">
+<mat-tab-group *ngIf="configAndSettings$ | async as configAndSettings">
     <mat-tab label="Partners">
-        <!--<div class="padding-top">-->
-            <!--<table>-->
-                <!--<tr><th colspan="2" class="sender"><h3>Sender's address list</h3></th></tr>-->
-                <!--<tr *ngFor="let address of settings.partner.addresses; let i = index">-->
-                    <!--<td><mat-icon matListIcon (click)="onRemoveAddress(i)" color="primary">delete</mat-icon></td>-->
-                    <!--<td [innerHTML]=replaceComma(address)></td>-->
-                <!--</tr>-->
-                <!--<tr *ngIf="!settings.partner.addresses.length"><td></td><td>No address is added</td></tr>-->
-            <!--</table>-->
-            <!--<h3 class="padding-top">Add to address list:</h3>-->
-            <!--<mat-form-field>-->
-                <!--<mat-label>Address</mat-label>-->
-                <!--<input matInput [(ngModel)]="newSenderAddress">-->
-                <!--<mat-hint>Use comma for line change</mat-hint>-->
-            <!--</mat-form-field>-->
-
-            <!--<div mat-dialog-actions class="padding-top">-->
-                <!--<button mat-raised-button color="primary" (click)="onAddSender()">Save address</button>-->
-            <!--</div>-->
-            <!--<br>-->
-        <!--</div>-->
+        <div class="padding-top">
+            <table>
+                <tr><th class="sender"><h3>My address</h3></th><th class="sender"><h3>Sender's address list</h3></th></tr>
+                <tr *ngFor="let address of configAndSettings.config.partner.addresses; let i = index">
+                    <td>
+                        <mat-radio-button style="display: block; color: black"
+                                          (change)="onSelectMyAddress($event)"
+                                          [value]=i
+                                          checked="{{configAndSettings.settings.myAddress===address}}">
+                        </mat-radio-button>
+                    </td>
+                    <td [innerHTML]=replaceComma(address)></td>
+                </tr>
+                <tr *ngIf="!configAndSettings.config.partner.addresses.length"><td></td><td>No address is added</td></tr>
+            </table>
+            <br>
+        </div>
     </mat-tab>
 </mat-tab-group>

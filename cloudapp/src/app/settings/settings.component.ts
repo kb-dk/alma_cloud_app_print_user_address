@@ -1,75 +1,78 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {AppService} from '../app.service';
-import {CloudAppSettingsService} from '@exlibris/exl-cloudapp-angular-lib';
+import {CloudAppSettingsService, CloudAppConfigService} from '@exlibris/exl-cloudapp-angular-lib';
 import {ToastrService} from 'ngx-toastr';
-// import {Settings} from '../models/settings';
-// import {ExternalLinkTemplate} from "../models/external-link-template";
 import {MatDialog} from "@angular/material/dialog";
-// import {SettingsDialogComponent} from "./settings-dialog/settings-dialog.component";
+import {catchError, map, tap} from "rxjs/operators";
+import {combineLatest, EMPTY} from "rxjs";
 
 @Component({
     selector: 'app-settings',
     templateUrl: './settings.component.html',
     styleUrls: ['./settings.component.scss']
 })
-export class SettingsComponent implements OnInit {
-    // externalLinkTemplates: ExternalLinkTemplate[] = [];
-    settings;
+export class SettingsComponent{
+    errorMsg;
     saving = false;
-    dialogOpen: boolean = false;
+    loading: boolean = true;
+    settings = {myAddress:''};
+    config = {user: {logo: ''}, partner: {addresses: []}};
+
+    config$ = this.configService.get().pipe(
+        tap(config => this.config = config),
+        catchError(error => {
+            console.log('Error getting configuration:', error);
+            return EMPTY;
+        })
+    );
+
+    settings$ = this.settingsService.get().pipe(
+        tap(settings => this.settings = settings),
+        catchError(error => {
+            console.log('Error getting settings:', error);
+            return EMPTY;
+        })
+    );
+
+    configAndSettings$ = combineLatest([
+        this.config$,
+        this.settings$,
+    ]).pipe(
+        map(([config, settings]) => ({'config':config, 'settings':settings})),
+        tap(() => this.loading = false),
+        catchError(error => {
+            this.errorMsg = error.message;
+            return EMPTY;
+        }),
+    );
 
     constructor(
         private appService: AppService,
         private settingsService: CloudAppSettingsService,
+        private configService: CloudAppConfigService,
         private toastr: ToastrService,
         public dialog: MatDialog
     ) { }
 
-    ngOnInit() {
-        // this.appService.setTitle('Settings');
-        this.getSettings();
-    }
-
-    private getSettings() {
-        this.settingsService.get().subscribe(result => {
-            console.log(result);
-            this.settings = result;
-        })
-    }
-
-    private saveSettings(toastMessage:string) {
-        this.saving = true;
+    saveSettings = (toastMessage:string) =>{
         this.settingsService.set(this.settings).subscribe(
             response => {
-                this.toastr.success(toastMessage, 'Settings updated', {timeOut:10000});
+                this.toastr.success(toastMessage, 'Settings updated', {timeOut:2000});
             },
-            err => this.toastr.error(err.message, '', {timeOut:10000}),
+            err => this.toastr.error(err.message, '', {timeOut:2000}),
             () => this.saving = false
         );
-        this.saving = false;
-    }
+    };
 
-    // remove(removableExternalLinkTemplate: ExternalLinkTemplate) {
-    //     this.settings.externalLinkTemplates = this.settings.externalLinkTemplates.filter(externalLinkTemplate => externalLinkTemplate.id != removableExternalLinkTemplate.id);
-    //     this.saveSettings('Template: ' + removableExternalLinkTemplate.linkName + ' removed from settings.');
-    // }
+    replaceComma = (string) => {
+        let title = string.substring(0, string.indexOf(','));
+        let address = string.substring(string.indexOf(','));
+        string = '<strong>'+title+'</strong>' + address;
+        return string.replaceAll(',', '<br/>')
+    };
 
-    // openDialog() {
-    //     this.dialogOpen = true;
-    //     const dialogRef = this.dialog.open(SettingsDialogComponent, {
-    //         width: '95%',
-    //         data: new ExternalLinkTemplate()
-    //     });
-
-        // dialogRef.afterClosed().subscribe(result  => {
-        //     result = result as ExternalLinkTemplate;
-        //     this.dialogOpen = false;
-        //     const readyForSaving = result.searchCriteriaType>0 && result.linkName != '' && result.startOfLink != ''
-        //     if (readyForSaving) {
-        //         this.settings.externalLinkTemplates.push(result);
-        //         this.saveSettings('Localization-link: ' + result.linkName + ' saved to settings.');
-        //     }
-        // });
-    // }
-
+    onSelectMyAddress = (event) => {
+        this.settings.myAddress = this.config.partner.addresses[event.value];
+        this.saveSettings('Your address is set.');
+    };
 }
