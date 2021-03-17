@@ -18,7 +18,8 @@
       "REQUEST"
    ],
    "pages": {
-      "config": "/#/config"
+      "config": "/#/config",
+      "settings": "/#/settings"
    },
    "contentSecurity": {
       "sandbox": {

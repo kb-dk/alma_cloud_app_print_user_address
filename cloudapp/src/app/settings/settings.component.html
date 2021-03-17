@@ -1,0 +1,38 @@
+<div class="title">
+    <h1>Admin settings</h1>
+    <a [routerLink]="['']">
+        <button mat-raised-button>
+            <mat-icon>arrow_back</mat-icon>
+            Back
+        </button>
+    </a>
+</div>
+<div class="loading-shade" *ngIf="loading">
+    <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+</div>
+
+<mat-tab-group *ngIf="settings$ | async as settings">
+    <mat-tab label="Partners">
+        <!--<div class="padding-top">-->
+            <!--<table>-->
+                <!--<tr><th colspan="2" class="sender"><h3>Sender's address list</h3></th></tr>-->
+                <!--<tr *ngFor="let address of settings.partner.addresses; let i = index">-->
+                    <!--<td><mat-icon matListIcon (click)="onRemoveAddress(i)" color="primary">delete</mat-icon></td>-->
+                    <!--<td [innerHTML]=replaceComma(address)></td>-->
+                <!--</tr>-->
+                <!--<tr *ngIf="!settings.partner.addresses.length"><td></td><td>No address is added</td></tr>-->
+            <!--</table>-->
+            <!--<h3 class="padding-top">Add to address list:</h3>-->
+            <!--<mat-form-field>-->
+                <!--<mat-label>Address</mat-label>-->
+                <!--<input matInput [(ngModel)]="newSenderAddress">-->
+                <!--<mat-hint>Use comma for line change</mat-hint>-->
+            <!--</mat-form-field>-->
+
+            <!--<div mat-dialog-actions class="padding-top">-->
+                <!--<button mat-raised-button color="primary" (click)="onAddSender()">Save address</button>-->
+            <!--</div>-->
+            <!--<br>-->
+        <!--</div>-->
+    </mat-tab>
+</mat-tab-group>

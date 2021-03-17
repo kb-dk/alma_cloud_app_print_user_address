@@ -6,6 +6,7 @@ import {
     CloudAppEventsService,
     CloudAppRestService,
     CloudAppConfigService,
+    CloudAppSettingsService,
     Entity,
     PageInfo
 } from '@exlibris/exl-cloudapp-angular-lib';
@@ -111,6 +112,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
     constructor(private restService: CloudAppRestService,
                 private configService: CloudAppConfigService,
+                private settingsService: CloudAppSettingsService,
                 private eventsService: CloudAppEventsService,
                 private userService: UserService,
                 private partnerService: PartnerService
@@ -126,6 +128,15 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.logoUrl = config.user.logo;
                 this.senderAddresses = config.partner.addresses;
                 this.senderAddress = this.replaceComma(this.senderAddresses[0]);
+            },
+            err => console.log(err.message));
+
+        this.settingsService.get().subscribe(
+            settings => {
+                console.log(settings);
+                // this.logoUrl = settings.user.logo;
+                // this.senderAddresses = settings.partner.addresses;
+                // this.senderAddress = this.replaceComma(this.senderAddresses[0]);
             },
             err => console.log(err.message));
     }
