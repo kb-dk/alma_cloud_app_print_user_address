@@ -69,6 +69,7 @@ export class ConfigComponent {
         let title = string.substring(0, string.indexOf(','));
         let address = string.substring(string.indexOf(','));
         string = '<strong>'+title+'</strong>' + address;
-        return string.replaceAll(',', '<br/>')};
+        return string.replaceAll(',', '<br/>')
+    };
 }
 
