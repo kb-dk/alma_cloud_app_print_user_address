@@ -64,6 +64,7 @@ export class SettingsComponent{
         );
     };
 
+    // Replace commas with line-break and bold the first line
     replaceComma = (string) => {
         let title = string.substring(0, string.indexOf(','));
         let address = string.substring(string.indexOf(','));
