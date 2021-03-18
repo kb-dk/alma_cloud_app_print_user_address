@@ -24,35 +24,20 @@ export class PartnerService {
         return (calls.length === 0) ?
             of([]) :
             forkJoin(calls).pipe(
-                catchError(err => this.handleError(err)),
-                // map(users => users.map((user, index) => this.userFromAlmaUser(user, index))),
+                catchError(err => this.handleError(err))
             );
     };
 
 
     private partnerAddressFromLoan = (link) => this.getLoanFromAlma(link).pipe(
-        tap(loan => console.log('step 2: ', loan)),
-        // tap(result => result.location_code.name === 'Borrowing Resource Sharing Requests'?this.getPartnerAddress(result.request_id.link):''),
         filter(loan => loan.location_code.name === 'Borrowing Resource Sharing Requests'),
         tap(loan => this.user_id = loan.user_id),
         switchMap(loan => this.getRequestFromLoan(loan)),
         tap(loan => this.senders_address = loan.pickup_location),
-        tap(request => console.log('step 3: ', request)),
         switchMap(request => this.getResourceSharingRequestFromRequest(request.resource_sharing.id)),
-        tap(request => console.log('step 4: ', request)),
         switchMap(resourceSharingRequest => this.getPartnerFromResourceSharingRequest(resourceSharingRequest)),
-        tap(request => console.log('step 5: ', request, request.partner_details.name)),
         map(partner => this.partnerFromAlmaPartner(partner)),
-        // tap(request => console.log('step 6: ', request.contact_info.address[0]))
     );
-
-    // private getPartnerAddress = (link) => {
-    //     console.log(link);
-    //     this.getRequestFromAlma(link).subscribe(
-    //         result => console.log(result),
-    //         err => console.log(err.message)
-    //     );
-    // };
 
     constructor(private restService: CloudAppRestService) {
     }
@@ -76,15 +61,9 @@ export class PartnerService {
         };
 
     private getLoanFromAlma = link => this.restService.call(link);
-    private getRequestFromLoan = loan => {
-        console.log(loan);
-        return this.restService.call(loan.request_id.link);
-        // res.user_id = loan.user_id;
-        //
-        // return {
-        //     user_id: loan.user_id
-        // }
-    };
+
+    private getRequestFromLoan = loan => this.restService.call(loan.request_id.link);
+
     private getResourceSharingRequestFromRequest = id => this.restService.call(`/users/${this.user_id}/resource-sharing-requests/${id}`);
 
     private getPartnerFromResourceSharingRequest = resourceSharingRequest => this.restService.call(resourceSharingRequest.partner.link);

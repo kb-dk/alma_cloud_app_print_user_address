@@ -42,7 +42,6 @@ export class MainComponent implements OnInit, OnDestroy {
     partnerAction$ = this.pageLoadedSubject.asObservable().pipe(
         concatMap(entities => this.partnerService.partners$(entities)),
         tap(currentPartnerAction => this.currentPartnerActions = currentPartnerAction),
-        tap(result => console.log('result:',result)),
         tap(() => this.partnersReady = true),
     );
 
@@ -70,7 +69,6 @@ export class MainComponent implements OnInit, OnDestroy {
         this.partnerAddressSelectedAction$
     ])
         .pipe(
-            // tap(([partners, selectedPartner, selectedAddressType]) => console.log([partners, selectedPartner])),
             map(([partners, selectedPartner, selectedAddressType]) =>
                     partners.map((partner, requestIndex) => ({
                         ...partner,
@@ -80,7 +78,6 @@ export class MainComponent implements OnInit, OnDestroy {
                 toArray(),
             ),
             tap(currentPartnerActions => this.currentPartnerActions = currentPartnerActions),
-            // tap(currentPartnerActions => console.log(currentPartnerActions)),
             catchError(error => {
                 this.errorMsg = error.message;
                 return EMPTY;
@@ -93,7 +90,6 @@ export class MainComponent implements OnInit, OnDestroy {
         this.userAddressSelectedAction$
     ])
         .pipe(
-            // tap(([users, selectedUser, selectedAddressType]) => console.log([users, selectedUser, selectedAddressType])),
             map(([users, selectedUser, selectedAddressType]) =>
                     users.map((user, requestIndex) => ({
                         ...user,
@@ -127,16 +123,16 @@ export class MainComponent implements OnInit, OnDestroy {
             config => {
                 this.logoUrl = config.user.logo;
                 this.senderAddresses = config.partner.addresses;
-                this.senderAddress = this.replaceComma(this.senderAddresses[0]);
             },
             err => console.log(err.message));
 
         this.settingsService.get().subscribe(
             settings => {
-                console.log(settings);
-                // this.logoUrl = settings.user.logo;
-                // this.senderAddresses = settings.partner.addresses;
-                // this.senderAddress = this.replaceComma(this.senderAddresses[0]);
+                if (settings.myAddress){
+                    this.senderAddress = this.replaceComma(settings.myAddress);
+                } else {
+                    this.senderAddress = this.replaceComma(this.senderAddresses[0]);
+                }
             },
             err => console.log(err.message));
     }
@@ -147,7 +143,6 @@ export class MainComponent implements OnInit, OnDestroy {
     }
 
     onPageLoad = (pageInfo: PageInfo) => {
-        console.log("step 1:", pageInfo);
         this.onClear();
         this.partnersReady = false;
         this.usersReady = false;
@@ -156,10 +151,6 @@ export class MainComponent implements OnInit, OnDestroy {
 
     onPrintLogoToggled = (e) => {
         this.printLogo = e.checked;
-    };
-
-    onPrintSenderAddress = (e) => {
-        this.senderAddress = this.replaceComma(e.value);
     };
 
     onClear = () => {
@@ -190,7 +181,6 @@ export class MainComponent implements OnInit, OnDestroy {
         this.numPartnersToPrint = (e.checked) ? this.numPartnersToPrint + 1 : this.numPartnersToPrint - 1;
         let partner, id;
         [partner, id] = e.source.value.split('_');
-        console.log(id , e.checked);
         this.partnerToggledSubject.next({id: +id, checked: e.checked});
     };
 
@@ -245,7 +235,6 @@ export class MainComponent implements OnInit, OnDestroy {
                       <div class="recipient" style="position: relative;">${partner.name}<br/>
                       ${partner.receivers_addresses.find(address => address.type === partner.selectedAddress).address}</div>
                       <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
-                      <!--<p style="position: absolute; bottom:0; left:0.8cm;">${partner.senders_address}</p>-->
                   </div>`);
             }
         });
@@ -289,12 +278,10 @@ export class MainComponent implements OnInit, OnDestroy {
                            </body>
                        </html>`;
         this.printContent(content);
-
     };
 
     printContent = (content) => {
         let win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
-        // console.log(content);
         win.document.write(content);
         win.document.close();
     };

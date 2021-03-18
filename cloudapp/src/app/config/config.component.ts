@@ -49,7 +49,6 @@ export class ConfigComponent {
     clearLogo = () => {
         this.config.user.logo = '';
         this.saveConfig();
-        console.log('Logo cleared');
     };
 
     onAddSender = () => {
