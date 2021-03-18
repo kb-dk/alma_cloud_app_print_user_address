@@ -55,3 +55,35 @@ div.logo{
     max-width: 100%;
   }
 }
+
+#sender_input{
+  width: 80%;
+}
+
+.add_sender_button{
+  float: right;
+}
+
+mat-form-field{
+  width: 100%;
+}
+
+.padding-top{
+  padding-top: 30px;
+}
+
+.mat-icon{
+  cursor: pointer;
+}
+
+td.mat-cell,
+th.mat-cell{
+  padding: 10px;
+}
+
+th.sender{
+  text-align: left;
+}
+
+//Det Kgl. Bibliotek Aarhus,Victor albecksvej 1,DK-8000 Aarhus C,Denmark
+//Det Kgl. Bibliotek København,Christians Brygge 8 ,1219 København K,Denmark

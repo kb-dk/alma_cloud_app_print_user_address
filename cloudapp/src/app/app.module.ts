@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -11,6 +12,7 @@ import { MainComponent } from './main/main.component';
 
 import {UserService} from './user.service';
 import {ConfigComponent} from './config/config.component';
+import {SettingsComponent} from './settings/settings.component';
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -23,7 +25,8 @@ export function getToastrModule() {
   declarations: [
     AppComponent,
     MainComponent,
-    ConfigComponent
+    ConfigComponent,
+    SettingsComponent,
   ],
   imports: [
     MaterialModule,
@@ -31,6 +34,8 @@ export function getToastrModule() {
     BrowserAnimationsModule,
     AppRoutingModule,
     HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
     getTranslateModule(),
     getToastrModule()
   ],

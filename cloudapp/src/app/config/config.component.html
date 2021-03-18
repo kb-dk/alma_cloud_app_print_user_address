@@ -10,18 +10,44 @@
 <div class="loading-shade" *ngIf="loading">
     <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
-<h1>Settings</h1>
-<hr>
-<h2>Logo</h2>
-<div class="buttonsContainer">
-    <input type="file" id="logo" class="hidden"
-           (change)="onLogoChanged($event.target.files)"
-           accept=".gif, .jpg, .png"/>
-    <label for="logo" class="mat-raised-button">Select a logo ...</label>
 
-    <input id="clear" class="hidden" (click)="clearLogo()"/>
-    <label for="clear" class="mat-raised-button">Clear logo</label>
-</div>
-<div class="logo">
-    <img alt="No logo is selected" src="{{logoUrl$ | async}}"/>
-</div>
+<mat-tab-group *ngIf="config$ | async as configuration">
+    <mat-tab label="Partners">
+        <div class="padding-top">
+            <table>
+                <tr><th colspan="2" class="sender"><h3>Sender's address list</h3></th></tr>
+                <tr *ngFor="let address of configuration.partner.addresses; let i = index">
+                    <td><mat-icon matListIcon (click)="onRemoveAddress(i)" color="primary">delete</mat-icon></td>
+                    <td [innerHTML]=replaceComma(address)></td>
+                </tr>
+                <tr *ngIf="!configuration.partner.addresses.length"><td></td><td>No address is added</td></tr>
+            </table>
+            <h3 class="padding-top">Add to address list:</h3>
+            <mat-form-field>
+                <mat-label>Address</mat-label>
+                <input matInput [(ngModel)]="newSenderAddress">
+                <mat-hint>Use comma for line change</mat-hint>
+            </mat-form-field>
+
+            <div mat-dialog-actions class="padding-top">
+                <button mat-raised-button color="primary" (click)="onAddSender()">Save address</button>
+            </div>
+            <br>
+        </div>
+    </mat-tab>
+    <mat-tab label="Users">
+        <h2>Logo</h2>
+        <div class="buttonsContainer">
+            <input type="file" id="logo" class="hidden"
+                   (change)="onLogoChanged($event.target.files)"
+                   accept=".gif, .jpg, .png"/>
+            <label for="logo" class="mat-raised-button">Select a logo ...</label>
+
+            <input id="clear" class="hidden" (click)="clearLogo()"/>
+            <label for="clear" class="mat-raised-button">Clear logo</label>
+        </div>
+        <div class="logo">
+            <img alt="No logo is selected" src="{{configuration.user.logo}}"/>
+        </div>
+    </mat-tab>
+</mat-tab-group>
