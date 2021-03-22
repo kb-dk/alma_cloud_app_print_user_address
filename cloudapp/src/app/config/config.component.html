@@ -12,7 +12,7 @@
 </div>
 
 <mat-tab-group *ngIf="config$ | async as configuration">
-    <mat-tab label="Partners">
+    <mat-tab label="Partners" *ngIf="configuration.hasOwnProperty('partner')">
         <div class="padding-top">
             <table>
                 <tr><th colspan="2" class="sender"><h3>Sender's address list</h3></th></tr>
@@ -35,7 +35,7 @@
             <br>
         </div>
     </mat-tab>
-    <mat-tab label="Users">
+    <mat-tab label="Users" *ngIf="configuration.hasOwnProperty('user')">
         <h2>Logo</h2>
         <div class="buttonsContainer">
             <input type="file" id="logo" class="hidden"

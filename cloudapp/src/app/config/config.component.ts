@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {CloudAppConfigService} from '@exlibris/exl-cloudapp-angular-lib';
-import {catchError, tap} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
 import {EMPTY} from "rxjs";
 
 @Component({
@@ -16,6 +16,7 @@ export class ConfigComponent {
     config = {user: {logo: ''}, partner: {addresses: []}};
 
     config$ = this.configService.get().pipe(
+        map(config=> Object.keys(config).length === 0? this.config : config),
         tap(config => this.config = config),
         tap(() => this.loading = false),
         catchError(error => {
