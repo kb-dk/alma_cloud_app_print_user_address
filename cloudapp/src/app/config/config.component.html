@@ -14,7 +14,7 @@
 <mat-tab-group *ngIf="config$ | async as configuration">
     <mat-tab label="Partners">
         <div class="padding-top">
-            <table  >
+            <table *ngIf="configuration.hasOwnProperty('partner')">
                 <tr><th colspan="2" class="sender"><h3>Sender's address list</h3></th></tr>
                 <tr *ngFor="let address of configuration.partner.addresses; let i = index">
                     <td><mat-icon matListIcon (click)="onRemoveAddress(i)" color="primary">delete</mat-icon></td>
