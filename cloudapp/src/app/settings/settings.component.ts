@@ -19,6 +19,7 @@ export class SettingsComponent{
     config = {user: {logo: ''}, partner: {addresses: []}};
 
     config$ = this.configService.get().pipe(
+        map(config=> Object.keys(config).length === 0? this.config : config),
         tap(config => this.config = config),
         catchError(error => {
             console.log('Error getting configuration:', error);
@@ -27,6 +28,7 @@ export class SettingsComponent{
     );
 
     settings$ = this.settingsService.get().pipe(
+        map(settings=> Object.keys(settings).length === 0? this.settings : settings),
         tap(settings => this.settings = settings),
         catchError(error => {
             console.log('Error getting settings:', error);
