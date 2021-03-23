@@ -38,7 +38,7 @@
             <br>
         </div>
     </mat-tab>
-    <mat-tab label="Users" *ngIf="configuration.hasOwnProperty('user')">
+    <mat-tab label="Users">
         <h2>Logo</h2>
         <div class="buttonsContainer">
             <input type="file" id="logo" class="hidden"
@@ -49,8 +49,11 @@
             <input id="clear" class="hidden" (click)="clearLogo()"/>
             <label for="clear" class="mat-raised-button">Clear logo</label>
         </div>
-        <div class="logo">
+        <div class="logo" *ngIf="configuration.hasOwnProperty('user')">
             <img alt="No logo is selected" src="{{configuration.user.logo}}"/>
+        </div>
+        <div class="logo" *ngIf="!configuration.hasOwnProperty('user')">
+            <img alt="No logo is selected" src=""/>
         </div>
     </mat-tab>
 </mat-tab-group>
