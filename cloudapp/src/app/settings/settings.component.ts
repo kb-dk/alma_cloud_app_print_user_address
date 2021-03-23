@@ -5,6 +5,9 @@ import {ToastrService} from 'ngx-toastr';
 import {MatDialog} from "@angular/material/dialog";
 import {catchError, map, tap} from "rxjs/operators";
 import {combineLatest, EMPTY} from "rxjs";
+import {Config} from '../config/config';
+import {Settings} from './settings';
+import {ConfigAndSettings} from './configAndSettings';
 
 @Component({
     selector: 'app-settings',
@@ -15,8 +18,8 @@ export class SettingsComponent{
     errorMsg;
     saving = false;
     loading: boolean = true;
-    settings = {myAddress:''};
-    config = {user: {logo: ''}, partner: {addresses: []}};
+    settings : Settings = {myAddress:''};
+    config : Config = {user: {logo: ''}, partner: {addresses: []}};
 
     config$ = this.configService.get().pipe(
         map(config=> Object.keys(config).length === 0? this.config : config),
@@ -40,7 +43,13 @@ export class SettingsComponent{
         this.config$,
         this.settings$,
     ]).pipe(
-        map(([config, settings]) => ({'config':config, 'settings':settings})),
+        map(([config, setting]) => {
+            let conf = Object.keys(config).length === 0? this.config : config;
+            let set = Object.keys(setting).length === 0? this.settings : this.settings;
+            let result : ConfigAndSettings = {'config':conf, 'settings':set};
+            console.log(this.settings);
+            return result;
+        }),
         tap(() => this.loading = false),
         catchError(error => {
             this.errorMsg = error.message;
