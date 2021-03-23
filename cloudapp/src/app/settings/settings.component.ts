@@ -41,7 +41,6 @@ export class SettingsComponent{
         this.settings$,
     ]).pipe(
         map(([config, settings]) => ({'config':config, 'settings':settings})),
-        tap(r => console.log(r)),
         tap(() => this.loading = false),
         catchError(error => {
             this.errorMsg = error.message;

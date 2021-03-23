@@ -14,7 +14,7 @@
 <mat-tab-group *ngIf="configAndSettings$ | async as configAndSettings">
     <mat-tab label="Partners">
         <div class="padding-top">
-            <table>
+            <table *ngIf="configAndSettings.hasOwnProperty('config')">
                 <tr><th class="sender"><h3>My address</h3></th><th class="sender"><h3>Sender's address list</h3></th></tr>
                 <tr *ngFor="let address of configAndSettings.config.partner.addresses; let i = index">
                     <td>
@@ -26,8 +26,12 @@
                     </td>
                     <td [innerHTML]=replaceComma(address)></td>
                 </tr>
-                <tr *ngIf="!configAndSettings.config.partner.addresses.length"><td></td><td>No address is added</td></tr>
+                <tr *ngIf="!configAndSettings.config.partner.addresses.length"><td></td><td>No address is added. Please contact your general system administrator.</td></tr>
             </table>
+            <table *ngIf="!configAndSettings.hasOwnProperty('config')">
+                <tr><td></td><td>No address is added. Please contact your general system administrator.</td></tr>
+            </table>
+
             <br>
         </div>
     </mat-tab>
