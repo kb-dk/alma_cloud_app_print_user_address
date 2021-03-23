@@ -47,7 +47,7 @@ export class SettingsComponent{
             let conf = Object.keys(config).length === 0? this.config : config;
             let set = Object.keys(setting).length === 0? this.settings : this.settings;
             let result : ConfigAndSettings = {'config':conf, 'settings':set};
-            console.log(this.settings);
+            console.log(result);
             return result;
         }),
         tap(() => this.loading = false),
