@@ -2,6 +2,9 @@ import {Component} from '@angular/core';
 import {CloudAppConfigService} from '@exlibris/exl-cloudapp-angular-lib';
 import {catchError, map, tap} from 'rxjs/operators';
 import {EMPTY} from "rxjs";
+import {Config} from "./config";
+import {User} from "../user";
+
 
 @Component({
     selector: 'app-config',
@@ -13,7 +16,7 @@ export class ConfigComponent {
 
     loading: boolean = true;
     newSenderAddress: string = '';
-    config = {user: {logo: ''}, partner: {addresses: []}};
+    config: Config = {user: {logo: ''}, partner: {addresses: []}};
 
     config$ = this.configService.get().pipe(
         map(config=> Object.keys(config).length === 0? this.config : config),

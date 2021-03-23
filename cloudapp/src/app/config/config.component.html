@@ -12,15 +12,18 @@
 </div>
 
 <mat-tab-group *ngIf="config$ | async as configuration">
-    <mat-tab label="Partners" *ngIf="configuration.hasOwnProperty('partner')">
+    <mat-tab label="Partners">
         <div class="padding-top">
-            <table>
+            <table  >
                 <tr><th colspan="2" class="sender"><h3>Sender's address list</h3></th></tr>
                 <tr *ngFor="let address of configuration.partner.addresses; let i = index">
                     <td><mat-icon matListIcon (click)="onRemoveAddress(i)" color="primary">delete</mat-icon></td>
                     <td [innerHTML]=replaceComma(address)></td>
                 </tr>
                 <tr *ngIf="!configuration.partner.addresses.length"><td></td><td>No address is added</td></tr>
+            </table>
+            <table *ngIf="!configuration.hasOwnProperty('partner')">
+                <tr><td></td><td>No address is added</td></tr>
             </table>
             <h3 class="padding-top">Add to address list:</h3>
             <mat-form-field>
