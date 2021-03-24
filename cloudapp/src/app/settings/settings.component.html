@@ -14,21 +14,19 @@
 <mat-tab-group *ngIf="configAndSettings$ | async as configAndSettings">
     <mat-tab label="Partners">
         <div class="padding-top">
-            <!--<table *ngIf="configAndSettings.config.partner.addresses.length">-->
-                <!--<tr><th class="sender"><h3>My address</h3></th><th class="sender"><h3>Sender's address list</h3></th></tr>-->
-                <!--<tr *ngFor="let address of configAndSettings.config.partner.addresses; let i = index">-->
-                    <!--<td>-->
-                        <!--<mat-radio-button style="display: block; color: black"-->
-                                          <!--(change)="onSelectMyAddress($event)"-->
-                                          <!--[value]=i-->
-                                          <!--checked="{{configAndSettings.settings.myAddress===address}}">-->
-                        <!--</mat-radio-button>-->
-                    <!--</td>-->
-                    <!--<td [innerHTML]=replaceComma(address)></td>-->
-                <!--</tr>-->
-            <!--</table>-->
             <table>
-                <tr><td>No address is added. Please contact your general system administrator.</td></tr>
+                <tr><th class="sender"><h3>My address</h3></th><th class="sender"><h3>Sender's address list</h3></th></tr>
+                <tr *ngFor="let address of configAndSettings.config.partner.addresses; let i = index">
+                    <td>
+                        <mat-radio-button style="display: block; color: black"
+                                          (change)="onSelectMyAddress($event)"
+                                          [value]=i
+                                          checked="{{configAndSettings.settings.myAddress===address}}">
+                        </mat-radio-button>
+                    </td>
+                    <td [innerHTML]=replaceComma(address)></td>
+                </tr>
+                <tr *ngIf="!configAndSettings.config.partner.addresses.length"><td>No address is added. Please contact your general system administrator.</td></tr>
             </table>
             <br>
         </div>

@@ -44,6 +44,12 @@ export class SettingsComponent{
         this.settings$,
     ]).pipe(
         map(([config, setting]) => {
+            // Fix the old config format
+            if (config.hasOwnProperty('logo')){
+                let newConfig = this.config;
+                newConfig.user.logo = config.logo;
+                config = newConfig;
+            }
             let conf = Object.keys(config).length === 0? this.config : config;
             let set = Object.keys(setting).length === 0? this.settings : this.settings;
             let result : ConfigAndSettings = {'config':conf, 'settings':set};
