@@ -22,6 +22,15 @@ export class SettingsComponent{
     config : Config = {user: {logo: ''}, partner: {addresses: []}};
 
     config$ = this.configService.get().pipe(
+        map(config => {
+            // Fix the old config format
+            if (config.hasOwnProperty('logo')){
+                let newConfig = this.config;
+                newConfig.user.logo = config.logo;
+                config = newConfig;
+            }
+            return config;
+        }),
         map(config=> Object.keys(config).length === 0? this.config : config),
         tap(config => this.config = config),
         catchError(error => {
@@ -45,13 +54,6 @@ export class SettingsComponent{
     ]).pipe(
         tap(r => console.log(r)),
         map(([config, setting]) => {
-            // Fix the old config format
-            if (config.hasOwnProperty('logo')){
-                let newConfig = this.config;
-                newConfig.user.logo = config.logo;
-                config = newConfig;
-                console.log(config);
-            }
             let conf = Object.keys(config).length === 0? this.config : config;
             let set = Object.keys(setting).length === 0? this.settings : this.settings;
             let result : ConfigAndSettings = {'config':conf, 'settings':set};
