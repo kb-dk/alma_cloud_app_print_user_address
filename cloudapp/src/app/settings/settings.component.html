@@ -15,7 +15,7 @@
     <mat-tab label="Partners">
         <div class="padding-top">
             <table>
-                <tr><th class="sender"><h3>My address</h3></th><th class="sender"><h3>Sender's address list</h3></th></tr>
+                <tr *ngIf="configAndSettings.config.partner.addresses.length"><th class="sender"><h3>My address</h3></th><th class="sender"><h3>Sender's address list</h3></th></tr>
                 <tr *ngFor="let address of configAndSettings.config.partner.addresses; let i = index">
                     <td>
                         <mat-radio-button style="display: block; color: black"
@@ -26,7 +26,7 @@
                     </td>
                     <td [innerHTML]=replaceComma(address)></td>
                 </tr>
-                <tr *ngIf="!configAndSettings.config.partner.addresses.length"><td>No address is added. Please contact your general system administrator.</td></tr>
+                <tr *ngIf="!configAndSettings.config.partner.addresses.length"><td class="alarm">No address is added. Please contact your general system administrator.</td></tr>
             </table>
             <br>
         </div>
