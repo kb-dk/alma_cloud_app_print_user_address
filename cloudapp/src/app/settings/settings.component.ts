@@ -43,12 +43,14 @@ export class SettingsComponent{
         this.config$,
         this.settings$,
     ]).pipe(
+        tap(r => console.log(r)),
         map(([config, setting]) => {
             // Fix the old config format
             if (config.hasOwnProperty('logo')){
                 let newConfig = this.config;
                 newConfig.user.logo = config.logo;
                 config = newConfig;
+                console.log(config);
             }
             let conf = Object.keys(config).length === 0? this.config : config;
             let set = Object.keys(setting).length === 0? this.settings : this.settings;
