@@ -7,7 +7,6 @@ import {catchError, map, tap} from "rxjs/operators";
 import {combineLatest, EMPTY} from "rxjs";
 import {Config} from '../config/config';
 import {Settings} from './settings';
-import {ConfigAndSettings} from './configAndSettings';
 
 @Component({
     selector: 'app-settings',
@@ -52,13 +51,10 @@ export class SettingsComponent{
         this.config$,
         this.settings$,
     ]).pipe(
-        tap(r => console.log(r)),
         map(([config, setting]) => {
             let conf = Object.keys(config).length === 0? this.config : config;
             let set = Object.keys(setting).length === 0? this.settings : this.settings;
-            let result : ConfigAndSettings = {'config':conf, 'settings':set};
-            console.log(result);
-            return result;
+            return {'config':conf, 'settings':set};
         }),
         tap(() => this.loading = false),
         catchError(error => {

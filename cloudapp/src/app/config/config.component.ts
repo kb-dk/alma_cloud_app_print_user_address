@@ -3,9 +3,6 @@ import {CloudAppConfigService} from '@exlibris/exl-cloudapp-angular-lib';
 import {catchError, map, tap} from 'rxjs/operators';
 import {EMPTY} from "rxjs";
 import {Config} from "./config";
-import {User} from "../user";
-import {ConfigAndSettings} from "../settings/configAndSettings";
-
 
 @Component({
     selector: 'app-config',

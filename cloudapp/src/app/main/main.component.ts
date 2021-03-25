@@ -121,6 +121,11 @@ export class MainComponent implements OnInit, OnDestroy {
 
         this.configService.get().subscribe(
             config => {
+                if (config.hasOwnProperty('logo')){
+                    let newConfig = {user: {logo: ''}, partner: {addresses: []}};
+                    newConfig.user.logo = config.logo;
+                    config = newConfig;
+                }
                 this.logoUrl = config.user.logo;
                 this.senderAddresses = config.partner.addresses;
             },
