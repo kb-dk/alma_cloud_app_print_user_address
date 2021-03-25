@@ -26,7 +26,7 @@
                     </td>
                     <td [innerHTML]=replaceComma(address)></td>
                 </tr>
-                <tr *ngIf="!configAndSettings.config.partner.addresses.length"><td class="alarm">No address is added. Please contact your general system administrator.</td></tr>
+                <tr *ngIf="!configAndSettings.config.partner.addresses.length"><td class="mat-error">No address is added. Please contact your general system administrator.</td></tr>
             </table>
             <br>
         </div>

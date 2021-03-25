@@ -240,13 +240,6 @@ export class MainComponent implements OnInit, OnDestroy {
 
     onPartnerPrint = () => {
         let innerHtml: string = "";
-        let senderAddress;
-        // if (this.senderAddress === ""){
-        //     senderAddress = "<b>Please contact your general system <br/>administrator to add <br/>sender's address to config.</b>";
-        // } else {
-        //     senderAddress = this.senderAddress;
-        // }
-        //
         this.currentPartnerActions.map(partner => {
             if (partner.checked) {
                 innerHtml = innerHtml.concat(
