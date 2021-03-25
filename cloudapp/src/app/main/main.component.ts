@@ -139,10 +139,8 @@ export class MainComponent implements OnInit, OnDestroy {
                 if (settings.hasOwnProperty('myAddress')) {
                     if (settings.myAddress) {
                         this.senderAddress = this.replaceComma(settings.myAddress);
-                        console.log('replaced');
                     } else {
                         this.senderAddress = this.replaceComma(this.senderAddresses[0]);
-                        console.log('replaced 2');
                     }
                 } else{
                     if(this.senderAddresses.length){
