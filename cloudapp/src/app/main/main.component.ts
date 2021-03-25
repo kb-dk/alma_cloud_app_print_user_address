@@ -128,6 +128,9 @@ export class MainComponent implements OnInit, OnDestroy {
                 }
                 this.logoUrl = config.user.logo;
                 this.senderAddresses = config.partner.addresses;
+                if(this.senderAddresses.length && !this.senderAddress){
+                    this.senderAddress = this.replaceComma(this.senderAddresses[0]);
+                }
             },
             err => console.log(err.message));
 
@@ -136,7 +139,13 @@ export class MainComponent implements OnInit, OnDestroy {
                 if (settings.hasOwnProperty('myAddress')) {
                     if (settings.myAddress) {
                         this.senderAddress = this.replaceComma(settings.myAddress);
+                        console.log('replaced');
                     } else {
+                        this.senderAddress = this.replaceComma(this.senderAddresses[0]);
+                        console.log('replaced 2');
+                    }
+                } else{
+                    if(this.senderAddresses.length){
                         this.senderAddress = this.replaceComma(this.senderAddresses[0]);
                     }
                 }
@@ -210,7 +219,6 @@ export class MainComponent implements OnInit, OnDestroy {
 
     onUserPrint = () => {
         let innerHtml: string = "";
-
         this.currentUserActions.map(user => {
             if (user.checked) {
                 let logo = this.printLogo&&this.logoUrl?`<div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>`:'';
@@ -234,7 +242,13 @@ export class MainComponent implements OnInit, OnDestroy {
 
     onPartnerPrint = () => {
         let innerHtml: string = "";
-
+        let senderAddress;
+        // if (this.senderAddress === ""){
+        //     senderAddress = "<b>Please contact your general system <br/>administrator to add <br/>sender's address to config.</b>";
+        // } else {
+        //     senderAddress = this.senderAddress;
+        // }
+        //
         this.currentPartnerActions.map(partner => {
             if (partner.checked) {
                 innerHtml = innerHtml.concat(
