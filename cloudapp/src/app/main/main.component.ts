@@ -133,10 +133,12 @@ export class MainComponent implements OnInit, OnDestroy {
 
         this.settingsService.get().subscribe(
             settings => {
-                if (settings.hasOwnProperty('myAddress')){
-                    this.senderAddress = this.replaceComma(settings.myAddress);
-                } else {
-                    this.senderAddress = this.replaceComma(this.senderAddresses[0]);
+                if (settings.hasOwnProperty('myAddress')) {
+                    if (settings.myAddress) {
+                        this.senderAddress = this.replaceComma(settings.myAddress);
+                    } else {
+                        this.senderAddress = this.replaceComma(this.senderAddresses[0]);
+                    }
                 }
             },
             err => console.log(err.message));
