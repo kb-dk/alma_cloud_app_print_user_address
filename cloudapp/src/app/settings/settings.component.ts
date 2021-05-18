@@ -5,6 +5,8 @@ import {ToastrService} from 'ngx-toastr';
 import {MatDialog} from "@angular/material/dialog";
 import {catchError, map, tap} from "rxjs/operators";
 import {combineLatest, EMPTY} from "rxjs";
+import {Config} from '../config/config';
+import {Settings} from './settings';
 
 @Component({
     selector: 'app-settings',
@@ -15,10 +17,20 @@ export class SettingsComponent{
     errorMsg;
     saving = false;
     loading: boolean = true;
-    settings = {myAddress:''};
-    config = {user: {logo: ''}, partner: {addresses: []}};
+    settings : Settings = {myAddress:''};
+    config : Config = {user: {logo: ''}, partner: {addresses: []}};
 
     config$ = this.configService.get().pipe(
+        map(config => {
+            // Fix the old config format
+            if (config.hasOwnProperty('logo')){
+                let newConfig = this.config;
+                newConfig.user.logo = config.logo;
+                config = newConfig;
+            }
+            return config;
+        }),
+        map(config=> Object.keys(config).length === 0? this.config : config),
         tap(config => this.config = config),
         catchError(error => {
             console.log('Error getting configuration:', error);
@@ -27,6 +39,7 @@ export class SettingsComponent{
     );
 
     settings$ = this.settingsService.get().pipe(
+        map(settings=> Object.keys(settings).length === 0? this.settings : settings),
         tap(settings => this.settings = settings),
         catchError(error => {
             console.log('Error getting settings:', error);
@@ -38,7 +51,11 @@ export class SettingsComponent{
         this.config$,
         this.settings$,
     ]).pipe(
-        map(([config, settings]) => ({'config':config, 'settings':settings})),
+        map(([config, setting]) => {
+            let conf = Object.keys(config).length === 0? this.config : config;
+            let set = Object.keys(setting).length === 0? this.settings : this.settings;
+            return {'config':conf, 'settings':set};
+        }),
         tap(() => this.loading = false),
         catchError(error => {
             this.errorMsg = error.message;

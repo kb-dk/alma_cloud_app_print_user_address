@@ -1,8 +1,8 @@
 {
-   "id": "print-user-address",
-   "title": "Print user address",
-   "description": "It gives the possibility to select one or more users and print their addresses.",
-   "subtitle": "Gives the possibility to select one or more users and print their addresses",
+   "id": "print-address",
+   "title": "Print address",
+   "description": "It gives the possibility to select one or more user or partner and print their addresses.",
+   "subtitle": "Gives the possibility to select one or more user or partner and print their addresses",
    "author": "Royal Danish library",
    "icon": {
       "type": "font",

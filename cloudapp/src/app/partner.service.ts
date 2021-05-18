@@ -9,18 +9,19 @@ import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
 })
 
 export class PartnerService {
-
-    // To get the partner address from the page entities
-    // there is the need for two more API call (There might be other ways)
-    // get the requests from the link string in the entity object (if there is user info in it)
-    // then get the user info from the user_primary_id or user_id or primary_id field and extract the address from the response
+    // The Cloud App’s JSON includes the URL for GET-loan API (from workbench when you return an item).
+    // You can then call the following APIs:
+    // GET (historic) loan – starting Alma’s March Release it will include the related request ID and a link to the Get-Request API
+    // GET request – from there you’ll get the GET resource-sharing-request API URL
+    // GET resource-sharing-request – which includes the partner’s code
+    // GET partner – which will give you the partner’s address.
     user_id : string = '';
     senders_address : string = '';
 
     partners$ = (entities: Entity[]) => {
-
         let calls = entities.filter(entity => [EntityType.LOAN].includes(entity.type))
             .map(entity => this.partnerAddressFromLoan(entity.link));
+        console.log('Entities:', entities);
         return (calls.length === 0) ?
             of([]) :
             forkJoin(calls).pipe(
@@ -28,12 +29,13 @@ export class PartnerService {
             );
     };
 
-
     private partnerAddressFromLoan = (link) => this.getLoanFromAlma(link).pipe(
         filter(loan => loan.location_code.name === 'Borrowing Resource Sharing Requests'),
         tap(loan => this.user_id = loan.user_id),
+        tap(loan => console.log('loan:',loan)),
         switchMap(loan => this.getRequestFromLoan(loan)),
         tap(loan => this.senders_address = loan.pickup_location),
+        tap(request => console.log('request:',request)),
         switchMap(request => this.getResourceSharingRequestFromRequest(request.resource_sharing.id)),
         switchMap(resourceSharingRequest => this.getPartnerFromResourceSharingRequest(resourceSharingRequest)),
         map(partner => this.partnerFromAlmaPartner(partner)),

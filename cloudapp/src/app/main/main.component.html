@@ -9,11 +9,12 @@
         <mat-tab label="Partners" *ngIf="partners.length && usersReady" [tabIndex]="-1">
             <div>
                 <div class="buttonsContainer">
-                    <button class="float-right" mat-stroked-button color="primary" (click)="onPartnerPrint()">
+                    <button class="float-right" [disabled]="!senderAddress" mat-stroked-button color="primary" (click)="onPartnerPrint()">
                         Print {{numPartnersToPrint}} partner address(es)
                     </button>
                     <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear
                     </button>
+                    <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to add sender's address to config.</b></div>
                 </div>
                 <h3>Select partner record(s) to print:</h3>
                 <table border="1px">
