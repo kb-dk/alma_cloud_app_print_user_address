@@ -10,6 +10,8 @@ import {
     Entity,
     PageInfo
 } from '@exlibris/exl-cloudapp-angular-lib';
+import {Config} from "../config/config";
+import {Settings} from "../settings/settings";
 import {User} from "../user";
 import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
@@ -120,12 +122,7 @@ export class MainComponent implements OnInit, OnDestroy {
         this.pageLoadSubscription = this.eventsService.onPageLoad(this.onPageLoad);
 
         this.configService.get().subscribe(
-            config => {
-                if (config.hasOwnProperty('logo')){
-                    let newConfig = {user: {logo: ''}, partner: {addresses: []}};
-                    newConfig.user.logo = config.logo;
-                    config = newConfig;
-                }
+            (config:Config) => {
                 this.logoUrl = config.user.logo;
                 this.senderAddresses = config.partner.addresses;
                 if(this.senderAddresses.length && !this.senderAddress){
@@ -135,7 +132,8 @@ export class MainComponent implements OnInit, OnDestroy {
             err => console.log(err.message));
 
         this.settingsService.get().subscribe(
-            settings => {
+            (settings:Settings) => {
+                console.log(settings);
                 if (settings.hasOwnProperty('myAddress')) {
                     if (settings.myAddress) {
                         this.senderAddress = this.replaceComma(settings.myAddress);
