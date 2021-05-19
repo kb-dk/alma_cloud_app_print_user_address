@@ -12,6 +12,7 @@ import {Config} from "./config";
 
 export class ConfigComponent {
 
+    showExample: boolean = true;
     loading: boolean = true;
     newSenderAddress: string = '';
     config: Config = {user: {logo: ''}, partner: {addresses: []}};
