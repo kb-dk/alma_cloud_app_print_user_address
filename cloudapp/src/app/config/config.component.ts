@@ -28,7 +28,7 @@ export class ConfigComponent {
         //     return config;
         // }),
         // map(config=> Object.keys(config).length === 0? this.config : config),
-        map(config => config.partner.hasOwnProperty('addresses')?config:config.partner.addresses = []),
+        tap(config => config.partner.hasOwnProperty('addresses')?config:config.partner.addresses = []),
         tap(config => this.config = config),
         tap(config => console.log("Config:",config)),
         tap(() => this.loading = false),

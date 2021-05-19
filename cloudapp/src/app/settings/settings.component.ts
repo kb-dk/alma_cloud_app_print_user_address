@@ -4,7 +4,7 @@ import {CloudAppSettingsService, CloudAppConfigService} from '@exlibris/exl-clou
 import {ToastrService} from 'ngx-toastr';
 import {MatDialog} from "@angular/material/dialog";
 import {catchError, map, tap} from "rxjs/operators";
-import {combineLatest, EMPTY} from "rxjs";
+import {combineLatest, EMPTY, Observable} from "rxjs";
 import {Config} from '../config/config';
 import {Settings} from './settings';
 
@@ -20,17 +20,18 @@ export class SettingsComponent{
     settings : Settings = {myAddress:''};
     config : Config = {user: {logo: ''}, partner: {addresses: []}};
 
-    config$ = this.configService.get().pipe(
-        map(config => {
-            // Fix the old config format
-            if (config.hasOwnProperty('logo')){
-                let newConfig = this.config;
-                newConfig.user.logo = config.logo;
-                config = newConfig;
-            }
-            return config;
-        }),
-        map(config=> Object.keys(config).length === 0? this.config : config),
+    config$:Observable<Config> = this.configService.get().pipe(
+        // map(config => {
+        //     // Fix the old config format
+        //     if (config.hasOwnProperty('logo')){
+        //         let newConfig = this.config;
+        //         newConfig.user.logo = config.logo;
+        //         config = newConfig;
+        //     }
+        //     return config;
+        // }),
+        // map(config=> Object.keys(config).length === 0? this.config : config),
+        tap(config => config.partner.hasOwnProperty('addresses')?config:config.partner.addresses = []),
         tap(config => this.config = config),
         catchError(error => {
             console.log('Error getting configuration:', error);
