@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {CloudAppConfigService} from '@exlibris/exl-cloudapp-angular-lib';
 import {catchError, map, tap} from 'rxjs/operators';
-import {EMPTY} from "rxjs";
+import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
 
 @Component({
@@ -16,18 +16,21 @@ export class ConfigComponent {
     newSenderAddress: string = '';
     config: Config = {user: {logo: ''}, partner: {addresses: []}};
 
-    config$ = this.configService.get().pipe(
-        map(config => {
-            // Fix the old config format
-            if (config.hasOwnProperty('logo')){
-                let newConfig = this.config;
-                newConfig.user.logo = config.logo;
-                config = newConfig;
-            }
-            return config;
-        }),
-        map(config=> Object.keys(config).length === 0? this.config : config),
+    config$:Observable<Config> = this.configService.get()
+        .pipe(
+        // map((config:Config) => {
+        //     // Fix the old config format
+        //     if (config.hasOwnProperty('logo')){
+        //         let newConfig = this.config;
+        //         newConfig.user.logo = config.logo;
+        //         config = newConfig;
+        //     }
+        //     return config;
+        // }),
+        // map(config=> Object.keys(config).length === 0? this.config : config),
+        map(config => config.partner.hasOwnProperty('addresses')?config:config.partner.addresses = []),
         tap(config => this.config = config),
+        tap(config => console.log("Config:",config)),
         tap(() => this.loading = false),
         catchError(error => {
             console.log('Error getting configuration:', error);
