@@ -80,9 +80,6 @@ export class UserService {
     private convertToPrintableAddress = (addressObj: Address) => {
         console.log(addressObj.country);
         let city_and_post_code_and_province = ['postal_code', 'city', 'state_province'];
-        if (addressObj.country.desc.toLowerCase() === "the united states" || addressObj.country.desc.toLowerCase() === "united states" || addressObj.country.value.toLowerCase() === "us"){
-            city_and_post_code_and_province = ['city', 'postal_code', 'state_province'];
-        }
         let neededFields = {
             address: ['line1', 'line2', 'line3', 'line4', 'line5'],
             city: city_and_post_code_and_province
