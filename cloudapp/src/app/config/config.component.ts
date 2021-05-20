@@ -4,6 +4,7 @@ import {catchError, map, tap} from 'rxjs/operators';
 import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
 import {ToastrService} from 'ngx-toastr';
+import {AddressFormats} from "./address-format";
 
 @Component({
     selector: 'app-config',
@@ -14,46 +15,11 @@ import {ToastrService} from 'ngx-toastr';
 export class ConfigComponent {
 
     showExample: boolean = true;
-    example1 = [
-        ['recipient'],
-        ['line1', 'line2', 'line3', 'line4', 'line5'],
-        ['postal_code', 'city', 'state_province'],
-        ['country']
-    ];
-    example2 = [
-        ['recipient'],
-        ['line1', 'line2', 'line3', 'line4', 'line5'],
-        ['city', 'state_province', 'postal_code'],
-        ['country']
-    ];
+    example1 = AddressFormats['1'];
+    example2 = AddressFormats['2'];
     loading: boolean = true;
     newSenderAddress: string = '';
-    config: Config = {
-        user:
-            {
-                logo: ''
-            },
-        partner: {
-            addresses: []
-        },
-        addressFormat: {
-            addresses: {
-                '1': [
-                    ['recipient'],
-                    ['line1', 'line2', 'line3', 'line4', 'line5'],
-                    ['postal_code', 'city', 'state_province'],
-                    ['country']
-                ],
-                '2': [
-                    ['recipient'],
-                    ['line1', 'line2', 'line3', 'line4', 'line5'],
-                    ['city', 'state_province', 'postal_code'],
-                    ['country']
-                ]
-            },
-            default: "1"
-        }
-    };
+    config: Config = {user:{logo: ''},partner: {addresses: []},addressFormat: {addresses: {},default: "1"}};
 
     config$:Observable<Config> = this.configService.get()
         .pipe(
@@ -68,10 +34,10 @@ export class ConfigComponent {
         // }),
         // map(config=> Object.keys(config).length === 0? this.config : config),
 
-            // tap(config => this.saveConfig()),
+            tap(config => this.saveConfig('')),
         tap(config => config.partner.hasOwnProperty('addresses')?config:config.partner.addresses = []),
         tap(config => {
-            if (!config.addressFormat.hasOwnProperty('addresses')){
+            if (!config.hasOwnProperty('addressFormat')){
                 config.addressFormat = {};
                 config.addressFormat.addresses = {};
                 config.addressFormat.addresses['1'] = this.example1;
@@ -104,34 +70,34 @@ export class ConfigComponent {
     };
 
     saveConfig = (toastMessage) => {
-        // let config = {
-        //         user:
-        //             {
-        //                 logo: ''
-        //             },
-        //         partner: {
-        //             addresses: []
-        //         },
-        //         addressFormat: {
-        //             addresses: {
-        //                 '1': [
-        //                     ['recipient'],
-        //                     ['line1', 'line2', 'line3', 'line4', 'line5'],
-        //                     ['postal_code', 'city', 'state_province'],
-        //                     ['country']
-        //                 ],
-        //                 '2': [
-        //                     ['recipient'],
-        //                     ['line1', 'line2', 'line3', 'line4', 'line5'],
-        //                     ['city', 'state_province', 'postal_code'],
-        //                     ['country']
-        //                 ]
-        //             },
-        //             default: "1"
-        //         }
-        //     };
+        let config = {
+                user:
+                    {
+                        logo: ''
+                    },
+                partner: {
+                    addresses: []
+                },
+                addressFormat: {
+                    addresses: {
+                        '1': [
+                            ['recipient'],
+                            ['line1', 'line2', 'line3', 'line4', 'line5'],
+                            ['postal_code', 'city', 'state_province'],
+                            ['country']
+                        ],
+                        '2': [
+                            ['recipient'],
+                            ['line1', 'line2', 'line3', 'line4', 'line5'],
+                            ['city', 'state_province', 'postal_code'],
+                            ['country']
+                        ]
+                    },
+                    default: "1"
+                }
+            };
 
-        this.configService.set(this.config).pipe(
+        this.configService.set({}).pipe(
         ).subscribe(
             () => this.toastr.success(toastMessage, 'Config updated', {timeOut:2000}),
             error => console.log('Error saving configuration:', error)

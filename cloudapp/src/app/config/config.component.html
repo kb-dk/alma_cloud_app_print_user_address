@@ -69,10 +69,6 @@
     <mat-tab label="Address format">
         <div *ngIf="showExample">
             <mat-divider></mat-divider>
-            <br>
-            <div>This section is under construction</div>
-            <br>
-
             <table *ngIf="configuration.hasOwnProperty('addressFormat')">
                 <tr style="text-align: left">
                     <th></th>
@@ -87,7 +83,6 @@
                                           checked="{{configuration.addressFormat.default === addresses.key }}"
                         >
                         </mat-radio-button>
-
                     </td>
                     <td valign="top"><h3>{{ addresses.key}}</h3></td>
                     <td>
