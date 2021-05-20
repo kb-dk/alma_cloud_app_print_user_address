@@ -18,7 +18,32 @@ export class SettingsComponent{
     saving = false;
     loading: boolean = true;
     settings : Settings = {myAddress:''};
-    config : Config = {user: {logo: ''}, partner: {addresses: []}};
+    config: Config = {
+        user:
+            {
+                logo: ''
+            },
+        partner: {
+            addresses: []
+        },
+        addressFormat: {
+            addresses: {
+                '1': [
+                    ['recipient'],
+                    ['line1', 'line2', 'line3', 'line4', 'line5'],
+                    ['postal_code', 'city', 'state_province'],
+                    ['country']
+                ],
+                '2': [
+                    ['recipient'],
+                    ['line1', 'line2', 'line3', 'line4', 'line5'],
+                    ['city', 'state_province', 'postal_code'],
+                    ['country']
+                ]
+            },
+            default: "1"
+        }
+    };
 
     config$:Observable<Config> = this.configService.get().pipe(
         // map(config => {
@@ -33,6 +58,7 @@ export class SettingsComponent{
         // map(config=> Object.keys(config).length === 0? this.config : config),
         tap(config => config.partner.hasOwnProperty('addresses')?config:config.partner.addresses = []),
         tap(config => this.config = config),
+        tap(config => console.log("Config:",config)),
         catchError(error => {
             console.log('Error getting configuration:', error);
             return EMPTY;

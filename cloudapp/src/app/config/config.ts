@@ -6,4 +6,8 @@ export interface Config {
     partner: {
         addresses: string[];
     }
+    addressFormat: {
+        addresses: {},
+        default: string
+    }
 }

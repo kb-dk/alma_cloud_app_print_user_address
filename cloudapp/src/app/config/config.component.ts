@@ -13,9 +13,46 @@ import {Config} from "./config";
 export class ConfigComponent {
 
     showExample: boolean = true;
+    example1 = [
+        ['recipient'],
+        ['line1', 'line2', 'line3', 'line4', 'line5'],
+        ['postal_code', 'city', 'state_province'],
+        ['country']
+    ];
+    example2 = [
+        ['recipient'],
+        ['line1', 'line2', 'line3', 'line4', 'line5'],
+        ['city', 'state_province', 'postal_code'],
+        ['country']
+    ];
     loading: boolean = true;
     newSenderAddress: string = '';
-    config: Config = {user: {logo: ''}, partner: {addresses: []}};
+    config: Config = {
+        user:
+            {
+                logo: ''
+            },
+        partner: {
+            addresses: []
+        },
+        addressFormat: {
+            addresses: {
+                '1': [
+                    ['recipient'],
+                    ['line1', 'line2', 'line3', 'line4', 'line5'],
+                    ['postal_code', 'city', 'state_province'],
+                    ['country']
+                ],
+                '2': [
+                    ['recipient'],
+                    ['line1', 'line2', 'line3', 'line4', 'line5'],
+                    ['city', 'state_province', 'postal_code'],
+                    ['country']
+                ]
+            },
+            default: "1"
+        }
+    };
 
     config$:Observable<Config> = this.configService.get()
         .pipe(
@@ -29,7 +66,19 @@ export class ConfigComponent {
         //     return config;
         // }),
         // map(config=> Object.keys(config).length === 0? this.config : config),
+
+            tap(config => this.saveConfig()),
         tap(config => config.partner.hasOwnProperty('addresses')?config:config.partner.addresses = []),
+        tap(config => {
+            if (!config.addressFormat.hasOwnProperty('addresses')){
+                config.addressFormat = {};
+                config.addressFormat.addresses = {};
+                config.addressFormat.addresses['1'] = this.example1;
+                config.addressFormat.addresses['2'] = this.example2;
+                config.addressFormat.default = '1';
+                console.log(config);
+            }
+        }),
         tap(config => this.config = config),
         tap(config => console.log("Config:",config)),
         tap(() => this.loading = false),
@@ -54,11 +103,42 @@ export class ConfigComponent {
     };
 
     saveConfig = () => {
-        this.configService.set(this.config).pipe(
+        let config = {
+                user:
+                    {
+                        logo: ''
+                    },
+                partner: {
+                    addresses: []
+                },
+                addressFormat: {
+                    addresses: {
+                        '1': [
+                            ['recipient'],
+                            ['line1', 'line2', 'line3', 'line4', 'line5'],
+                            ['postal_code', 'city', 'state_province'],
+                            ['country']
+                        ],
+                        '2': [
+                            ['recipient'],
+                            ['line1', 'line2', 'line3', 'line4', 'line5'],
+                            ['city', 'state_province', 'postal_code'],
+                            ['country']
+                        ]
+                    },
+                    default: "1"
+                }
+            };
+
+        this.configService.set(config).pipe(
         ).subscribe(
             () => console.log('Configuration successfully saved'),
             error => console.log('Error saving configuration:', error)
         )
+    };
+
+    onSelectMyAddressFormat = (event) => {
+        console.log(event.value);
     };
 
     clearLogo = () => {

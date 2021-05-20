@@ -15,15 +15,25 @@
     <mat-tab label="Partners">
         <div class="padding-top">
             <table *ngIf="configuration.hasOwnProperty('partner')">
-                <tr><th colspan="2" class="sender"><h3>Sender's address list</h3></th></tr>
+                <tr>
+                    <th colspan="2" class="sender"><h3>Sender's address list</h3></th>
+                </tr>
                 <tr *ngFor="let address of configuration.partner.addresses; let i = index">
-                    <td><mat-icon matListIcon (click)="onRemoveAddress(i)" color="primary">delete</mat-icon></td>
+                    <td>
+                        <mat-icon matListIcon (click)="onRemoveAddress(i)" color="primary">delete</mat-icon>
+                    </td>
                     <td [innerHTML]=replaceComma(address)></td>
                 </tr>
-                <tr *ngIf="!configuration.partner.addresses.length"><td></td><td>No address is added</td></tr>
+                <tr *ngIf="!configuration.partner.addresses.length">
+                    <td></td>
+                    <td>No address is added</td>
+                </tr>
             </table>
             <table *ngIf="!configuration.hasOwnProperty('partner')">
-                <tr><td></td><td>No address is added</td></tr>
+                <tr>
+                    <td></td>
+                    <td>No address is added</td>
+                </tr>
             </table>
             <h3 class="padding-top">Add to address list:</h3>
             <mat-form-field>
@@ -58,9 +68,53 @@
     </mat-tab>
     <mat-tab label="Address format">
         <div *ngIf="showExample">
-            <mat-divider></mat-divider><br>
-            <div>This section is under construction</div><br>
-            <mat-divider></mat-divider><br>
+            <mat-divider></mat-divider>
+            <br>
+            <div>This section is under construction</div>
+            <br>
+
+            <table *ngIf="configuration.hasOwnProperty('addressFormat')">
+                <tr style="text-align: left">
+                    <th></th>
+                    <th>Number</th>
+                    <th>Address format</th>
+                </tr>
+                <tr *ngFor="let addresses of configuration.addressFormat.addresses | keyvalue">
+                    <td valign="top">
+                        <mat-radio-button style="display: block; color: black"
+                                          (change)="onSelectMyAddressFormat($event)"
+                                          [value]="addresses.key"
+                        >
+                        </mat-radio-button>
+                        <!--checked="{{configAndSettings.settings.myAddress===address}}"-->
+
+                    </td>
+                    <td valign="top"><h3>{{ addresses.key}}</h3></td>
+                    <td>
+                        <div style="padding-top: 10px" *ngFor="let addressLine of addresses.value ">
+                            <span *ngFor="let addressElement of addressLine">
+                                {{ addressElement }}
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <!--<div buttons>-->
+            <!--<button mat-flat-button type="button" color="primary">Add address format</button>-->
+            <!--</div>-->
+            <!--<br/>-->
+            <!--<mat-divider></mat-divider>-->
+            <!--<br/>-->
+
+            <!--<div *ngIf="true">-->
+            <!--<h3 class="padding-top">Country format name</h3>-->
+            <!--<mat-form-field>-->
+            <!--<mat-label>Address</mat-label>-->
+            <!--<input matInput [(ngModel)]="newSenderAddress">-->
+            <!--<mat-hint>Use comma for line change</mat-hint>-->
+            <!--</mat-form-field>-->
+            <!--</div>-->
         </div>
     </mat-tab>
 </mat-tab-group>
