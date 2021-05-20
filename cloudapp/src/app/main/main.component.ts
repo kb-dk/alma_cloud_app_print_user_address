@@ -2,6 +2,7 @@ import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from '../user.service';
 import {PartnerService} from '../partner.service';
+import {AddressFormats} from '../config/address-format';
 import {
     CloudAppEventsService,
     CloudAppRestService,
@@ -33,6 +34,8 @@ export class MainComponent implements OnInit, OnDestroy {
     selectedTab: string = "0";
     partnersReady: boolean = false;
     usersReady: boolean = false;
+    example1 = AddressFormats['1'];
+    example2 = AddressFormats['2'];
 
     private currentUserActions;
     private currentPartnerActions;
@@ -123,6 +126,11 @@ export class MainComponent implements OnInit, OnDestroy {
 
         this.configService.get().subscribe(
             (config:Config) => {
+                if (!Object.keys(config).length){
+                    config = {user:{logo: ''},partner: {addresses: []},addressFormat: {addresses: {},default: "1"}};
+                    config.addressFormat.addresses['1'] = this.example1;
+                    config.addressFormat.addresses['2'] = this.example2;
+                }
                 this.logoUrl = config.user.logo;
                 this.senderAddresses = config.partner.addresses;
                 if(this.senderAddresses.length && !this.senderAddress){
