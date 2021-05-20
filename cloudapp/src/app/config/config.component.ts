@@ -3,6 +3,7 @@ import {CloudAppConfigService} from '@exlibris/exl-cloudapp-angular-lib';
 import {catchError, map, tap} from 'rxjs/operators';
 import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
+import {ToastrService} from 'ngx-toastr';
 
 @Component({
     selector: 'app-config',
@@ -67,7 +68,7 @@ export class ConfigComponent {
         // }),
         // map(config=> Object.keys(config).length === 0? this.config : config),
 
-            tap(config => this.saveConfig()),
+            // tap(config => this.saveConfig()),
         tap(config => config.partner.hasOwnProperty('addresses')?config:config.partner.addresses = []),
         tap(config => {
             if (!config.addressFormat.hasOwnProperty('addresses')){
@@ -88,7 +89,7 @@ export class ConfigComponent {
         })
     );
 
-    constructor(private configService: CloudAppConfigService) {
+    constructor(private configService: CloudAppConfigService, private toastr: ToastrService) {
     }
 
     onLogoChanged = (images: File[]) => {
@@ -97,66 +98,68 @@ export class ConfigComponent {
         logoReader.readAsDataURL(logo);
         logoReader.onload = () => {
             this.config.user.logo = logoReader.result.toString();
-            this.saveConfig();
+            this.saveConfig('Your logo is set.');
         };
         logoReader.onerror = error => console.log('Error reading image' + error);
     };
 
-    saveConfig = () => {
-        let config = {
-                user:
-                    {
-                        logo: ''
-                    },
-                partner: {
-                    addresses: []
-                },
-                addressFormat: {
-                    addresses: {
-                        '1': [
-                            ['recipient'],
-                            ['line1', 'line2', 'line3', 'line4', 'line5'],
-                            ['postal_code', 'city', 'state_province'],
-                            ['country']
-                        ],
-                        '2': [
-                            ['recipient'],
-                            ['line1', 'line2', 'line3', 'line4', 'line5'],
-                            ['city', 'state_province', 'postal_code'],
-                            ['country']
-                        ]
-                    },
-                    default: "1"
-                }
-            };
+    saveConfig = (toastMessage) => {
+        // let config = {
+        //         user:
+        //             {
+        //                 logo: ''
+        //             },
+        //         partner: {
+        //             addresses: []
+        //         },
+        //         addressFormat: {
+        //             addresses: {
+        //                 '1': [
+        //                     ['recipient'],
+        //                     ['line1', 'line2', 'line3', 'line4', 'line5'],
+        //                     ['postal_code', 'city', 'state_province'],
+        //                     ['country']
+        //                 ],
+        //                 '2': [
+        //                     ['recipient'],
+        //                     ['line1', 'line2', 'line3', 'line4', 'line5'],
+        //                     ['city', 'state_province', 'postal_code'],
+        //                     ['country']
+        //                 ]
+        //             },
+        //             default: "1"
+        //         }
+        //     };
 
-        this.configService.set(config).pipe(
+        this.configService.set(this.config).pipe(
         ).subscribe(
-            () => console.log('Configuration successfully saved'),
+            () => this.toastr.success(toastMessage, 'Config updated', {timeOut:2000}),
             error => console.log('Error saving configuration:', error)
         )
     };
 
     onSelectMyAddressFormat = (event) => {
-        console.log(event.value);
+        console.log(event);
+        this.config.addressFormat.default = event.value;
+        this.saveConfig('Your address format is set.');
     };
 
     clearLogo = () => {
         this.config.user.logo = '';
-        this.saveConfig();
+        this.saveConfig('Your logo is cleared.');
     };
 
     onAddSender = () => {
         if (this.newSenderAddress) {
             this.config.partner.addresses.push(this.newSenderAddress);
             this.newSenderAddress = '';
-            this.saveConfig();
+            this.saveConfig('The sender address is added.');
         }
     };
 
     onRemoveAddress = (i) => {
         this.config.partner.addresses.splice(i, 1);
-        this.saveConfig();
+        this.saveConfig('The address is removed.');
     };
 
     replaceComma = (string) => {
