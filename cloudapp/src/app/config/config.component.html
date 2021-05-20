@@ -84,9 +84,9 @@
                         <mat-radio-button style="display: block; color: black"
                                           (change)="onSelectMyAddressFormat($event)"
                                           [value]="addresses.key"
+                                          checked="{{configuration.addressFormat.default === addresses.key }}"
                         >
                         </mat-radio-button>
-                        <!--checked="{{configAndSettings.settings.myAddress===address}}"-->
 
                     </td>
                     <td valign="top"><h3>{{ addresses.key}}</h3></td>
