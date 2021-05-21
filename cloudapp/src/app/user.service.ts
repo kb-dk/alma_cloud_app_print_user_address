@@ -2,11 +2,12 @@ import {Injectable} from '@angular/core';
 import {Address} from "./address";
 import {AddressFormats} from "./config/address-format";
 import {FixConfigService} from "./fix-config.service";
-import {CloudAppRestService,
-        Entity,
-        EntityType,
-        CloudAppConfigService,
-        } from "@exlibris/exl-cloudapp-angular-lib";
+import {
+    CloudAppRestService,
+    Entity,
+    EntityType,
+    CloudAppConfigService,
+} from "@exlibris/exl-cloudapp-angular-lib";
 import {of, forkJoin, iif, throwError} from "rxjs";
 import {catchError, map, switchMap} from "rxjs/operators";
 import {Config} from "./config/config";
@@ -26,12 +27,11 @@ export class UserService {
     users$ = (entities: Entity[]) => {
 
         this.configService.get().subscribe(
-            (config:Config) => {
+            (config: Config) => {
                 config = this.fixConfigService.fixOldOrEmptyConfigElements(config);
                 this.addressFormat = config.addressFormat.addresses[config.addressFormat.default];
-                console.log('from user service:',this.addressFormat);
             },
-            err => console.log(err.message));
+            err => console.error(err.message));
 
         let calls = entities.filter(entity => [EntityType.LOAN, EntityType.USER, EntityType.REQUEST, EntityType.BORROWING_REQUEST].includes(entity.type))
             .map(entity => {
@@ -58,7 +58,7 @@ export class UserService {
         switchMap(request => iif(() => request.requester !== null,
             this.getRequestFromAlma(`/users/${request.requester.value}`),
             of(null),
-            ))
+        ))
     );
 
     private userFromLoan = (link) => this.getRequestFromAlma(link).pipe(
@@ -98,23 +98,18 @@ export class UserService {
     private getRequestFromAlma = link => this.restService.call(link);
 
     private convertToPrintableAddress = (addressObj: Address) => {
-        console.log(addressObj.country);
-        let city_and_post_code_and_province = ['postal_code', 'city', 'state_province'];
-        let neededFields = {
-            address: ['line1', 'line2', 'line3', 'line4', 'line5'],
-            city: city_and_post_code_and_province
-        };
         let address: string = '';
-        neededFields.address.map(field => {
-            address = addressObj[field] && !address.includes(addressObj[field]) ? address.concat(addressObj[field]).concat(' ') : address;
+        this.addressFormat.map((addressFormatLine, index) => {
+            addressFormatLine.map(field => {
+                    let value = field === 'country' ? addressObj[field].desc : addressObj[field];
+                    address = addressObj[field] && !address.includes(value) ? address.concat(value).concat(' ') : address;
+                }
+            );
+            // Recipient is empty here, it will be calculate in userFromAlmaUser
+            // so No page break after first and last line please
+            address = index + 1 !== this.addressFormat.length && index != 0 ? address + '<br/>' : address;
         });
-        address = address + '<br/>';
-        neededFields.city.map(field => {
-            address = addressObj[field] ? address.concat(addressObj[field]).concat(' ') : address;
-        });
-        address = address + '<br/>';
-        return addressObj.country.desc ? address.concat(addressObj.country.desc) : address;
-
+        return address;
     };
 
     private handleError = (err: any) => {
