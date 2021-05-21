@@ -5,6 +5,7 @@ import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
 import {ToastrService} from 'ngx-toastr';
 import {AddressFormats} from "./address-format";
+import {FixConfigService} from "../fix-config.service";
 
 @Component({
     selector: 'app-config',
@@ -23,9 +24,9 @@ export class ConfigComponent {
     config$: Observable<Config> = this.configService.get()
         .pipe(
 
-            // tap(config => this.saveConfig('')),
+            tap(config => this.saveConfig('')),
 
-            map(config => this.fixOldOrEmptyConfigElements(config)),
+            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.config = config),
             tap(config => console.log("Config:", config)),
             tap(() => this.loading = false),
@@ -35,36 +36,10 @@ export class ConfigComponent {
             })
         );
 
-    constructor(private configService: CloudAppConfigService, private toastr: ToastrService) {
+    constructor(private configService: CloudAppConfigService,
+                private fixConfigService: FixConfigService,
+                private toastr: ToastrService) {
     }
-
-    fixOldOrEmptyConfigElements = (config) => {
-        // Fix it if config is an empty object
-        if (!Object.keys(config).length) {
-            config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};
-            config.addressFormat.addresses = this.addressFormats;
-        }
-        // Fix it if logo is directly in the config and not under user
-        if (config.hasOwnProperty('logo')) {
-            config.user = {};
-            config.user.logo = config.logo;
-            delete config.logo;
-        }
-        // Fix the config if there is no partner
-        if (!config.hasOwnProperty('partner')) {
-            config.partner = {}
-        }
-        // Fix the config if there is not addresses in partner
-        if (!config.partner.hasOwnProperty('addresses')) {
-            config.partner.addresses = []
-        }
-        // Fix the config if there is not addressFormat
-        if (!config.hasOwnProperty('addressFormat')) {
-            config.addressFormat = {addresses: {}, default: "1"};
-            config.addressFormat.addresses = this.addressFormats;
-        }
-        return config;
-    };
 
     onLogoChanged = (images: File[]) => {
         let logo = images[0];
@@ -80,7 +55,7 @@ export class ConfigComponent {
     saveConfig = (toastMessage) => {
         // let config = {user: {logo: ''}, partner: {addresses: []}};
 
-        this.configService.set(this.config).pipe(
+        this.configService.set({}).pipe(
         ).subscribe(
             () => this.toastr.success(toastMessage, 'Config updated', {timeOut: 2000}),
             error => console.log('Error saving configuration:', error)

@@ -8,6 +8,7 @@ import {combineLatest, EMPTY, Observable} from "rxjs";
 import {Config} from '../config/config';
 import {Settings} from './settings';
 import {AddressFormats} from "../config/address-format";
+import {FixConfigService} from "../fix-config.service";
 
 @Component({
     selector: 'app-settings',
@@ -23,7 +24,7 @@ export class SettingsComponent {
     config: Config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};
 
     config$: Observable<Config> = this.configService.get().pipe(
-        map(config => this.fixOldOrEmptyConfigElements(config)),
+        map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
         tap(config => this.config = config),
         tap(config => console.log("Config:", config)),
         catchError(error => {
@@ -31,35 +32,6 @@ export class SettingsComponent {
             return EMPTY;
         })
     );
-
-    fixOldOrEmptyConfigElements = (config) => {
-        // Fix it if config is an empty object
-        if (!Object.keys(config).length) {
-            config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};
-            config.addressFormat.addresses = this.addressFormats;
-        }
-        // Fix it if logo is directly in the config and not under user
-        if (config.hasOwnProperty('logo')) {
-            config.user = {};
-            config.user.logo = config.logo;
-            delete config.logo;
-        }
-        // Fix the config if there is no partner
-        if (!config.hasOwnProperty('partner')) {
-            config.partner = {}
-        }
-        // Fix the config if there is not addresses in partner
-        if (!config.partner.hasOwnProperty('addresses')) {
-            config.partner.addresses = []
-        }
-        // Fix the config if there is not addressFormat
-        if (!config.hasOwnProperty('addressFormat')) {
-            config.addressFormat = {addresses: {}, default: "1"};
-            config.addressFormat.addresses = this.addressFormats;
-        }
-        return config;
-    };
-
 
     settings$ = this.settingsService.get().pipe(
         map(settings => Object.keys(settings).length === 0 ? this.settings : settings),
@@ -91,6 +63,7 @@ export class SettingsComponent {
         private settingsService: CloudAppSettingsService,
         private configService: CloudAppConfigService,
         private toastr: ToastrService,
+        private fixConfigService: FixConfigService,
         public dialog: MatDialog
     ) {
     }

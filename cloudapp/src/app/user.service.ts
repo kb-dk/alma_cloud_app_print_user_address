@@ -1,8 +1,15 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
-import {CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
+import {FixConfigService} from "./fix-config.service";
+import {CloudAppRestService,
+        Entity,
+        EntityType,
+        CloudAppConfigService,
+        } from "@exlibris/exl-cloudapp-angular-lib";
 import {of, forkJoin, iif, throwError} from "rxjs";
 import {catchError, map, switchMap} from "rxjs/operators";
+import {Config} from "./config/config";
+
 
 @Injectable({
     providedIn: 'root'
@@ -10,11 +17,20 @@ import {catchError, map, switchMap} from "rxjs/operators";
 
 export class UserService {
 
+    addressFormat = {};
     // To get the user address from the page entities
     // there is the need for two more API call (There might be other ways)
     // get the requests from the link string in the entity object (if there is user info in it)
     // then get the user info from the user_primary_id or user_id or primary_id field and extract the address from the response
     users$ = (entities: Entity[]) => {
+
+        this.configService.get().subscribe(
+            (config:Config) => {
+                config = this.fixConfigService.fixOldOrEmptyConfigElements(config);
+                this.addressFormat = config.addressFormat;
+                console.log('hejhej:',this.addressFormat);
+            },
+            err => console.log(err.message));
 
         let calls = entities.filter(entity => [EntityType.LOAN, EntityType.USER, EntityType.REQUEST, EntityType.BORROWING_REQUEST].includes(entity.type))
             .map(entity => {
@@ -55,7 +71,10 @@ export class UserService {
         ))
     );
 
-    constructor(private restService: CloudAppRestService) {
+    constructor(private restService: CloudAppRestService,
+                private configService: CloudAppConfigService,
+                private fixConfigService: FixConfigService,
+    ) {
     }
 
     private userFromAlmaUser = (almaUser, index) => almaUser === null ?
