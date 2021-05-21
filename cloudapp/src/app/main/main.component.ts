@@ -34,8 +34,7 @@ export class MainComponent implements OnInit, OnDestroy {
     selectedTab: string = "0";
     partnersReady: boolean = false;
     usersReady: boolean = false;
-    example1 = AddressFormats['1'];
-    example2 = AddressFormats['2'];
+    addressFormats = AddressFormats;
 
     private currentUserActions;
     private currentPartnerActions;
@@ -126,11 +125,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
         this.configService.get().subscribe(
             (config:Config) => {
-                if (!Object.keys(config).length){
-                    config = {user:{logo: ''},partner: {addresses: []},addressFormat: {addresses: {},default: "1"}};
-                    config.addressFormat.addresses['1'] = this.example1;
-                    config.addressFormat.addresses['2'] = this.example2;
-                }
+                config = this.fixOldOrEmptyConfigElements(config);
                 this.logoUrl = config.user.logo;
                 this.senderAddresses = config.partner.addresses;
                 if(this.senderAddresses.length && !this.senderAddress){
@@ -155,6 +150,34 @@ export class MainComponent implements OnInit, OnDestroy {
             },
             err => console.log(err.message));
     }
+
+    fixOldOrEmptyConfigElements = (config) => {
+        // Fix it if config is an empty object
+        if (!Object.keys(config).length) {
+            config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};
+            config.addressFormat.addresses = this.addressFormats;
+        }
+        // Fix it if logo is directly in the config and not under user
+        if (config.hasOwnProperty('logo')) {
+            config.user = {};
+            config.user.logo = config.logo;
+            delete config.logo;
+        }
+        // Fix the config if there is no partner
+        if (!config.hasOwnProperty('partner')) {
+            config.partner = {}
+        }
+        // Fix the config if there is not addresses in partner
+        if (!config.partner.hasOwnProperty('addresses')) {
+            config.partner.addresses = []
+        }
+        // Fix the config if there is not addressFormat
+        if (!config.hasOwnProperty('addressFormat')) {
+            config.addressFormat = {addresses: {}, default: "1"};
+            config.addressFormat.addresses = this.addressFormats;
+        }
+        return config;
+    };
 
     ngOnDestroy(): void {
         this.pageLoadSubscription.unsubscribe();

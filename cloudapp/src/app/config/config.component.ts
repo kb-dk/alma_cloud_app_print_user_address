@@ -15,48 +15,56 @@ import {AddressFormats} from "./address-format";
 export class ConfigComponent {
 
     showExample: boolean = true;
-    example1 = AddressFormats['1'];
-    example2 = AddressFormats['2'];
+    addressFormats = AddressFormats;
     loading: boolean = true;
     newSenderAddress: string = '';
-    config: Config = {user:{logo: ''},partner: {addresses: []},addressFormat: {addresses: {},default: "1"}};
+    config: Config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};
 
-    config$:Observable<Config> = this.configService.get()
+    config$: Observable<Config> = this.configService.get()
         .pipe(
-        // map((config:Config) => {
-        //     // Fix the old config format
-        //     if (config.hasOwnProperty('logo')){
-        //         let newConfig = this.config;
-        //         newConfig.user.logo = config.logo;
-        //         config = newConfig;
-        //     }
-        //     return config;
-        // }),
-        // map(config=> Object.keys(config).length === 0? this.config : config),
 
-            tap(config => this.saveConfig('')),
-        tap(config => config.partner.hasOwnProperty('addresses')?config:config.partner.addresses = []),
-        tap(config => {
-            if (!config.hasOwnProperty('addressFormat')){
-                config.addressFormat = {};
-                config.addressFormat.addresses = {};
-                config.addressFormat.addresses['1'] = this.example1;
-                config.addressFormat.addresses['2'] = this.example2;
-                config.addressFormat.default = '1';
-                console.log(config);
-            }
-        }),
-        tap(config => this.config = config),
-        tap(config => console.log("Config:",config)),
-        tap(() => this.loading = false),
-        catchError(error => {
-            console.log('Error getting configuration:', error);
-            return EMPTY;
-        })
-    );
+            // tap(config => this.saveConfig('')),
+
+            map(config => this.fixOldOrEmptyConfigElements(config)),
+            tap(config => this.config = config),
+            tap(config => console.log("Config:", config)),
+            tap(() => this.loading = false),
+            catchError(error => {
+                console.log('Error getting configuration:', error);
+                return EMPTY;
+            })
+        );
 
     constructor(private configService: CloudAppConfigService, private toastr: ToastrService) {
     }
+
+    fixOldOrEmptyConfigElements = (config) => {
+        // Fix it if config is an empty object
+        if (!Object.keys(config).length) {
+            config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};
+            config.addressFormat.addresses = this.addressFormats;
+        }
+        // Fix it if logo is directly in the config and not under user
+        if (config.hasOwnProperty('logo')) {
+            config.user = {};
+            config.user.logo = config.logo;
+            delete config.logo;
+        }
+        // Fix the config if there is no partner
+        if (!config.hasOwnProperty('partner')) {
+            config.partner = {}
+        }
+        // Fix the config if there is not addresses in partner
+        if (!config.partner.hasOwnProperty('addresses')) {
+            config.partner.addresses = []
+        }
+        // Fix the config if there is not addressFormat
+        if (!config.hasOwnProperty('addressFormat')) {
+            config.addressFormat = {addresses: {}, default: "1"};
+            config.addressFormat.addresses = this.addressFormats;
+        }
+        return config;
+    };
 
     onLogoChanged = (images: File[]) => {
         let logo = images[0];
@@ -70,42 +78,16 @@ export class ConfigComponent {
     };
 
     saveConfig = (toastMessage) => {
-        let config = {
-                user:
-                    {
-                        logo: ''
-                    },
-                partner: {
-                    addresses: []
-                },
-                addressFormat: {
-                    addresses: {
-                        '1': [
-                            ['recipient'],
-                            ['line1', 'line2', 'line3', 'line4', 'line5'],
-                            ['postal_code', 'city', 'state_province'],
-                            ['country']
-                        ],
-                        '2': [
-                            ['recipient'],
-                            ['line1', 'line2', 'line3', 'line4', 'line5'],
-                            ['city', 'state_province', 'postal_code'],
-                            ['country']
-                        ]
-                    },
-                    default: "1"
-                }
-            };
+        // let config = {user: {logo: ''}, partner: {addresses: []}};
 
-        this.configService.set({}).pipe(
+        this.configService.set(this.config).pipe(
         ).subscribe(
-            () => this.toastr.success(toastMessage, 'Config updated', {timeOut:2000}),
+            () => this.toastr.success(toastMessage, 'Config updated', {timeOut: 2000}),
             error => console.log('Error saving configuration:', error)
         )
     };
 
     onSelectMyAddressFormat = (event) => {
-        console.log(event);
         this.config.addressFormat.default = event.value;
         this.saveConfig('Your address format is set.');
     };
@@ -131,7 +113,7 @@ export class ConfigComponent {
     replaceComma = (string) => {
         let title = string.substring(0, string.indexOf(','));
         let address = string.substring(string.indexOf(','));
-        string = '<strong>'+title+'</strong>' + address;
+        string = '<strong>' + title + '</strong>' + address;
         return string.replaceAll(',', '<br/>')
     };
 }
