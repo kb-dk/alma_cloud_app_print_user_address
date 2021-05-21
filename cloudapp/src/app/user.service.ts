@@ -1,5 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
+import {AddressFormats} from "./config/address-format";
 import {FixConfigService} from "./fix-config.service";
 import {CloudAppRestService,
         Entity,
@@ -17,7 +18,7 @@ import {Config} from "./config/config";
 
 export class UserService {
 
-    addressFormat = {};
+    addressFormat = AddressFormats['1'];
     // To get the user address from the page entities
     // there is the need for two more API call (There might be other ways)
     // get the requests from the link string in the entity object (if there is user info in it)
@@ -27,8 +28,8 @@ export class UserService {
         this.configService.get().subscribe(
             (config:Config) => {
                 config = this.fixConfigService.fixOldOrEmptyConfigElements(config);
-                this.addressFormat = config.addressFormat;
-                console.log('hejhej:',this.addressFormat);
+                this.addressFormat = config.addressFormat.addresses[config.addressFormat.default];
+                console.log('from user service:',this.addressFormat);
             },
             err => console.log(err.message));
 

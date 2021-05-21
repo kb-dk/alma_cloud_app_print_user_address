@@ -24,7 +24,7 @@ export class ConfigComponent {
     config$: Observable<Config> = this.configService.get()
         .pipe(
 
-            tap(config => this.saveConfig('')),
+            // tap(config => this.saveConfig('')),
 
             map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.config = config),
@@ -55,7 +55,7 @@ export class ConfigComponent {
     saveConfig = (toastMessage) => {
         // let config = {user: {logo: ''}, partner: {addresses: []}};
 
-        this.configService.set({}).pipe(
+        this.configService.set(this.config).pipe(
         ).subscribe(
             () => this.toastr.success(toastMessage, 'Config updated', {timeOut: 2000}),
             error => console.log('Error saving configuration:', error)
