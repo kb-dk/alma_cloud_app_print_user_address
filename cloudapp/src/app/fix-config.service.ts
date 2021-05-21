@@ -13,7 +13,6 @@ export class FixConfigService {
     }
 
     fixOldOrEmptyConfigElements = (config) => {
-        console.log('hi there');
         // Fix it if config is an empty object
         if (!Object.keys(config).length) {
             config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};
