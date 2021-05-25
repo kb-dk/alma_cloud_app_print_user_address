@@ -102,7 +102,7 @@ export class UserService {
         this.addressFormat.map((addressFormatLine, index) => {
             addressFormatLine.map(field => {
                     let value = field === 'country' ? addressObj[field].desc : addressObj[field];
-                    address = addressObj[field] && !address.includes(value) ? address.concat(value).concat(' ') : address;
+                    address = value && !(address.includes(value)&& field in ['line1', 'line2', 'line3', 'line4', 'line5']) ? address.concat(value).concat(' ') : address;
                 }
             );
             // Recipient is empty here, it will be calculate in userFromAlmaUser

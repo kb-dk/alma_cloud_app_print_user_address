@@ -28,7 +28,6 @@ export class ConfigComponent {
 
             map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.config = config),
-            tap(config => console.log("Config:", config)),
             tap(() => this.loading = false),
             catchError(error => {
                 console.log('Error getting configuration:', error);

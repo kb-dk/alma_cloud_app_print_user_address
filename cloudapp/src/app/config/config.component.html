@@ -67,12 +67,16 @@
         </div>
     </mat-tab>
     <mat-tab label="Address format">
-        <div *ngIf="showExample">
+        <div>
             <mat-divider></mat-divider>
+            <mat-card>If you cannot find your address format in the list, create a new issue in <a target="_blank"
+                                                                                                   href="https://github.com/kb-dk/alma_cloud_app_print_user_address/issues">our
+                Github</a> and send us your address format so we add it to the list.
+            </mat-card>
             <table *ngIf="configuration.hasOwnProperty('addressFormat')">
                 <tr style="text-align: left">
                     <th></th>
-                    <th>Number</th>
+                    <th>Address code</th>
                     <th>Address format</th>
                 </tr>
                 <tr *ngFor="let addresses of configuration.addressFormat.addresses | keyvalue">
@@ -94,22 +98,6 @@
                     </td>
                 </tr>
             </table>
-
-            <!--<div buttons>-->
-            <!--<button mat-flat-button type="button" color="primary">Add address format</button>-->
-            <!--</div>-->
-            <!--<br/>-->
-            <!--<mat-divider></mat-divider>-->
-            <!--<br/>-->
-
-            <!--<div *ngIf="true">-->
-            <!--<h3 class="padding-top">Country format name</h3>-->
-            <!--<mat-form-field>-->
-            <!--<mat-label>Address</mat-label>-->
-            <!--<input matInput [(ngModel)]="newSenderAddress">-->
-            <!--<mat-hint>Use comma for line change</mat-hint>-->
-            <!--</mat-form-field>-->
-            <!--</div>-->
         </div>
     </mat-tab>
 </mat-tab-group>

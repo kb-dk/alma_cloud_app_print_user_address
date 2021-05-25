@@ -19,9 +19,9 @@ export class PartnerService {
     senders_address : string = '';
 
     partners$ = (entities: Entity[]) => {
+        console.log('Entities:', entities);
         let calls = entities.filter(entity => [EntityType.LOAN].includes(entity.type))
             .map(entity => this.partnerAddressFromLoan(entity.link));
-        console.log('Entities:', entities);
         return (calls.length === 0) ?
             of([]) :
             forkJoin(calls).pipe(
@@ -32,10 +32,8 @@ export class PartnerService {
     private partnerAddressFromLoan = (link) => this.getLoanFromAlma(link).pipe(
         filter(loan => loan.location_code.name === 'Borrowing Resource Sharing Requests'),
         tap(loan => this.user_id = loan.user_id),
-        tap(loan => console.log('loan:',loan)),
         switchMap(loan => this.getRequestFromLoan(loan)),
         tap(loan => this.senders_address = loan.pickup_location),
-        tap(request => console.log('request:',request)),
         switchMap(request => this.getResourceSharingRequestFromRequest(request.resource_sharing.id)),
         switchMap(resourceSharingRequest => this.getPartnerFromResourceSharingRequest(resourceSharingRequest)),
         map(partner => this.partnerFromAlmaPartner(partner)),
