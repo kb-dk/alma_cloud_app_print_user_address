@@ -19,7 +19,6 @@ export class PartnerService {
     senders_address : string = '';
 
     partners$ = (entities: Entity[]) => {
-        console.log('Entities:', entities);
         let calls = entities.filter(entity => [EntityType.LOAN].includes(entity.type))
             .map(entity => this.partnerAddressFromLoan(entity.link));
         return (calls.length === 0) ?

@@ -9,7 +9,7 @@ import {
     CloudAppConfigService,
 } from "@exlibris/exl-cloudapp-angular-lib";
 import {of, forkJoin, iif, throwError} from "rxjs";
-import {catchError, map, switchMap} from "rxjs/operators";
+import {catchError, map, switchMap, tap} from "rxjs/operators";
 import {Config} from "./config/config";
 
 
@@ -26,12 +26,12 @@ export class UserService {
     // then get the user info from the user_primary_id or user_id or primary_id field and extract the address from the response
     users$ = (entities: Entity[]) => {
 
-        this.configService.get().subscribe(
-            (config: Config) => {
-                config = this.fixConfigService.fixOldOrEmptyConfigElements(config);
-                this.addressFormat = config.addressFormat.addresses[config.addressFormat.default];
-            },
-            err => console.error(err.message));
+        let config = this.configService.get().pipe(
+            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
+            tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
+            tap(config => console.log(config)),
+            catchError(err => this.handleError(err))
+        );
 
         let calls = entities.filter(entity => [EntityType.LOAN, EntityType.USER, EntityType.REQUEST, EntityType.BORROWING_REQUEST].includes(entity.type))
             .map(entity => {
@@ -46,10 +46,12 @@ export class UserService {
                         return this.getRequesterFromAlma(entity.link);
                 }
             });
-        return (calls.length === 0) ?
+        calls.push(config);
+        return (calls.length === 1) ?
             of([]) :
             forkJoin(calls).pipe(
                 catchError(err => this.handleError(err)),
+                tap(users => users.pop()),
                 map(users => users.map((user, index) => this.userFromAlmaUser(user, index))),
             );
     };
