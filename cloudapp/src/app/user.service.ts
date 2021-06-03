@@ -20,6 +20,7 @@ import {Config} from "./config/config";
 export class UserService {
 
     addressFormat = AddressFormats['1'];
+    showCountry = true;
     // To get the user address from the page entities
     // there is the need for two more API call (There might be other ways)
     // get the requests from the link string in the entity object (if there is user info in it)
@@ -29,6 +30,7 @@ export class UserService {
         let config = this.configService.get().pipe(
             map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
+            tap(config => this.showCountry = config.addressFormat.showCountry),
             tap(config => console.log(config)),
             catchError(err => this.handleError(err))
         );
@@ -104,7 +106,8 @@ export class UserService {
         this.addressFormat.map((addressFormatLine, index) => {
             addressFormatLine.map(field => {
                     let value = field === 'country' ? addressObj[field].desc : addressObj[field];
-                    address = value && !(address.includes(value)&& field in ['line1', 'line2', 'line3', 'line4', 'line5']) ? address.concat(value).concat(' ') : address;
+                    value = field === 'country' && !this.showCountry ? '' : value;
+                    address = (value && !(address.includes(value)&& field in ['line1', 'line2', 'line3', 'line4', 'line5'])) ? address.concat(value).concat(' ') : address;
                 }
             );
             // Recipient is empty here, it will be calculate in userFromAlmaUser
