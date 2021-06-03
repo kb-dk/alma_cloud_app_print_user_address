@@ -6,6 +6,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {catchError, map, tap} from "rxjs/operators";
 import {combineLatest, EMPTY, Observable} from "rxjs";
 import {Config} from '../config/config';
+import {emptyConfig} from "../config/emptyConfig";
 import {Settings} from './settings';
 import {AddressFormats} from "../config/address-format";
 import {FixConfigService} from "../fix-config.service";
@@ -21,7 +22,7 @@ export class SettingsComponent {
     saving = false;
     loading: boolean = true;
     settings: Settings = {myAddress: ''};
-    config: Config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};
+    config: Config = emptyConfig;
 
     config$: Observable<Config> = this.configService.get().pipe(
         map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
