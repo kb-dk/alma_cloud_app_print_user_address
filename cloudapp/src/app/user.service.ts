@@ -31,7 +31,6 @@ export class UserService {
             map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
             tap(config => this.showCountry = config.addressFormat.showCountry),
-            tap(config => console.log(config)),
             catchError(err => this.handleError(err))
         );
 

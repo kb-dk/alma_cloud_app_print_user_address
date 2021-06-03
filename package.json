@@ -1,6 +1,6 @@
 {
   "name": "print-address",
-  "version": "3.2.5",
+  "version": "3.2.9",
   "private": true,
   "scripts": {
     "start": "eca start"

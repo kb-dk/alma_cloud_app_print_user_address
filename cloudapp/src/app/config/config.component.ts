@@ -25,7 +25,6 @@ export class ConfigComponent {
             map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.config = config),
             tap(() => this.loading = false),
-            tap(config=>console.log(config)),
             catchError(error => {
                 console.log('Error getting configuration:', error);
                 return EMPTY;
@@ -63,7 +62,6 @@ export class ConfigComponent {
 
     onSelectShowCountry = (event) => {
         this.config.addressFormat.showCountry = event.checked;
-        console.log(this.config, event.checked);
         this.saveConfig('Your address format is set.');
     };
 
