@@ -41,6 +41,11 @@ export class FixConfigService {
         if (!config.addressFormat.addresses.length) {
             config.addressFormat.addresses = this.addressFormats;
         }
+        // Fix if showCountry is not defined
+        if (!config.addressFormat.hasOwnProperty('showCountry')) {
+            config.addressFormat.showCountry = true;
+        }
+
         return config;
     };
 }

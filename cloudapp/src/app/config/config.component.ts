@@ -3,6 +3,7 @@ import {CloudAppConfigService} from '@exlibris/exl-cloudapp-angular-lib';
 import {catchError, map, tap} from 'rxjs/operators';
 import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
+import {emptyConfig} from "./emptyConfig";
 import {ToastrService} from 'ngx-toastr';
 import {AddressFormats} from "./address-format";
 import {FixConfigService} from "../fix-config.service";
@@ -15,20 +16,16 @@ import {FixConfigService} from "../fix-config.service";
 
 export class ConfigComponent {
 
-    showExample: boolean = true;
-    addressFormats = AddressFormats;
     loading: boolean = true;
     newSenderAddress: string = '';
-    config: Config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};
+    config: Config = emptyConfig;
 
     config$: Observable<Config> = this.configService.get()
         .pipe(
-
-            // tap(config => this.saveConfig('')),
-
             map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.config = config),
             tap(() => this.loading = false),
+            tap(config=>console.log(config)),
             catchError(error => {
                 console.log('Error getting configuration:', error);
                 return EMPTY;
@@ -52,8 +49,6 @@ export class ConfigComponent {
     };
 
     saveConfig = (toastMessage) => {
-        // let config = {user: {logo: ''}, partner: {addresses: []}};
-
         this.configService.set(this.config).pipe(
         ).subscribe(
             () => this.toastr.success(toastMessage, 'Config updated', {timeOut: 2000}),
@@ -63,6 +58,12 @@ export class ConfigComponent {
 
     onSelectMyAddressFormat = (event) => {
         this.config.addressFormat.default = event.value;
+        this.saveConfig('Your address format is set.');
+    };
+
+    onSelectShowCountry = (event) => {
+        this.config.addressFormat.showCountry = event.checked;
+        console.log(this.config, event.checked);
         this.saveConfig('Your address format is set.');
     };
 

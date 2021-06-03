@@ -95,6 +95,18 @@
                     </td>
                 </tr>
             </table>
+            <mat-divider></mat-divider>
+            <table *ngIf="configuration.hasOwnProperty('addressFormat')">
+                <tr>
+                    <th valign="top" align="left">
+                        <mat-checkbox (change)="onSelectShowCountry($event)"
+                                      [checked]="config.addressFormat.showCountry">
+                            Print country in the address
+                        </mat-checkbox>
+                    </th>
+                </tr>
+            </table>
+
         </div>
     </mat-tab>
 </mat-tab-group>
