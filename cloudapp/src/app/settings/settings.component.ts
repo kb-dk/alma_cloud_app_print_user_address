@@ -27,7 +27,6 @@ export class SettingsComponent {
     config$: Observable<Config> = this.configService.get().pipe(
         map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
         tap(config => this.config = config),
-        tap(config => console.log("Config:", config)),
         catchError(error => {
             console.log('Error getting configuration:', error);
             return EMPTY;
