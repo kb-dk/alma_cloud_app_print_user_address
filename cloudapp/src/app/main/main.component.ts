@@ -1,7 +1,8 @@
-import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, EMPTY, of, Subject, Subscription} from 'rxjs';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from '../user.service';
 import {PartnerService} from '../partner.service';
+import {ScanService} from "../scan.service";
 import {AddressFormats} from '../config/address-format';
 import {FixConfigService} from "../fix-config.service";
 import {
@@ -25,11 +26,12 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 export class MainComponent implements OnInit, OnDestroy {
 
+    barcode: number = 550010441358;
     numUsersToPrint: number = 0;
     numPartnersToPrint: number = 0;
     logoUrl: string = '';
     senderAddresses = [];
-    senderAddress : string = '';
+    senderAddress: string = '';
     printLogo: boolean = true;
     errorMsg: string = '';
     selectedTab: string = "0";
@@ -116,8 +118,9 @@ export class MainComponent implements OnInit, OnDestroy {
                 private settingsService: CloudAppSettingsService,
                 private eventsService: CloudAppEventsService,
                 private userService: UserService,
-                private fixConfigService: FixConfigService,
-                private partnerService: PartnerService
+                private partnerService: PartnerService,
+                private scanService: ScanService,
+                private fixConfigService: FixConfigService
     ) {
     }
 
@@ -126,26 +129,26 @@ export class MainComponent implements OnInit, OnDestroy {
         this.pageLoadSubscription = this.eventsService.onPageLoad(this.onPageLoad);
 
         this.configService.get().subscribe(
-            (config:Config) => {
+            (config: Config) => {
                 config = this.fixConfigService.fixOldOrEmptyConfigElements(config);
                 this.logoUrl = config.user.logo;
                 this.senderAddresses = config.partner.addresses;
-                if(this.senderAddresses.length && !this.senderAddress){
+                if (this.senderAddresses.length && !this.senderAddress) {
                     this.senderAddress = this.replaceComma(this.senderAddresses[0]);
                 }
             },
             err => console.log(err.message));
 
         this.settingsService.get().subscribe(
-            (settings:Settings) => {
+            (settings: Settings) => {
                 if (settings.hasOwnProperty('myAddress')) {
                     if (settings.myAddress) {
                         this.senderAddress = this.replaceComma(settings.myAddress);
                     } else {
                         this.senderAddress = this.replaceComma(this.senderAddresses[0]);
                     }
-                } else{
-                    if(this.senderAddresses.length){
+                } else {
+                    if (this.senderAddresses.length) {
                         this.senderAddress = this.replaceComma(this.senderAddresses[0]);
                     }
                 }
@@ -186,6 +189,10 @@ export class MainComponent implements OnInit, OnDestroy {
         }
     };
 
+    onScan = () => {
+        this.scanService.scan(this.barcode);
+    };
+
     onUserToggled = (e) => {
         this.numUsersToPrint = (e.checked) ? this.numUsersToPrint + 1 : this.numUsersToPrint - 1;
         let user, id;
@@ -203,7 +210,7 @@ export class MainComponent implements OnInit, OnDestroy {
     onAddressSelected = (e) => {
         let selectedId, selectedAddressType, userOrPartner;
         [userOrPartner, selectedId, selectedAddressType] = e.source.value.split('_');
-        if (userOrPartner === 'user'){
+        if (userOrPartner === 'user') {
             this.userAddressSelectedSubject.next({id: +selectedId, value: selectedAddressType});
         } else {
             this.partnerAddressSelectedSubject.next({id: +selectedId, value: selectedAddressType});
@@ -213,7 +220,7 @@ export class MainComponent implements OnInit, OnDestroy {
     replaceComma = (string) => {
         let title = string.substring(0, string.indexOf(','));
         let address = string.substring(string.indexOf(','));
-        string = '<strong>'+title+'</strong>' + address;
+        string = '<strong>' + title + '</strong>' + address;
         return string.replaceAll(',', '<br/>')
     };
 
@@ -221,7 +228,7 @@ export class MainComponent implements OnInit, OnDestroy {
         let innerHtml: string = "";
         this.currentUserActions.map(user => {
             if (user.checked) {
-                let logo = this.printLogo&&this.logoUrl?`<div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>`:'';
+                let logo = this.printLogo && this.logoUrl ? `<div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
                 innerHtml = innerHtml.concat(
                     `<div class='pageBreak'>
                       ${logo}  

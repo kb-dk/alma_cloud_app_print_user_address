@@ -5,6 +5,21 @@
 </div>
 
 <mat-tab-group [(selectedIndex)]="selectedTab">
+
+    <div>
+        <mat-tab label="Scan barcode">
+
+            <h3 class="padding-top">Enter barcode:</h3>
+            <mat-form-field>
+                <mat-label>Barcode</mat-label>
+                <input matInput [(ngModel)]="barcode">
+            </mat-form-field>
+            <div mat-dialog-actions class="padding-top">
+                <button mat-raised-button color="primary" (click)="onScan()">Find partner</button>
+            </div>
+        </mat-tab>
+    </div>
+
     <div *ngIf="partnerActions$ | async as partners">
         <mat-tab label="Partners" *ngIf="partners.length && usersReady" [tabIndex]="-1">
             <div>
