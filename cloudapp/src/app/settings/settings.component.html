@@ -14,6 +14,20 @@
 <mat-tab-group *ngIf="configAndSettings$ | async as configAndSettings">
     <mat-tab label="Partners">
         <div class="padding-top">
+            <div>
+                <mat-radio-group>
+                    <mat-radio-button value="label" class="md-primary"
+                                      [checked]=true
+                                      (change)="onPrintTypeSelected($event)"
+                    >Print as label (10cm x 5,5cm)</mat-radio-button>
+                    <mat-radio-button value="paper"
+                                      (change)="onPrintTypeSelected($event)"
+                    >Print as A4 paper with logo</mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <hr/>
+
+            <h3>Print as label (10cm x 5,5cm):</h3>
             <table>
                 <tr *ngIf="configAndSettings.config.partner.addresses.length"><th class="sender"><h3>My address</h3></th><th class="sender"><h3>Sender's address list</h3></th></tr>
                 <tr *ngFor="let address of configAndSettings.config.partner.addresses; let i = index">
