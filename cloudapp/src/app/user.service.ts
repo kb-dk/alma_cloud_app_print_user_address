@@ -47,12 +47,13 @@ export class UserService {
                         return this.getRequesterFromAlma(entity.link);
                 }
             });
-        calls.push(config);
+        // TODO Find a better way to ensure having the config before piping the addresses into partnerAddressFromLoan
+        calls.push(config); // Pushing the config into array of observables
         return (calls.length === 1) ?
             of([]) :
             forkJoin(calls).pipe(
                 catchError(err => this.handleError(err)),
-                tap(users => users.pop()),
+                tap(users => users.pop()), // Pulling the config off of the array of results
                 map(users => users.map((user, index) => this.userFromAlmaUser(user, index))),
             );
     };

@@ -34,11 +34,12 @@ export class PartnerService {
 
         let calls = entities.filter(entity => [EntityType.LOAN].includes(entity.type))
             .map(entity => this.partnerAddressFromLoan(entity.link));
-        calls.push(config);
+        // TODO Find a better way to ensure having the config before piping the addresses into partnerAddressFromLoan
+        calls.push(config); // Pushing the config into array of observables
         return (calls.length === 1) ?
             of([]) :
             forkJoin(calls).pipe(
-                tap(users => users.pop()),
+                tap(users => users.pop()),// Pulling the config off of the array of results
                 catchError(err => this.handleError(err))
             );
     };
