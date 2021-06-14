@@ -1,8 +1,10 @@
 import {Injectable} from '@angular/core';
 import {Address} from "./address";
-import {CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
+import {CloudAppConfigService, CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
 import {of, forkJoin, throwError} from "rxjs";
 import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
+import {AddressFormats} from "./config/address-format";
+import {FixConfigService} from "./fix-config.service";
 
 @Injectable({
     providedIn: 'root'
@@ -17,13 +19,26 @@ export class PartnerService {
     // GET partner – which will give you the partner’s address.
     user_id : string = '';
     senders_address : string = '';
+    addressFormat = AddressFormats['1'];
+    showCountry = true;
+
 
     partners$ = (entities: Entity[]) => {
+
+        let config = this.configService.get().pipe(
+            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
+            tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
+            tap(config => this.showCountry = config.addressFormat.showCountry),
+            catchError(err => this.handleError(err))
+        );
+
         let calls = entities.filter(entity => [EntityType.LOAN].includes(entity.type))
             .map(entity => this.partnerAddressFromLoan(entity.link));
-        return (calls.length === 0) ?
+        calls.push(config);
+        return (calls.length === 1) ?
             of([]) :
             forkJoin(calls).pipe(
+                tap(users => users.pop()),
                 catchError(err => this.handleError(err))
             );
     };
@@ -38,8 +53,10 @@ export class PartnerService {
         map(partner => this.partnerFromAlmaPartner(partner)),
     );
 
-    constructor(private restService: CloudAppRestService) {
-    }
+    constructor(private restService: CloudAppRestService,
+                private configService: CloudAppConfigService,
+                private fixConfigService: FixConfigService,
+                ){}
 
     private partnerFromAlmaPartner = (almaPartner) => almaPartner === null ?
         {id: 'N/A', name: 'N/A', receivers_addresses: [], senders_address: ''} :
@@ -67,24 +84,22 @@ export class PartnerService {
 
     private getPartnerFromResourceSharingRequest = resourceSharingRequest => this.restService.call(resourceSharingRequest.partner.link);
 
-
     private convertToPrintableAddress = (addressObj: Address) => {
-        let neededFields = {
-            address: ['line1', 'line2', 'line3', 'line4', 'line5'],
-            city: ['state_province', 'postal_code', 'city']
-        };
         let address: string = '';
-        neededFields.address.map(field => {
-            address = addressObj[field] && !address.includes(addressObj[field]) ? address.concat(addressObj[field]).concat(' ') : address;
-        });
-        address = address + '<br/>';
-        neededFields.city.map(field => {
-            address = addressObj[field] ? address.concat(addressObj[field]).concat(' ') : address;
-        });
-        address = address + '<br/>';
-        return addressObj.country && addressObj.country.desc ? address.concat(addressObj.country.desc) : address;
-
-    };
+        this.addressFormat.map((addressFormatLine, index) => {
+            addressFormatLine.map(field => {
+                console.log(addressObj, field);
+                let value = field === 'country' && addressObj[field] !== null ? addressObj[field].desc : addressObj[field];
+                    value = field === 'country' && addressObj[field] !== null && !this.showCountry ? '' : value;
+                    address = (value && !(address.includes(value)&& field in ['line1', 'line2', 'line3', 'line4', 'line5'])) ? address.concat(value).concat(' ') : address;
+                }
+        );
+        // Recipient is empty here, it will be calculate in userFromAlmaUser
+        // so No page break after first and last line please
+        address = index + 1 !== this.addressFormat.length && index != 0 ? address + '<br/>' : address;
+    });
+    return address;
+};
 
     private handleError = (err: any) => {
         console.error(err);
