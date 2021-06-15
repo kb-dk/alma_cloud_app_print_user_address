@@ -93,8 +93,7 @@ export class SettingsComponent {
     };
 
     onPrintTypeSelected = (event) => {
-        // console.log(event);
         this.settings.printType = event.value;
-        this.saveSettings ('Your print type is set.');
+        this.saveSettings('Your print type is set.');
     };
 }
