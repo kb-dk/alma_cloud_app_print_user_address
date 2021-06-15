@@ -21,7 +21,7 @@ export class SettingsComponent {
     addressFormats = AddressFormats;
     saving = false;
     loading: boolean = true;
-    settings: Settings = {myAddress: '', printType: ''};
+    settings: Settings = {myAddress: '', printType: 'label'};
     config: Config = emptyConfig;
 
     config$: Observable<Config> = this.configService.get().pipe(
@@ -36,7 +36,7 @@ export class SettingsComponent {
     settings$ = this.settingsService.get().pipe(
         map(settings => Object.keys(settings).length === 0 ? this.settings : settings),
         tap(settings => this.settings = settings),
-        tap(settings => settings.printType === undefined ? this.settings.printType = '' : true),
+        tap(settings => settings.printType === undefined ? this.settings.printType = 'label' : true),
         catchError(error => {
             console.log('Error getting settings:', error);
             return EMPTY;
