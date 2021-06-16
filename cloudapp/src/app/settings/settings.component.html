@@ -16,13 +16,13 @@
         <div class="padding-top">
             <mat-radio-group>
                 <mat-radio-button value="paper"
-                                  [checked]="(configAndSettings.settings.printType === 'paper')"
-                                  (change)="onPrintTypeSelected($event)"
-                >Print as A4 paper with logo
+                                  [checked]="(configAndSettings.settings.partnerPrintType === 'paper')"
+                                  (change)="onPartnerPrintTypeSelected($event)"
+                >Print as A4 paper (with or without logo)
                 </mat-radio-button>
                 <mat-radio-button value="label" class="md-primary"
-                                  [checked]="(configAndSettings.settings.printType === 'label')"
-                                  (change)="onPrintTypeSelected($event)"
+                                  [checked]="(configAndSettings.settings.partnerPrintType === 'label')"
+                                  (change)="onPartnerPrintTypeSelected($event)"
                 >Print as label (10cm x 5,5cm)
                 </mat-radio-button>
             </mat-radio-group>

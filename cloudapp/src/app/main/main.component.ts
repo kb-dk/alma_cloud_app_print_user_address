@@ -32,12 +32,14 @@ export class MainComponent implements OnInit, OnDestroy {
     logoUrl: string = '';
     senderAddresses = [];
     senderAddress: string = '';
-    printLogo: boolean = true;
+    printLogoUser: boolean = true;
+    printLogoPartner: boolean = true;
     errorMsg: string = '';
     selectedTab: string = "0";
     partnersReady: boolean = false;
     usersReady: boolean = false;
     addressFormats = AddressFormats;
+    partnerPrintType: string = '';
 
     private currentUserActions;
     private currentPartnerActions;
@@ -142,16 +144,12 @@ export class MainComponent implements OnInit, OnDestroy {
         this.settingsService.get().subscribe(
             (settings: Settings) => {
                 if (settings.hasOwnProperty('myAddress')) {
-                    if (settings.myAddress) {
-                        this.senderAddress = this.replaceComma(settings.myAddress);
-                    } else {
-                        this.senderAddress = this.replaceComma(this.senderAddresses[0]);
-                    }
+                    this.senderAddress = settings.myAddress ? this.replaceComma(settings.myAddress) : this.replaceComma(this.senderAddresses[0]);
                 } else {
-                    if (this.senderAddresses.length) {
-                        this.senderAddress = this.replaceComma(this.senderAddresses[0]);
-                    }
+                    this.senderAddress = this.senderAddresses.length ? this.replaceComma(this.senderAddresses[0]) : this.senderAddress;
                 }
+
+                this.partnerPrintType = settings.hasOwnProperty('partnerPrintType') ? settings.partnerPrintType : 'label';
             },
             err => console.log(err.message));
     }
@@ -168,8 +166,12 @@ export class MainComponent implements OnInit, OnDestroy {
         this.pageLoadedSubject.next(pageInfo.entities);
     };
 
-    onPrintLogoToggled = (e) => {
-        this.printLogo = e.checked;
+    onPrintLogoUserToggled = (e) => {
+        this.printLogoUser = e.checked;
+    };
+
+    onPrintLogoPartnerToggled = (e) => {
+        this.printLogoPartner = e.checked;
     };
 
     onClear = () => {
@@ -228,13 +230,7 @@ export class MainComponent implements OnInit, OnDestroy {
         let innerHtml: string = "";
         this.currentUserActions.map(user => {
             if (user.checked) {
-                let logo = this.printLogo && this.logoUrl ? `<div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
-                innerHtml = innerHtml.concat(
-                    `<div class='pageBreak'>
-                      ${logo}  
-                      <p style="position: relative; top:2cm; width:9cm;">${user.name}<br/>
-                      ${user.addresses.find(address => address.type === user.selectedAddress).address}</p>
-                  </div>`);
+                innerHtml = innerHtml.concat(this.getHtmlForPaper(user, user.addresses, this.printLogoUser));
             }
         });
 
@@ -251,12 +247,22 @@ export class MainComponent implements OnInit, OnDestroy {
         let innerHtml: string = "";
         this.currentPartnerActions.map(partner => {
             if (partner.checked) {
-                innerHtml = innerHtml.concat(
-                    `<div class='pageBreak' style="position:relative; border:solid black 1px; width: 10cm; height: 5.5cm; padding:0.15cm;">  
-                      <div class="recipient" style="position: relative;">${partner.name}<br/>
-                      ${partner.receivers_addresses.find(address => address.type === partner.selectedAddress).address}</div>
-                      <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
-                  </div>`);
+                let addresses : string;
+                switch(this.partnerPrintType) {
+                    case 'label': {
+                        addresses = this.getHtmlForLabel(partner, partner.receivers_addresses);
+                        break;
+                    }
+                    case 'paper': {
+                        addresses = this.getHtmlForPaper(partner, partner.receivers_addresses, this.printLogoPartner);
+                        break;
+                    }
+                    default: {
+                        addresses = this.getHtmlForLabel(partner, partner.receivers_addresses);
+                        break;
+                    }
+                }
+                innerHtml = innerHtml.concat(addresses);
             }
         });
 
@@ -300,6 +306,21 @@ export class MainComponent implements OnInit, OnDestroy {
                        </html>`;
         this.printContent(content);
     };
+
+    getHtmlForLabel = (partner, addresses) => `<div class='pageBreak' style="position:relative; border:solid black 1px; width: 10cm; height: 5.5cm; padding:0.15cm;">  
+                      <div class="recipient" style="position: relative;">${partner.name}<br/>
+                      ${addresses.find(address => address.type === partner.selectedAddress).address}</div>
+                      <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
+                  </div>`;
+
+    getHtmlForPaper = (partner, addresses, printLogo) => `<div class='pageBreak'>
+                      ${this.getLogo(printLogo)}  
+                      <p style="position: relative; top:2cm; width:9cm;">${partner.name}<br/>
+                      ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
+                  </div>`;
+
+    getLogo = (printLogo) =>   printLogo && this.logoUrl ? `<div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
+
 
     printContent = (content) => {
         let win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');

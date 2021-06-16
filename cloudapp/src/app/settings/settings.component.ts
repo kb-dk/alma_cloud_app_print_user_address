@@ -21,7 +21,7 @@ export class SettingsComponent {
     addressFormats = AddressFormats;
     saving = false;
     loading: boolean = true;
-    settings: Settings = {myAddress: '', printType: 'label'};
+    settings: Settings = {myAddress: '', partnerPrintType: 'label'};
     config: Config = emptyConfig;
 
     config$: Observable<Config> = this.configService.get().pipe(
@@ -36,7 +36,7 @@ export class SettingsComponent {
     settings$ = this.settingsService.get().pipe(
         map(settings => Object.keys(settings).length === 0 ? this.settings : settings),
         tap(settings => this.settings = settings),
-        tap(settings => settings.printType === undefined ? this.settings.printType = 'label' : true),
+        tap(settings => settings.partnerPrintType === undefined ? this.settings.partnerPrintType = 'label' : true),
         catchError(error => {
             console.log('Error getting settings:', error);
             return EMPTY;
@@ -92,8 +92,8 @@ export class SettingsComponent {
         this.saveSettings('Your address is set.');
     };
 
-    onPrintTypeSelected = (event) => {
-        this.settings.printType = event.value;
+    onPartnerPrintTypeSelected = (event) => {
+        this.settings.partnerPrintType = event.value;
         this.saveSettings('Your print type is set.');
     };
 }
