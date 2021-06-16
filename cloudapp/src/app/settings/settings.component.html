@@ -14,7 +14,7 @@
 <mat-tab-group *ngIf="configAndSettings$ | async as configAndSettings">
     <mat-tab label="Partners">
         <div class="padding-top">
-            <mat-radio-group>
+            <mat-radio-group [(ngModel)]="settings.partnerPrintType">
                 <mat-radio-button value="paper"
                                   [checked]="(configAndSettings.settings.partnerPrintType === 'paper')"
                                   (change)="onPartnerPrintTypeSelected($event)"
@@ -26,7 +26,7 @@
                 >Print as label (10cm x 5,5cm)
                 </mat-radio-button>
             </mat-radio-group>
-            <table>
+            <table *ngIf="settings.partnerPrintType === 'label'">
                     <tr *ngIf="configAndSettings.config.partner.addresses.length">
                         <th class="sender"><h3>My address</h3></th>
                         <th class="sender"><h3>Sender's address list</h3></th>
