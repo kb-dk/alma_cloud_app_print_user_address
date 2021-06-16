@@ -1,6 +1,6 @@
 import {Injectable, ElementRef} from '@angular/core';
 import {of} from "rxjs";
-import {concatMap} from "rxjs/operators";
+import {concatMap, map, tap} from "rxjs/operators";
 import {
     CloudAppEventsService,
     CloudAppRestService,
@@ -18,6 +18,8 @@ import {FixConfigService} from "./fix-config.service";
 
 export class ScanService {
 
+    requests_link = '';
+
     constructor(private restService: CloudAppRestService,
                 private configService: CloudAppConfigService,
                 private settingsService: CloudAppSettingsService,
@@ -31,20 +33,31 @@ export class ScanService {
 
     scan = (barcode) => {
         if (barcode) {
-            let x = this.restService.call(`/items?item_barcode=${barcode}`);
+            let x = this.restService.call(`/almaws/v1/items?item_barcode=${barcode}`);
             let y = x.pipe(
-                concatMap(item => {
-                        return this.getItem(item.link)
-                }));
+                tap(item => console.log('item:',item)),
+                tap(item => this.requests_link = item.link),
+                concatMap(item => this.getRequests(this.requests_link )),
+                tap(item => console.log('requests:',item)),
+                map(item => item.user_request[0].request_id),
+                tap(request => console.log(`${this.requests_link}`)),
+                concatMap(request => this.getRequest(request)),
+            //    /almaws/v1/users/88007088/requests/24518294710005763
+
+            );
 
             y.subscribe(
                 (data) => console.log('data:',data),
-                error => console.log('Error saving configuration:', error)
+                error => console.log('Error getting data from API:', error)
             )
         }
 
         return of('hi') ;
     };
+
+    getRequests = (link) => this.restService.call(`${link}/requests`);
+    getRequest = (request) => this.restService.call(`${this.requests_link}/requests/${request}`);
+    // getRequest = (id) =>
 
     getItem(link: string) {
         return this.restService.call({
