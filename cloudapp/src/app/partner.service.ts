@@ -89,7 +89,6 @@ export class PartnerService {
         let address: string = '';
         this.addressFormat.map((addressFormatLine, index) => {
             addressFormatLine.map(field => {
-                console.log(addressObj, field);
                 let value = field === 'country' && addressObj[field] !== null ? addressObj[field].desc : addressObj[field];
                     value = field === 'country' && addressObj[field] !== null && !this.showCountry ? '' : value;
                     address = (value && !(address.includes(value)&& field in ['line1', 'line2', 'line3', 'line4', 'line5'])) ? address.concat(value).concat(' ') : address;
