@@ -2,7 +2,6 @@ import {BehaviorSubject, combineLatest, EMPTY, of, Subject, Subscription} from '
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from '../user.service';
 import {PartnerService} from '../partner.service';
-import {ScanService} from "../scan.service";
 import {AddressFormats} from '../config/address-format';
 import {FixConfigService} from "../fix-config.service";
 import {
@@ -121,7 +120,6 @@ export class MainComponent implements OnInit, OnDestroy {
                 private eventsService: CloudAppEventsService,
                 private userService: UserService,
                 private partnerService: PartnerService,
-                private scanService: ScanService,
                 private fixConfigService: FixConfigService
     ) {
     }
@@ -189,10 +187,6 @@ export class MainComponent implements OnInit, OnDestroy {
                 user.checked = false;
             });
         }
-    };
-
-    onScan = () => {
-        this.scanService.scan(this.barcode);
     };
 
     onUserToggled = (e) => {
