@@ -313,7 +313,7 @@ export class MainComponent implements OnInit, OnDestroy {
                       <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
                   </div>`;
 
-    getHtmlForPaper = (partner, addresses, printLogo) => `<div class='pageBreak'>
+    getHtmlForPaper = (partner, addresses, printLogo) => `<div class='pageBreak' style="width: 21cm; height:20cm">
                       ${this.getLogo(printLogo)}  
                       <p style="position: relative; top:2cm; width:9cm;">${partner.name}<br/>
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
