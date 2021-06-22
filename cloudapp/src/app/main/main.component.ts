@@ -26,6 +26,8 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 export class MainComponent implements OnInit, OnDestroy {
 
     barcode: number = 550010441358;
+    userFontSize: number = 18;
+    partnerFontSize: number = 18;
     numUsersToPrint: number = 0;
     numPartnersToPrint: number = 0;
     logoUrl: string = '';
@@ -224,7 +226,7 @@ export class MainComponent implements OnInit, OnDestroy {
         let innerHtml: string = "";
         this.currentUserActions.map(user => {
             if (user.checked) {
-                innerHtml = innerHtml.concat(this.getHtmlForPaper(user, user.addresses, this.printLogoUser));
+                innerHtml = innerHtml.concat(this.getHtmlForPaper(user, user.addresses, this.printLogoUser, this.userFontSize));
             }
         });
 
@@ -248,7 +250,7 @@ export class MainComponent implements OnInit, OnDestroy {
                         break;
                     }
                     case 'paper': {
-                        addresses = this.getHtmlForPaper(partner, partner.receivers_addresses, this.printLogoPartner);
+                        addresses = this.getHtmlForPaper(partner, partner.receivers_addresses, this.printLogoPartner, this.partnerFontSize);
                         break;
                     }
                     default: {
@@ -307,9 +309,9 @@ export class MainComponent implements OnInit, OnDestroy {
                       <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
                   </div>`;
 
-    getHtmlForPaper = (partner, addresses, printLogo) => `<div class='pageBreak' style="width: 21cm; height:20cm">
+    getHtmlForPaper = (partner, addresses, printLogo, fontSize) => `<div class='pageBreak' style="width: 21cm; height:20cm">
                       ${this.getLogo(printLogo)}  
-                      <p style="position: relative; top:2cm; width:9cm; ">${partner.name}<br/>
+                      <p style="position: relative; top:2cm; width:9cm; font-size: ${fontSize || 18}px">${partner.name}<br/>
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
                   </div>`;
 

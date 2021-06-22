@@ -38,6 +38,12 @@
                     >Add institution logo to page
                     </mat-checkbox>
                 </h3>
+                <h3 *ngIf="partnerPrintType === 'paper'">Font size:
+                    <mat-form-field style="width: 30px" class="font-form-field">
+                        <input matInput maxlength="2" type="text" [(ngModel)]="partnerFontSize">
+                    </mat-form-field>
+                    px
+                </h3>
                 <h3>Select partner record(s) to print:</h3>
                 <table border="1px">
                     <tr>
@@ -87,6 +93,12 @@
                                   [checked]=true
                     >Add institution logo to page
                     </mat-checkbox>
+                </h3>
+                <h3>Font size:
+                    <mat-form-field style="width: 30px" class="font-form-field">
+                        <input matInput maxlength="2" type="text" [(ngModel)]="userFontSize">
+                    </mat-form-field>
+                    px
                 </h3>
                 <h3>Select user record(s) to print:</h3>
                 <table border="1px">
