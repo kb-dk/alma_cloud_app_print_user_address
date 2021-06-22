@@ -26,8 +26,8 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 export class MainComponent implements OnInit, OnDestroy {
 
     barcode: number = 550010441358;
-    userFontSize: number = 18;
-    partnerFontSize: number = 18;
+    userFontSize: number = 17;
+    partnerFontSize: number = 17;
     numUsersToPrint: number = 0;
     numPartnersToPrint: number = 0;
     logoUrl: string = '';
@@ -311,7 +311,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
     getHtmlForPaper = (partner, addresses, printLogo, fontSize) => `<div class='pageBreak' style="width: 21cm; height:20cm">
                       ${this.getLogo(printLogo)}  
-                      <p style="position: relative; top:2cm; width:9cm; font-size: ${fontSize || 18}px">${partner.name}<br/>
+                      <p style="position: relative; top:2cm; width:9cm; font-size: ${fontSize || 17}px">${partner.name}<br/>
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
                   </div>`;
 
