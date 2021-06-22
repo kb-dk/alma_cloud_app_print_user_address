@@ -7,6 +7,7 @@ import {catchError, map, tap} from "rxjs/operators";
 import {combineLatest, EMPTY, Observable} from "rxjs";
 import {Config} from '../config/config';
 import {emptyConfig} from "../config/emptyConfig";
+import {emptySettings} from "./emptySettings";
 import {Settings} from './settings';
 import {AddressFormats} from "../config/address-format";
 import {FixConfigService} from "../fix-config.service";
@@ -21,7 +22,7 @@ export class SettingsComponent {
     addressFormats = AddressFormats;
     saving = false;
     loading: boolean = true;
-    settings: Settings = {myAddress: '', partnerPrintType: 'label'};
+    settings: Settings = emptySettings;
     config: Config = emptyConfig;
 
     config$: Observable<Config> = this.configService.get().pipe(

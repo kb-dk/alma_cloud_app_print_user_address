@@ -230,7 +230,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
         let content = `<html>
                        <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}@page {margin-top: 2cm;margin-bottom: 2cm;margin-left: 2cm;margin-right: 2cm;}</style>
-                           <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600; margin: 0;">
+                           <body onload='window.print();' style="font-size:15px; font-family: sans-serif; font-weight:600; margin: 0;">
                                ${innerHtml}
                            </body>
                        </html>`;
