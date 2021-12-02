@@ -45,6 +45,33 @@
                         <td class="mat-error">No address is added. Please contact your general system administrator.
                         </td>
                     </tr>
+                    <tr></tr>
+                    <tr>
+                        <td>
+                            <h3 class="padding-top">Label width (cm):</h3></td>
+                        <td>
+                            <mat-form-field>
+                                <mat-label>Label width</mat-label>
+                                <input matInput
+                                       [(ngModel)]="settings.labelWidth"
+                                       (change)="onPartnerLabelWidthChanged()">
+                                <mat-hint></mat-hint>
+                            </mat-form-field>
+                        </td>
+                    </tr>
+                <tr>
+                    <td>
+                        <h3 class="padding-top">Label height (cm):</h3></td>
+                    <td>
+                        <mat-form-field>
+                            <mat-label>Label width</mat-label>
+                            <input matInput
+                                   [(ngModel)]="settings.labelHeight"
+                                   (change)="onPartnerLabelHeightChanged()">
+                            <mat-hint></mat-hint>
+                        </mat-form-field>
+                    </td>
+                </tr>
                 </table>
                 <br>
         </div>

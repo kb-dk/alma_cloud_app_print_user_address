@@ -21,7 +21,7 @@ export class SettingsComponent {
     addressFormats = AddressFormats;
     saving = false;
     loading: boolean = true;
-    settings: Settings = {myAddress: '', partnerPrintType: 'label'};
+    settings: Settings = {myAddress: '', partnerPrintType: 'label', labelWidth: '10', labelHeight: '5.5'};
     config: Config = emptyConfig;
 
     config$: Observable<Config> = this.configService.get().pipe(
@@ -37,6 +37,8 @@ export class SettingsComponent {
         map(settings => Object.keys(settings).length === 0 ? this.settings : settings),
         tap(settings => this.settings = settings),
         tap(settings => settings.partnerPrintType === undefined ? this.settings.partnerPrintType = 'label' : true),
+        tap(settings => settings.labelWidth === undefined ? this.settings.labelWidth = '10' : true),
+        tap(settings => settings.labelHeight === undefined ? this.settings.labelHeight = '5.5' : true),
         catchError(error => {
             console.log('Error getting settings:', error);
             return EMPTY;
@@ -70,6 +72,7 @@ export class SettingsComponent {
     }
 
     saveSettings = (toastMessage: string) => {
+        console.log(this.settings);
         this.settingsService.set(this.settings).subscribe(
             response => {
                 this.toastr.success(toastMessage, 'Settings updated', {timeOut: 1000});
@@ -95,5 +98,13 @@ export class SettingsComponent {
     onPartnerPrintTypeSelected = (event) => {
         this.settings.partnerPrintType = event.value;
         this.saveSettings('Your print type is set.');
+    };
+
+    onPartnerLabelWidthChanged = () => {
+        this.saveSettings('Your label width is set.');
+    };
+
+    onPartnerLabelHeightChanged = () => {
+        this.saveSettings('Your label height is set.');
     };
 }
