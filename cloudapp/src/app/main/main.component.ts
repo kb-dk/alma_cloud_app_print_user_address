@@ -26,7 +26,10 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 export class MainComponent implements OnInit, OnDestroy {
 
-    barcode: number = 550010441358;
+    barcode: number = 550010598265;  // status: "Returned by patron" for scan in items
+    scannedPartner;
+    loading: boolean = false;
+    scannedPartnerReady: boolean = false;
     numUsersToPrint: number = 0;
     numPartnersToPrint: number = 0;
     logoUrl: string = '';
@@ -192,7 +195,17 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     onScan = () => {
-        this.scanService.scan(this.barcode);
+        this.loading = true;
+        this.scanService.scan(this.barcode).subscribe(
+            (data) => {
+                this.loading = false;
+                this.scannedPartner = data;
+                this.scannedPartnerReady = true;
+                this.onScannedPartnerPrint();
+                console.log('scannedPartner:',this.scannedPartner);
+                },
+            error => console.log('Error getting data from API:', error)
+        );
     };
 
     onUserToggled = (e) => {
@@ -210,12 +223,14 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     onAddressSelected = (e) => {
-        let selectedId, selectedAddressType, userOrPartner;
-        [userOrPartner, selectedId, selectedAddressType] = e.source.value.split('_');
-        if (userOrPartner === 'user') {
+        let selectedId, selectedAddressType, userOrPartnerOrscannedPartner;
+        [userOrPartnerOrscannedPartner, selectedId, selectedAddressType] = e.source.value.split('_');
+        if (userOrPartnerOrscannedPartner === 'user') {
             this.userAddressSelectedSubject.next({id: +selectedId, value: selectedAddressType});
-        } else {
+        } else if (userOrPartnerOrscannedPartner === 'partner') {
             this.partnerAddressSelectedSubject.next({id: +selectedId, value: selectedAddressType});
+        } else if (userOrPartnerOrscannedPartner === 'scannedPartner') {
+            this.scannedPartner.selectedAddress = selectedAddressType;
         }
     };
 
@@ -242,6 +257,68 @@ export class MainComponent implements OnInit, OnDestroy {
                        </html>`;
         this.printContent(content);
     };
+
+    onScannedPartnerPrint = () => {
+        let innerHtml: string = "";
+            if (this.scannedPartner.checked) {
+                let addresses : string;
+                switch(this.partnerPrintType) {
+                    case 'label': {
+                        addresses = this.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses);
+                        break;
+                    }
+                    case 'paper': {
+                        addresses = this.getHtmlForPaper(this.scannedPartner, this.scannedPartner.receivers_addresses, this.printLogoPartner);
+                        break;
+                    }
+                    default: {
+                        addresses = this.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses);
+                        break;
+                    }
+                }
+                innerHtml = innerHtml.concat(addresses);
+            }
+        let content = `<html>
+                       <style>
+                       @media print {
+                       .hidden-print {display: none !important;}
+                       } 
+                       div.pageBreak{
+                       page-break-after: always
+                       }
+                       @page{
+                       margin:0;
+                       }
+                       .sender strong{
+                       font-weight: bold; 
+                       font-size: 18px;
+                       }
+                       .sender:before{
+                       content:"";
+                       position:absolute;
+                       border-top:1px solid black;
+                       width:7cm;
+                       transform: rotate(13deg);
+                       transform-origin: 0% 0%;
+                       }
+                       .sender:after{
+                       content:"";
+                       position:absolute;
+                       left:0;
+                       bottom:0.1cm;
+                       border-bottom:1px solid black;
+                       width:7cm;
+                       transform: rotate(-13deg);
+                       transform-origin: 0% 0%;
+                       }
+                       </style>
+                           <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600; margin: 0;">
+                               ${innerHtml}
+                           </body>
+                       </html>`;
+        this.printContent(content);
+    };
+
 
     onPartnerPrint = () => {
         let innerHtml: string = "";
@@ -313,7 +390,7 @@ export class MainComponent implements OnInit, OnDestroy {
                       <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
                   </div>`;
 
-    getHtmlForPaper = (partner, addresses, printLogo) => `<div class='pageBreak' style="width: 21cm; height:20cm">
+    getHtmlForPaper = (partner, addresses, printLogo) => `<div class='pageBreak' style="width: 10cm; height:5.5cm">
                       ${this.getLogo(printLogo)}  
                       <p style="position: relative; top:2cm; width:9cm; ">${partner.name}<br/>
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
