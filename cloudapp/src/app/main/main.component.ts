@@ -26,7 +26,7 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 export class MainComponent implements OnInit, OnDestroy {
 
-    barcode: number = 550010598265;  // status: "Returned by patron" for scan in items
+    barcode: number;  // status: "Returned by patron" for scan in items
     labelWidth: string = '10';
     labelHeight: string = '5.5';
     scannedPartner;
@@ -393,7 +393,7 @@ export class MainComponent implements OnInit, OnDestroy {
         this.printContent(content);
     };
 
-    getHtmlForLabel = (partner, addresses) => `<div class='label pageBreak' style="position:relative; border:solid black 1px; padding:0.15cm;">  
+    getHtmlForLabel = (partner, addresses) => `<div class='label pageBreak' style="position:relative; padding:0.15cm;">  
                       <div class="recipient" style="position: relative;">${partner.name}<br/>
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</div>
                       <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
