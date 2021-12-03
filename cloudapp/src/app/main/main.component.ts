@@ -27,6 +27,8 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 export class MainComponent implements OnInit, OnDestroy {
 
     barcode: number = 550010598265;  // status: "Returned by patron" for scan in items
+    labelWidth: string = '10';
+    labelHeight: string = '5.5';
     scannedPartner;
     loading: boolean = false;
     scannedPartnerReady: boolean = false;
@@ -153,8 +155,11 @@ export class MainComponent implements OnInit, OnDestroy {
                 }
 
                 this.partnerPrintType = settings.hasOwnProperty('partnerPrintType') ? settings.partnerPrintType : 'label';
+                this.labelHeight = settings.hasOwnProperty('labelHeight') ? settings.labelHeight : '5.5';
+                this.labelWidth = settings.hasOwnProperty('labelWidth') ? settings.labelWidth : '10';
             },
-            err => console.log(err.message));
+            err => console.log(err.message)
+        );
     }
 
     ngOnDestroy(): void {
@@ -282,6 +287,10 @@ export class MainComponent implements OnInit, OnDestroy {
                        <style>
                        @media print {
                        .hidden-print {display: none !important;}
+                       }
+                       html, body, .label{
+                       width: ${this.labelWidth}cm;
+                       height: ${this.labelHeight}cm;
                        } 
                        div.pageBreak{
                        page-break-after: always
@@ -384,13 +393,13 @@ export class MainComponent implements OnInit, OnDestroy {
         this.printContent(content);
     };
 
-    getHtmlForLabel = (partner, addresses) => `<div class='pageBreak' style="position:relative; border:solid black 1px; width: 10cm; height: 5.5cm; padding:0.15cm;">  
+    getHtmlForLabel = (partner, addresses) => `<div class='label pageBreak' style="position:relative; border:solid black 1px; padding:0.15cm;">  
                       <div class="recipient" style="position: relative;">${partner.name}<br/>
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</div>
                       <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
                   </div>`;
 
-    getHtmlForPaper = (partner, addresses, printLogo) => `<div class='pageBreak' style="width: 10cm; height:5.5cm">
+    getHtmlForPaper = (partner, addresses, printLogo) => `<div class='pageBreak'>
                       ${this.getLogo(printLogo)}  
                       <p style="position: relative; top:2cm; width:9cm; ">${partner.name}<br/>
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</p>

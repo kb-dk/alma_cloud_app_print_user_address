@@ -7,13 +7,16 @@
 <mat-tab-group [(selectedIndex)]="selectedTab">
 
     <div>
-        <mat-tab label="Scan barcode">
-
-            <h3 class="padding-top">Enter barcode:</h3>
-            <mat-form-field>
-                <mat-label>Barcode</mat-label>
-                <input matInput [(ngModel)]="barcode">
-            </mat-form-field>
+        <mat-tab label="Partner via barcode">
+            <table><tr>
+                <td><h3 class="padding-top">Enter barcode:</h3></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Barcode</mat-label>
+                        <input matInput [(ngModel)]="barcode">
+                    </mat-form-field>
+                </td>
+            </tr></table>
             <div mat-dialog-actions class="padding-top">
                 <button mat-raised-button color="primary" (click)="onScan()">Find and print partner's address</button>
             </div>
