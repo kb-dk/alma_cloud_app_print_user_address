@@ -72,7 +72,6 @@ export class SettingsComponent {
     }
 
     saveSettings = (toastMessage: string) => {
-        console.log(this.settings);
         this.settingsService.set(this.settings).subscribe(
             response => {
                 this.toastr.success(toastMessage, 'Settings updated', {timeOut: 1000});
