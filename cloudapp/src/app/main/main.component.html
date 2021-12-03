@@ -6,19 +6,72 @@
 
 <mat-tab-group [(selectedIndex)]="selectedTab">
 
-    <!--<div>-->
-        <!--<mat-tab label="Scan barcode">-->
+    <div>
+        <mat-tab label="Partner via barcode">
+            <table><tr>
+                <td><h3 class="padding-top">Enter barcode:</h3></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Barcode</mat-label>
+                        <input matInput [(ngModel)]="barcode">
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div style="color: red; font-size: 17px" *ngIf="barcodeError">{{ errorMessage }}</div>
+                </td>
+            </tr>
+            </table>
+            <div mat-dialog-actions class="padding-top">
+                <button mat-raised-button color="primary" (click)="onScan()">Find and print partner's address</button>
+            </div>
+            <div class="loading-shade" *ngIf="loading">
+                <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
+            </div>
+            <div *ngIf="scannedPartner && scannedPartnerReady">
+                <div class="buttonsContainer">
+                    <button class="float-right" [disabled]="!senderAddress" mat-stroked-button color="primary" (click)="onScannedPartnerPrint()">
+                        Print partner's address
+                    </button>
+                    <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to add sender's address to config.</b></div>
+                </div>
+                <h3 *ngIf="logoUrl && partnerPrintType === 'paper'">
+                    <mat-checkbox style="display: block; color: black"
+                                  (change)="onPrintLogoPartnerToggled($event)"
+                                  [checked]=true
+                    >Add institution logo to page
+                    </mat-checkbox>
+                </h3>
+                <h3>Select partner address to print:</h3>
+                <table border="1px">
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Address</th>
+                    </tr>
+                    <tr>
+                        <td style="width: 2%">{{scannedPartner.id + 1}}</td>
+                        <td style="width: 23%">
+                            <div>
+                               {{scannedPartner.name}}
+                            </div>
+                        </td>
+                        <td style="width: 75%">
+                            <mat-radio-group aria-label="Select an option">
+                                <mat-radio-button *ngFor="let address of scannedPartner.receivers_addresses"
+                                                  (change)="onAddressSelected($event)"
+                                                  [checked]="(scannedPartner.selectedAddress == address.type)"
+                                                  value="scannedPartner_{{scannedPartner.id}}_{{address.type}}"
+                                ><b>{{address.type}}: </b>{{address.address}}</mat-radio-button>
+                            </mat-radio-group>
+                        </td>
+                    </tr>
+                </table>
+            </div>
 
-            <!--<h3 class="padding-top">Enter barcode:</h3>-->
-            <!--<mat-form-field>-->
-                <!--<mat-label>Barcode</mat-label>-->
-                <!--<input matInput [(ngModel)]="barcode">-->
-            <!--</mat-form-field>-->
-            <!--<div mat-dialog-actions class="padding-top">-->
-                <!--<button mat-raised-button color="primary" (click)="onScan()">Find partner</button>-->
-            <!--</div>-->
-        <!--</mat-tab>-->
-    <!--</div>-->
+        </mat-tab>
+    </div>
 
     <div *ngIf="partnerActions$ | async as partners">
         <mat-tab label="Partners" *ngIf="partners.length && usersReady" [tabIndex]="-1">
@@ -44,7 +97,7 @@
                     </mat-form-field>
                     px
                 </h3>
-                <h3>Select partner record(s) to print:</h3>
+                <h3>Select partner(s) to print:</h3>
                 <table border="1px">
                     <tr>
                         <th></th>
@@ -100,7 +153,7 @@
                     </mat-form-field>
                     px
                 </h3>
-                <h3>Select user record(s) to print:</h3>
+                <h3>Select user(s) to print:</h3>
                 <table border="1px">
                     <tr>
                         <th></th>

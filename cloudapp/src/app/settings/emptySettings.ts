@@ -3,5 +3,7 @@ import {Settings} from "./settings";
 /* Defines the Config entity*/
 export const emptySettings : Settings = {
     myAddress: '',
-    partnerPrintType: 'label'
+    partnerPrintType: 'label',
+    labelWidth: '10',
+    labelHeight: '5.5'
 };
