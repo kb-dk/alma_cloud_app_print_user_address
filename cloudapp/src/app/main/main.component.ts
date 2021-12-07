@@ -414,7 +414,7 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     getHtmlForLabel = (partner, addresses) => `<div class='label pageBreak' style="position:relative; padding:0.15cm;">  
-                      <div class="recipient" style="position: relative;">${partner.name}<br/>
+                      <div class="recipient" style="position: relative; font-size: 16px;">${partner.name}<br/>
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</div>
                       <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
                   </div>`;
