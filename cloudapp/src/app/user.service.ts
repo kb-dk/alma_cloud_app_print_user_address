@@ -10,8 +10,6 @@ import {
 } from "@exlibris/exl-cloudapp-angular-lib";
 import {of, forkJoin, iif, throwError} from "rxjs";
 import {catchError, map, switchMap, tap} from "rxjs/operators";
-import {Config} from "./config/config";
-
 
 @Injectable({
     providedIn: 'root'
