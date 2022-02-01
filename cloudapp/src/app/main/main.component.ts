@@ -26,10 +26,11 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 export class MainComponent implements OnInit, OnDestroy {
 
+    entityType: string = 'USER';
     userFontSize: number = 17;
     partnerFontSize: number = 17;
     barcode: number;  // Borrowing request, status: "Returned by patron" for scan in items
-    errorMessage : string = '';
+    errorMessage: string = '';
     barcodeError: boolean = false;
     labelWidth: string = '10';
     labelHeight: string = '5.5';
@@ -58,6 +59,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
 
     partnerAction$ = this.pageLoadedSubject.asObservable().pipe(
+        tap(entities => this.entityType = entities.length && entities[0].type === 'VENDOR' ? 'VENDOR' : 'USER'), // It is called user for every entity type except for vendor
         concatMap(entities => this.partnerService.partners$(entities)),
         tap(currentPartnerAction => this.currentPartnerActions = currentPartnerAction),
         tap(() => this.partnersReady = true),
@@ -228,7 +230,7 @@ export class MainComponent implements OnInit, OnDestroy {
     showError = (errorMessage) => {
         this.errorMessage = errorMessage;
         this.barcodeError = true;
-        setTimeout(()=>{
+        setTimeout(() => {
             this.barcodeError = false;
         }, 3000);
     };
@@ -285,24 +287,24 @@ export class MainComponent implements OnInit, OnDestroy {
 
     onScannedPartnerPrint = () => {
         let innerHtml: string = "";
-            if (this.scannedPartner && this.scannedPartner.checked) {
-                let addresses : string;
-                switch(this.partnerPrintType) {
-                    case 'label': {
-                        addresses = this.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses);
-                        break;
-                    }
-                    case 'paper': {
-                        addresses = this.getHtmlForPaper(this.scannedPartner, this.scannedPartner.receivers_addresses, this.printLogoPartner, this.partnerFontSize);
-                        break;
-                    }
-                    default: {
-                        addresses = this.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses);
-                        break;
-                    }
+        if (this.scannedPartner && this.scannedPartner.checked) {
+            let addresses: string;
+            switch (this.partnerPrintType) {
+                case 'label': {
+                    addresses = this.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses);
+                    break;
                 }
-                innerHtml = innerHtml.concat(addresses);
+                case 'paper': {
+                    addresses = this.getHtmlForPaper(this.scannedPartner, this.scannedPartner.receivers_addresses, this.printLogoPartner, this.partnerFontSize);
+                    break;
+                }
+                default: {
+                    addresses = this.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses);
+                    break;
+                }
             }
+            innerHtml = innerHtml.concat(addresses);
+        }
         let content = `<html>
                        <style>
                        @media print {
@@ -353,8 +355,8 @@ export class MainComponent implements OnInit, OnDestroy {
         let innerHtml: string = "";
         this.currentPartnerActions.map(partner => {
             if (partner.checked) {
-                let addresses : string;
-                switch(this.partnerPrintType) {
+                let addresses: string;
+                switch (this.partnerPrintType) {
                     case 'label': {
                         addresses = this.getHtmlForLabel(partner, partner.receivers_addresses);
                         break;
@@ -425,12 +427,12 @@ export class MainComponent implements OnInit, OnDestroy {
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
                   </div>`;
 
-    getLogo = (printLogo) =>   printLogo && this.logoUrl ? `<div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
+    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
 
 
     printContent = (content) => {
         let win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
-        if (win.document){
+        if (win.document) {
             win.document.write(content);
             win.document.close();
         }

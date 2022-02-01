@@ -2,13 +2,8 @@ import {Injectable} from '@angular/core';
 import {Address} from "./address";
 import {AddressFormats} from "./config/address-format";
 import {FixConfigService} from "./fix-config.service";
-import {
-    CloudAppRestService,
-    Entity,
-    EntityType,
-    CloudAppConfigService,
-} from "@exlibris/exl-cloudapp-angular-lib";
-import {of, forkJoin, iif, throwError} from "rxjs";
+import {CloudAppConfigService, CloudAppRestService, Entity, EntityType,} from "@exlibris/exl-cloudapp-angular-lib";
+import {forkJoin, iif, of, throwError} from "rxjs";
 import {catchError, map, switchMap, tap} from "rxjs/operators";
 
 @Injectable({
@@ -32,7 +27,7 @@ export class UserService {
             catchError(err => this.handleError(err))
         );
 
-        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.USER, EntityType.REQUEST, EntityType.BORROWING_REQUEST].includes(entity.type))
+        let calls = entities.filter(entity => [EntityType.VENDOR, EntityType.LOAN, EntityType.USER, EntityType.REQUEST, EntityType.BORROWING_REQUEST].includes(entity.type))
             .map(entity => {
                 switch (entity.type) {
                     case EntityType.LOAN:
@@ -43,6 +38,8 @@ export class UserService {
                         return this.getRequestFromAlma(entity.link);
                     case EntityType.BORROWING_REQUEST:
                         return this.getRequesterFromAlma(entity.link);
+                    case EntityType.VENDOR:
+                        return this.getRequestFromAlma(entity.link);
                 }
             });
         // TODO Find a better way to ensure having the config before piping the addresses into partnerAddressFromLoan
@@ -80,22 +77,24 @@ export class UserService {
     ) {
     }
 
-    private userFromAlmaUser = (almaUser, index) => almaUser === null ?
-        {id: index, name: 'N/A', addresses: []} :
-        {
-            id: index,
-            name: almaUser.full_name.search('null ') === 0 ? almaUser.full_name.replace('null ', '') : almaUser.full_name,
-            addresses: almaUser.contact_info.address.map(
-                address => ({
-                    type: address.address_type[0].value,
-                    address: this.convertToPrintableAddress(address)
-                })
-            ),
-            selectedAddress: almaUser.contact_info.address.some(address => address.preferred === true)
-                ? almaUser.contact_info.address.find(address => address.preferred === true).address_type[0].value
-                : almaUser.contact_info.address.length > 0 ? almaUser.contact_info.address[0].address_type[0].value : 'none',
-            checked: false
-        };
+    private userFromAlmaUser = (almaUser, index) => {
+        return almaUser === null ?
+            {id: index, name: 'N/A', addresses: []} :
+            {
+                id: index,
+                name: almaUser.full_name ? (almaUser.full_name.search('null ') === 0 ? almaUser.full_name.replace('null ', '') : almaUser.full_name) : (almaUser.name ? almaUser.name : ''),
+                addresses: almaUser.contact_info.address.map(
+                    address => ({
+                        type: address.address_type[0].value,
+                        address: this.convertToPrintableAddress(address)
+                    })
+                ),
+                selectedAddress: almaUser.contact_info.address.some(address => address.preferred === true)
+                    ? almaUser.contact_info.address.find(address => address.preferred === true).address_type[0].value
+                    : almaUser.contact_info.address.length > 0 ? almaUser.contact_info.address[0].address_type[0].value : 'none',
+                checked: false
+            };
+    }
 
     private getRequestFromAlma = link => this.restService.call(link);
 
@@ -105,7 +104,7 @@ export class UserService {
             addressFormatLine.map(field => {
                     let value = field === 'country' ? addressObj[field].desc : addressObj[field];
                     value = field === 'country' && !this.showCountry ? '' : value;
-                    address = (value && !(address.includes(value)&& field in ['line1', 'line2', 'line3', 'line4', 'line5'])) ? address.concat(value).concat(' ') : address;
+                    address = (value && !(address.includes(value) && field in ['line1', 'line2', 'line3', 'line4', 'line5'])) ? address.concat(value).concat(' ') : address;
                 }
             );
             // Recipient is empty here, it will be calculate in userFromAlmaUser

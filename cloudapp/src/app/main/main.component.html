@@ -8,20 +8,21 @@
 
     <div>
         <mat-tab label="Partner via barcode">
-            <table><tr>
-                <td><h3 class="padding-top">Enter barcode:</h3></td>
-                <td>
-                    <mat-form-field>
-                        <mat-label>Barcode</mat-label>
-                        <input matInput [(ngModel)]="barcode">
-                    </mat-form-field>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2">
-                    <div style="color: red; font-size: 17px" *ngIf="barcodeError">{{ errorMessage }}</div>
-                </td>
-            </tr>
+            <table>
+                <tr>
+                    <td><h3 class="padding-top">Enter barcode:</h3></td>
+                    <td>
+                        <mat-form-field>
+                            <mat-label>Barcode</mat-label>
+                            <input matInput [(ngModel)]="barcode">
+                        </mat-form-field>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div style="color: red; font-size: 17px" *ngIf="barcodeError">{{ errorMessage }}</div>
+                    </td>
+                </tr>
             </table>
             <div mat-dialog-actions class="padding-top">
                 <button mat-raised-button color="primary" (click)="onScan()">Find and print partner's address</button>
@@ -31,10 +32,12 @@
             </div>
             <div *ngIf="scannedPartner && scannedPartnerReady">
                 <div class="buttonsContainer">
-                    <button class="float-right" [disabled]="!senderAddress" mat-stroked-button color="primary" (click)="onScannedPartnerPrint()">
+                    <button class="float-right" [disabled]="!senderAddress" mat-stroked-button color="primary"
+                            (click)="onScannedPartnerPrint()">
                         Print partner's address
                     </button>
-                    <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to add sender's address to config.</b></div>
+                    <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to
+                        add sender's address to config.</b></div>
                 </div>
                 <h3 *ngIf="logoUrl && partnerPrintType === 'paper'">
                     <mat-checkbox style="display: block; color: black"
@@ -54,7 +57,7 @@
                         <td style="width: 2%">{{scannedPartner.id + 1}}</td>
                         <td style="width: 23%">
                             <div>
-                               {{scannedPartner.name}}
+                                {{scannedPartner.name}}
                             </div>
                         </td>
                         <td style="width: 75%">
@@ -77,12 +80,14 @@
         <mat-tab label="Partners" *ngIf="partners.length && usersReady" [tabIndex]="-1">
             <div>
                 <div class="buttonsContainer">
-                    <button class="float-right" [disabled]="!senderAddress" mat-stroked-button color="primary" (click)="onPartnerPrint()">
+                    <button class="float-right" [disabled]="!senderAddress" mat-stroked-button color="primary"
+                            (click)="onPartnerPrint()">
                         Print {{numPartnersToPrint}} partner address(es)
                     </button>
                     <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear
                     </button>
-                    <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to add sender's address to config.</b></div>
+                    <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to
+                        add sender's address to config.</b></div>
                 </div>
                 <h3 *ngIf="logoUrl && partnerPrintType === 'paper'">
                     <mat-checkbox style="display: block; color: black"
@@ -131,11 +136,11 @@
     </div>
 
     <div *ngIf="userActions$ | async as users">
-        <mat-tab label="Users" *ngIf="users.length && partnersReady" [tabIndex]="0">
+        <mat-tab label="{{entityType|titlecase}}s" *ngIf="users.length && partnersReady" [tabIndex]="0">
             <div>
                 <div class="buttonsContainer">
                     <button class="float-right" mat-stroked-button color="primary" (click)="onUserPrint()">
-                        Print {{numUsersToPrint}} user address(es)
+                        Print {{numUsersToPrint}} {{entityType|lowercase}} address(es)
                     </button>
                     <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear
                     </button>
@@ -153,7 +158,7 @@
                     </mat-form-field>
                     px
                 </h3>
-                <h3>Select user(s) to print:</h3>
+                <h3>Select {{entityType | lowercase}}(s) to print:</h3>
                 <table border="1px">
                     <tr>
                         <th></th>
