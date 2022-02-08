@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {Address} from "./address";
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
 import {of, forkJoin, throwError} from "rxjs";
 import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
 import {AddressFormats} from "./config/address-format";
 import {FixConfigService} from "./fix-config.service";
+import {ConvertService} from "./convert.service";
 
 @Injectable({
     providedIn: 'root'
@@ -50,31 +50,14 @@ export class PartnerService {
         tap(loan => this.senders_address = loan.pickup_location),
         switchMap(request => this.getResourceSharingRequestFromRequest(request.resource_sharing.id)),
         switchMap(resourceSharingRequest => this.getPartnerFromResourceSharingRequest(resourceSharingRequest)),
-        map(partner => this.partnerFromAlmaPartner(partner)),
+        map(partner => this.convertService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address)),
     );
 
     constructor(private restService: CloudAppRestService,
                 private configService: CloudAppConfigService,
                 private fixConfigService: FixConfigService,
-                ){}
-
-    private partnerFromAlmaPartner = (almaPartner) => almaPartner === null ?
-        {id: 'N/A', name: 'N/A', receivers_addresses: [], senders_address: ''} :
-        {
-            id: 0,
-            name: almaPartner.partner_details.name,
-            receivers_addresses: almaPartner.contact_info.address.map(
-                address => ({
-                    type: address.address_type.join(),
-                    address: this.convertToPrintableAddress(address)
-                })
-            ),
-            senders_address: this.senders_address,
-            selectedAddress: almaPartner.contact_info.address.some(address => address.preferred === true)
-                ? almaPartner.contact_info.address.find(address => address.preferred === true).address_type.join()
-                : almaPartner.contact_info.address.length > 0 ? almaPartner.contact_info.address[0].address_type.join() : true,
-            checked: false
-        };
+                private convertService: ConvertService,
+    ){}
 
     private getLoanFromAlma = link => this.restService.call(link);
 
@@ -83,22 +66,6 @@ export class PartnerService {
     private getResourceSharingRequestFromRequest = id => this.restService.call(`/users/${this.user_id}/resource-sharing-requests/${id}`);
 
     private getPartnerFromResourceSharingRequest = resourceSharingRequest => this.restService.call(resourceSharingRequest.partner.link);
-
-    private convertToPrintableAddress = (addressObj: Address) => {
-        let address: string = '';
-        this.addressFormat.map((addressFormatLine, index) => {
-            addressFormatLine.map(field => {
-                let value = field === 'country' && addressObj[field] !== null ? addressObj[field].desc : addressObj[field];
-                    value = field === 'country' && addressObj[field] !== null && !this.showCountry ? '' : value;
-                    address = (value && !(address.includes(value)&& field in ['line1', 'line2', 'line3', 'line4', 'line5'])) ? address.concat(value).concat(' ') : address;
-                }
-        );
-        // Recipient is empty here, it will be calculate in userFromAlmaUser
-        // so No page break after first and last line please
-        address = index + 1 !== this.addressFormat.length && index != 0 ? address + '<br/>' : address;
-    });
-    return address;
-};
 
     private handleError = (err: any) => {
         console.error(err);

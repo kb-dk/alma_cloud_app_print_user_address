@@ -1,5 +1,5 @@
-import {Injectable, ElementRef} from '@angular/core';
-import {of, throwError} from "rxjs";
+import {Injectable} from '@angular/core';
+import {throwError} from "rxjs";
 import {catchError, concatMap, map, tap} from "rxjs/operators";
 import {
     CloudAppEventsService,
@@ -10,8 +10,8 @@ import {
 import {UserService} from "./user.service";
 import {PartnerService} from "./partner.service";
 import {FixConfigService} from "./fix-config.service";
-import {Address} from "./address";
 import {AddressFormats} from "./config/address-format";
+import {ConvertService} from "./convert.service";
 
 @Injectable({
     providedIn: 'root'
@@ -31,7 +31,8 @@ export class ScanService {
                 private userService: UserService,
                 private partnerService: PartnerService,
                 private scanService: ScanService,
-                private fixConfigService: FixConfigService
+                private fixConfigService: FixConfigService,
+                private convertService: ConvertService,
     ) {
     }
 
@@ -49,47 +50,15 @@ export class ScanService {
             concatMap(item => this.getRequests(item.link)),
             map(item => item.user_request[0].resource_sharing.partner.link),
             concatMap(partner_link => this.restService.call(partner_link)),
-            map(partner => this.partnerFromAlmaPartner(partner)),
+            tap(partner => console.log(partner)),
+            map(partner => this.convertService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address)),
+            tap(partner => partner.checked = true),
         )
     };
 
     getRequests = (link) => this.restService.call(`${link}/requests?status=history`);
 
     getResourceSharingRequestFromRequest = id => this.restService.call(`/resource-sharing-requests/${id}`);
-
-    private partnerFromAlmaPartner = (almaPartner) => almaPartner === null ?
-        {id: 'N/A', name: 'N/A', receivers_addresses: [], senders_address: ''} :
-        {
-            id: 0,
-            name: almaPartner.partner_details.name,
-            receivers_addresses: almaPartner.contact_info.address.map(
-                address => ({
-                    type: address.address_type.join(),
-                    address: this.convertToPrintableAddress(address)
-                })
-            ),
-            senders_address: this.senders_address,
-            selectedAddress: almaPartner.contact_info.address.some(address => address.preferred === true)
-                ? almaPartner.contact_info.address.find(address => address.preferred === true).address_type.join()
-                : almaPartner.contact_info.address.length > 0 ? almaPartner.contact_info.address[0].address_type.join() : true,
-            checked: true
-        };
-
-    private convertToPrintableAddress = (addressObj: Address) => {
-        let address: string = '';
-        this.addressFormat.map((addressFormatLine, index) => {
-            addressFormatLine.map(field => {
-                    let value = field === 'country' && addressObj[field] !== null ? addressObj[field].desc : addressObj[field];
-                    value = field === 'country' && addressObj[field] !== null && !this.showCountry ? '' : value;
-                    address = (value && !(address.includes(value) && field in ['line1', 'line2', 'line3', 'line4', 'line5'])) ? address.concat(value).concat(' ') : address;
-                }
-            );
-            // Recipient is empty here, it will be calculate in userFromAlmaUser
-            // so No page break after first and last line please
-            address = index + 1 !== this.addressFormat.length && index != 0 ? address + '<br/>' : address;
-        });
-        return address;
-    };
 
     private handleError = (err: any) => {
         console.error(err);

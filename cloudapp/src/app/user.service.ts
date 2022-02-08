@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
-import {Address} from "./address";
 import {AddressFormats} from "./config/address-format";
+import {ConvertService} from "./convert.service";
 import {FixConfigService} from "./fix-config.service";
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType,} from "@exlibris/exl-cloudapp-angular-lib";
 import {forkJoin, iif, of, throwError} from "rxjs";
@@ -13,7 +13,7 @@ import {catchError, map, switchMap, tap} from "rxjs/operators";
 export class UserService {
 
     addressFormat = AddressFormats['1'];
-    showCountry = true;
+    showCountry : boolean = true;
     // To get the user address from the page entities
     // there is the need for two more API call (There might be other ways)
     // get the requests from the link string in the entity object (if there is user info in it)
@@ -49,7 +49,7 @@ export class UserService {
             forkJoin(calls).pipe(
                 catchError(err => this.handleError(err)),
                 tap(users => users.pop()), // Pulling the config off of the array of results
-                map(users => users.map((user, index) => this.userFromAlmaUser(user, index))),
+                map(users => users.map((user, index) => this.convertService.userFromAlmaUser(this.addressFormat, this.showCountry, user, index))),
             );
     };
 
@@ -74,45 +74,11 @@ export class UserService {
     constructor(private restService: CloudAppRestService,
                 private configService: CloudAppConfigService,
                 private fixConfigService: FixConfigService,
+                private convertService: ConvertService,
     ) {
     }
 
-    private userFromAlmaUser = (almaUser, index) => {
-        return almaUser === null ?
-            {id: index, name: 'N/A', addresses: []} :
-            {
-                id: index,
-                name: almaUser.full_name ? (almaUser.full_name.search('null ') === 0 ? almaUser.full_name.replace('null ', '') : almaUser.full_name) : (almaUser.name ? almaUser.name : ''),
-                addresses: almaUser.contact_info.address.map(
-                    address => ({
-                        type: address.address_type[0].value,
-                        address: this.convertToPrintableAddress(address)
-                    })
-                ),
-                selectedAddress: almaUser.contact_info.address.some(address => address.preferred === true)
-                    ? almaUser.contact_info.address.find(address => address.preferred === true).address_type[0].value
-                    : almaUser.contact_info.address.length > 0 ? almaUser.contact_info.address[0].address_type[0].value : 'none',
-                checked: false
-            };
-    }
-
     private getRequestFromAlma = link => this.restService.call(link);
-
-    private convertToPrintableAddress = (addressObj: Address) => {
-        let address: string = '';
-        this.addressFormat.map((addressFormatLine, index) => {
-            addressFormatLine.map(field => {
-                    let value = field === 'country' ? addressObj[field].desc : addressObj[field];
-                    value = field === 'country' && !this.showCountry ? '' : value;
-                    address = (value && !(address.includes(value) && field in ['line1', 'line2', 'line3', 'line4', 'line5'])) ? address.concat(value).concat(' ') : address;
-                }
-            );
-            // Recipient is empty here, it will be calculate in userFromAlmaUser
-            // so No page break after first and last line please
-            address = index + 1 !== this.addressFormat.length && index != 0 ? address + '<br/>' : address;
-        });
-        return address;
-    };
 
     private handleError = (err: any) => {
         console.error(err);
