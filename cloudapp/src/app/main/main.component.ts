@@ -1,4 +1,4 @@
-import {BehaviorSubject, combineLatest, EMPTY, of, Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from '../user.service';
 import {PartnerService} from '../partner.service';
@@ -330,7 +330,7 @@ export class MainComponent implements OnInit, OnDestroy {
                        border-top:1px solid black;
                        width:7cm;
                        transform: rotate(13deg);
-                       transform-origin: 0% 0%;
+                       transform-origin: 0 0;
                        }
                        .sender:after{
                        content:"";
@@ -340,7 +340,7 @@ export class MainComponent implements OnInit, OnDestroy {
                        border-bottom:1px solid black;
                        width:7cm;
                        transform: rotate(-13deg);
-                       transform-origin: 0% 0%;
+                       transform-origin: 0 0;
                        }
                        </style>
                            <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600; margin: 0;">
@@ -379,6 +379,10 @@ export class MainComponent implements OnInit, OnDestroy {
                        @media print {
                        .hidden-print {display: none !important;}
                        } 
+                       html, body, .label{
+                       width: ${this.labelWidth}cm;
+                       height: ${this.labelHeight}cm;
+                       } 
                        div.pageBreak{
                        page-break-after: always
                        }
@@ -395,7 +399,7 @@ export class MainComponent implements OnInit, OnDestroy {
                        border-top:1px solid black;
                        width:7cm;
                        transform: rotate(13deg);
-                       transform-origin: 0% 0%;
+                       transform-origin: 0 0;
                        }
                        .sender:after{
                        content:"";
@@ -405,7 +409,7 @@ export class MainComponent implements OnInit, OnDestroy {
                        border-bottom:1px solid black;
                        width:7cm;
                        transform: rotate(-13deg);
-                       transform-origin: 0% 0%;
+                       transform-origin: 0 0;
                        }
                        </style>
                            <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600; margin: 0;">
@@ -427,7 +431,7 @@ export class MainComponent implements OnInit, OnDestroy {
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
                   </div>`;
 
-    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width: 25%"><img src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
+    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width: 25%"><img alt="logo" src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
 
 
     printContent = (content) => {
