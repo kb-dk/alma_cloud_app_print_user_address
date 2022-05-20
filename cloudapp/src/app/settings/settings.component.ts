@@ -40,6 +40,7 @@ export class SettingsComponent {
         tap(settings => settings.partnerPrintType === undefined ? this.settings.partnerPrintType = 'label' : true),
         tap(settings => settings.labelWidth === undefined ? this.settings.labelWidth = '10' : true),
         tap(settings => settings.labelHeight === undefined ? this.settings.labelHeight = '5.5' : true),
+        tap(settings => settings.defaultTab === undefined ? this.settings.defaultTab = '0' : true),
         catchError(error => {
             console.log('Error getting settings:', error);
             return EMPTY;
@@ -88,6 +89,11 @@ export class SettingsComponent {
         let address = string.substring(string.indexOf(','));
         string = '<strong>' + title + '</strong>' + address;
         return string.replaceAll(',', '<br/>')
+    };
+
+    onSelectDefaultTab = (event) => {
+        this.settings.defaultTab = event.value;
+        this.saveSettings('Your default tab is set.');
     };
 
     onSelectMyAddress = (event) => {

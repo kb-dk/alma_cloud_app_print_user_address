@@ -4,7 +4,7 @@
     <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
 
-<mat-tab-group [(selectedIndex)]="selectedTab">
+<mat-tab-group [(selectedIndex)]="defaultTab">
 
     <div>
         <mat-tab label="Partner via barcode">
@@ -76,10 +76,66 @@
         </mat-tab>
     </div>
 
-    <div *ngIf="partnerActions$ | async as partners">
-        <mat-tab label="Partners" *ngIf="partners.length && usersReady" [tabIndex]="-1">
-            <div>
-                <div class="buttonsContainer">
+    <div>
+        <mat-tab label="Users/Vendors">
+            <div class="padding-top" *ngIf="userActions$ | async as users">
+                <div class="buttonsContainer" *ngIf="users.length && partnersReady">
+                    <button class="float-right" mat-stroked-button color="primary" (click)="onUserPrint()">
+                        Print {{numUsersToPrint}} {{entityType|lowercase}} address(es)
+                    </button>
+                    <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear
+                    </button>
+                </div>
+                <h3 *ngIf="logoUrl && users.length && partnersReady">
+                    <mat-checkbox style="display: block; color: black"
+                                  (change)="onPrintLogoUserToggled($event)"
+                                  [checked]=true
+                    >Add institution logo to page
+                    </mat-checkbox>
+                </h3>
+                <h3 *ngIf="users.length && partnersReady">Font size:
+                    <mat-form-field style="width: 30px" class="font-form-field">
+                        <input matInput maxlength="2" type="text" [(ngModel)]="userFontSize">
+                    </mat-form-field>
+                    px
+                </h3>
+                <h3>Select user/vendor(s) to print:</h3>
+                <table border="1px">
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Address</th>
+                    </tr>
+                    <tr *ngFor="let user of users" id="tr_user_{{user.id}}">
+                        <td style="width: 2%">{{user.id + 1}}</td>
+                        <td style="width: 23%">
+                            <div>
+                                <mat-checkbox value="user_{{user.id}}"
+                                              (change)="onUserToggled($event)"
+                                              [checked]="user.checked"
+                                              [disabled]="user.addresses.length==0"
+                                >{{user.name}}</mat-checkbox>
+                            </div>
+                        </td>
+                        <td style="width: 75%">
+                            <mat-radio-group aria-label="Select an option">
+                                <mat-radio-button *ngFor="let address of user.addresses"
+                                                  (change)="onAddressSelected($event)"
+                                                  [checked]="(user.selectedAddress == address.type)"
+                                                  value="user_{{user.id}}_{{address.type}}"
+                                ><b>{{address.type}}: </b>{{address.address}}</mat-radio-button>
+                            </mat-radio-group>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </mat-tab>
+    </div>
+
+    <div >
+        <mat-tab label="Partners">
+            <div *ngIf="partnerActions$ | async as partners" class="padding-top">
+                <div class="buttonsContainer" *ngIf="partners.length && usersReady">
                     <button class="float-right" [disabled]="!senderAddress" mat-stroked-button color="primary"
                             (click)="onPartnerPrint()">
                         Print {{numPartnersToPrint}} partner address(es)
@@ -126,62 +182,6 @@
                                                   (change)="onAddressSelected($event)"
                                                   [checked]="(partner.selectedAddress == address.type)"
                                                   value="partner_{{partner.id}}_{{address.type}}"
-                                ><b>{{address.type}}: </b>{{address.address}}</mat-radio-button>
-                            </mat-radio-group>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-        </mat-tab>
-    </div>
-
-    <div *ngIf="userActions$ | async as users">
-        <mat-tab label="{{entityType|titlecase}}s" *ngIf="users.length && partnersReady" [tabIndex]="0">
-            <div>
-                <div class="buttonsContainer">
-                    <button class="float-right" mat-stroked-button color="primary" (click)="onUserPrint()">
-                        Print {{numUsersToPrint}} {{entityType|lowercase}} address(es)
-                    </button>
-                    <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear
-                    </button>
-                </div>
-                <h3 *ngIf="logoUrl">
-                    <mat-checkbox style="display: block; color: black"
-                                  (change)="onPrintLogoUserToggled($event)"
-                                  [checked]=true
-                    >Add institution logo to page
-                    </mat-checkbox>
-                </h3>
-                <h3>Font size:
-                    <mat-form-field style="width: 30px" class="font-form-field">
-                        <input matInput maxlength="2" type="text" [(ngModel)]="userFontSize">
-                    </mat-form-field>
-                    px
-                </h3>
-                <h3>Select {{entityType | lowercase}}(s) to print:</h3>
-                <table border="1px">
-                    <tr>
-                        <th></th>
-                        <th>Name</th>
-                        <th>Address</th>
-                    </tr>
-                    <tr *ngFor="let user of users" id="tr_user_{{user.id}}">
-                        <td style="width: 2%">{{user.id + 1}}</td>
-                        <td style="width: 23%">
-                            <div>
-                                <mat-checkbox value="user_{{user.id}}"
-                                              (change)="onUserToggled($event)"
-                                              [checked]="user.checked"
-                                              [disabled]="user.addresses.length==0"
-                                >{{user.name}}</mat-checkbox>
-                            </div>
-                        </td>
-                        <td style="width: 75%">
-                            <mat-radio-group aria-label="Select an option">
-                                <mat-radio-button *ngFor="let address of user.addresses"
-                                                  (change)="onAddressSelected($event)"
-                                                  [checked]="(user.selectedAddress == address.type)"
-                                                  value="user_{{user.id}}_{{address.type}}"
                                 ><b>{{address.type}}: </b>{{address.address}}</mat-radio-button>
                             </mat-radio-group>
                         </td>

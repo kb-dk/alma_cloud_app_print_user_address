@@ -34,6 +34,7 @@ export class MainComponent implements OnInit, OnDestroy {
     barcodeError: boolean = false;
     labelWidth: string = '10';
     labelHeight: string = '5.5';
+    defaultTab: string = '0';
     scannedPartner;
     loading: boolean = false;
     scannedPartnerReady: boolean = false;
@@ -45,7 +46,6 @@ export class MainComponent implements OnInit, OnDestroy {
     printLogoUser: boolean = true;
     printLogoPartner: boolean = true;
     errorMsg: string = '';
-    selectedTab: string = "0";
     partnersReady: boolean = false;
     usersReady: boolean = false;
     addressFormats = AddressFormats;
@@ -150,12 +150,12 @@ export class MainComponent implements OnInit, OnDestroy {
                     this.senderAddress = this.replaceComma(this.senderAddresses[0]);
                 }
             },
-            err => console.log(err.message));
+            err => console.error(err.message));
 
         this.settingsService.get().subscribe(
             (settings: Settings) => {
-                if (settings.hasOwnProperty('myAddress')) {
-                    this.senderAddress = settings.myAddress ? this.replaceComma(settings.myAddress) : this.replaceComma(this.senderAddresses[0]);
+                if (settings.hasOwnProperty('myAddress')){
+                    this.senderAddress = settings.myAddress ? this.replaceComma(settings.myAddress) : this.senderAddresses[0] ? this.replaceComma(this.senderAddresses[0]) : '';
                 } else {
                     this.senderAddress = this.senderAddresses.length ? this.replaceComma(this.senderAddresses[0]) : this.senderAddress;
                 }
@@ -163,8 +163,9 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.partnerPrintType = settings.hasOwnProperty('partnerPrintType') ? settings.partnerPrintType : 'label';
                 this.labelHeight = settings.hasOwnProperty('labelHeight') ? settings.labelHeight : '5.5';
                 this.labelWidth = settings.hasOwnProperty('labelWidth') ? settings.labelWidth : '10';
+                this.defaultTab = settings.hasOwnProperty('defaultTab') ? settings.defaultTab : '0';
             },
-            err => console.log(err.message)
+            err => console.error(err.message)
         );
     }
 
@@ -216,7 +217,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     this.onScannedPartnerPrint();
                 },
                 error => {
-                    console.log('Error getting data from API:', error);
+                    console.error('Error getting data from API:', error);
                     this.showError("Barcode is incorrect or partner dosn't exist");
                     this.loading = false;
 

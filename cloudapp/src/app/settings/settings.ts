@@ -4,4 +4,5 @@ export interface Settings {
     partnerPrintType: string;
     labelWidth: string;
     labelHeight: string;
+    defaultTab: string;
 }

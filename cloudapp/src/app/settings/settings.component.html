@@ -11,69 +11,91 @@
     <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
 
-<mat-tab-group *ngIf="configAndSettings$ | async as configAndSettings">
-    <mat-tab label="Partners">
-        <div class="padding-top">
-            <mat-radio-group [(ngModel)]="settings.partnerPrintType">
-                <mat-radio-button value="paper"
-                                  [checked]="(configAndSettings.settings.partnerPrintType === 'paper')"
-                                  (change)="onPartnerPrintTypeSelected($event)"
-                >Print as A4 paper (with or without logo)
-                </mat-radio-button>
-                <mat-radio-button value="label" class="md-primary"
-                                  [checked]="(configAndSettings.settings.partnerPrintType === 'label')"
-                                  (change)="onPartnerPrintTypeSelected($event)"
-                >Print as label (10cm x 5,5cm)
-                </mat-radio-button>
-            </mat-radio-group>
-            <table *ngIf="settings.partnerPrintType === 'label'">
-                    <tr *ngIf="configAndSettings.config.partner.addresses.length">
-                        <th class="sender"><h3>My address</h3></th>
-                        <th class="sender"><h3>Sender's address list</h3></th>
-                    </tr>
-                    <tr *ngFor="let address of configAndSettings.config.partner.addresses; let i = index">
-                        <td>
-                            <mat-radio-button style="display: block; color: black"
-                                              (change)="onSelectMyAddress($event)"
-                                              [value]=i
-                                              checked="{{configAndSettings.settings.myAddress===address}}">
-                            </mat-radio-button>
-                        </td>
-                        <td [innerHTML]=replaceComma(address)></td>
-                    </tr>
-                    <tr *ngIf="!configAndSettings.config.partner.addresses.length">
-                        <td class="mat-error">No address is added. Please contact your general system administrator.
-                        </td>
-                    </tr>
-                    <tr></tr>
-                    <tr>
-                        <td>
-                            <h3 class="padding-top">Label width (cm):</h3></td>
-                        <td>
-                            <mat-form-field>
-                                <mat-label>Label width</mat-label>
-                                <input matInput
-                                       [(ngModel)]="settings.labelWidth"
-                                       (change)="onPartnerLabelWidthChanged()">
-                                <mat-hint></mat-hint>
-                            </mat-form-field>
-                        </td>
-                    </tr>
-                <tr>
-                    <td>
-                        <h3 class="padding-top">Label height (cm):</h3></td>
-                    <td>
-                        <mat-form-field>
-                            <mat-label>Label width</mat-label>
-                            <input matInput
-                                   [(ngModel)]="settings.labelHeight"
-                                   (change)="onPartnerLabelHeightChanged()">
-                            <mat-hint></mat-hint>
-                        </mat-form-field>
-                    </td>
-                </tr>
-                </table>
-                <br>
-        </div>
-    </mat-tab>
-</mat-tab-group>
+<div *ngIf="configAndSettings$ | async as configAndSettings">
+    <div class="padding-top">
+
+        <h2>General</h2>
+
+        <table>
+            <tr>
+                <td><h3>Default tab</h3></td>
+                <td>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Default tab</mat-label>
+                        <mat-select [(value)]="settings.defaultTab" (selectionChange)="onSelectDefaultTab($event)">
+                            <mat-option value="0">Partner via barcode</mat-option>
+                            <mat-option value="1">Users / Vendors</mat-option>
+                            <mat-option value="2">Partners</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="padding-top">
+
+        <h2>Partners</h2>
+
+        <mat-radio-group [(ngModel)]="settings.partnerPrintType">
+            <mat-radio-button value="paper"
+                              [checked]="(configAndSettings.settings.partnerPrintType === 'paper')"
+                              (change)="onPartnerPrintTypeSelected($event)"
+            >Print as A4 paper (with or without logo)
+            </mat-radio-button>
+            <mat-radio-button value="label" class="md-primary"
+                              [checked]="(configAndSettings.settings.partnerPrintType === 'label')"
+                              (change)="onPartnerPrintTypeSelected($event)"
+            >Print as label (10cm x 5,5cm)
+            </mat-radio-button>
+        </mat-radio-group>
+        <table *ngIf="settings.partnerPrintType === 'label'">
+            <tr *ngIf="configAndSettings.config.partner.addresses.length">
+                <th class="sender"><h3>My address</h3></th>
+                <th class="sender"><h3>Sender's address list</h3></th>
+            </tr>
+            <tr *ngFor="let address of configAndSettings.config.partner.addresses; let i = index">
+                <td>
+                    <mat-radio-button style="display: block; color: black"
+                                      (change)="onSelectMyAddress($event)"
+                                      [value]=i
+                                      checked="{{configAndSettings.settings.myAddress===address}}">
+                    </mat-radio-button>
+                </td>
+                <td [innerHTML]=replaceComma(address)></td>
+            </tr>
+            <tr *ngIf="!configAndSettings.config.partner.addresses.length">
+                <td class="mat-error">No address is added. Please contact your general system administrator.
+                </td>
+            </tr>
+            <tr></tr>
+            <tr>
+                <td>
+                    <h3 class="padding-top">Label width (cm):</h3></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Label width</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.labelWidth"
+                               (change)="onPartnerLabelWidthChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3 class="padding-top">Label height (cm):</h3></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Label width</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.labelHeight"
+                               (change)="onPartnerLabelHeightChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+        </table>
+        <br>
+    </div>
+</div>

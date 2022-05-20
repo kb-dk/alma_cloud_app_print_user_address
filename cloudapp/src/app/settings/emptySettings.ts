@@ -5,5 +5,6 @@ export const emptySettings : Settings = {
     myAddress: '',
     partnerPrintType: 'label',
     labelWidth: '10',
-    labelHeight: '5.5'
+    labelHeight: '5.5',
+    defaultTab: '0',
 };
