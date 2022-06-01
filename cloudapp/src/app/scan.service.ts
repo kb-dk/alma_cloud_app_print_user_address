@@ -45,14 +45,13 @@ export class ScanService {
             catchError(err => this.handleError(err))
         );
 
-
         return this.restService.call(`/almaws/v1/items?item_barcode=${barcode}`).pipe(
             concatMap(item => this.getRequests(item.link)),
             map(item => item.user_request[0].resource_sharing.partner.link),
             concatMap(partner_link => this.restService.call(partner_link)),
-            tap(partner => console.log(partner)),
-            map(partner => this.convertService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address)),
+            map(partner => this.convertService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address, '0')),
             tap(partner => partner.checked = true),
+            catchError(err => this.handleError(err))
         )
     };
 

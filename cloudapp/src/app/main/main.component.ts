@@ -89,11 +89,17 @@ export class MainComponent implements OnInit, OnDestroy {
         this.partnerAddressSelectedAction$
     ])
         .pipe(
+            tap(([partners, selectedPartner, selectedAddressType]) => { // If there is only one partner, then select it by default
+                if(partners.length === 1 && selectedPartner.id === -1 && selectedAddressType.id === -1){
+                    this.numPartnersToPrint = 1;
+                    partners[0].checked = true;
+                }
+            }),
             map(([partners, selectedPartner, selectedAddressType]) =>
                     partners.map((partner, requestIndex) => ({
                         ...partner,
                         selectedAddress: partner.id === selectedAddressType.id ? selectedAddressType.value : this.currentPartnerActions[requestIndex].selectedAddress,
-                        checked: partner.id === selectedPartner.id ? selectedPartner.checked : partner.id === 0,
+                        checked: partner.id === selectedPartner.id ? selectedPartner.checked : this.currentPartnerActions[requestIndex].checked,
                     }) as User),
                 toArray(),
             ),
@@ -110,6 +116,12 @@ export class MainComponent implements OnInit, OnDestroy {
         this.userAddressSelectedAction$
     ])
         .pipe(
+            tap(([users, selectedUser, selectedAddressType]) => { // If there is only one user, then select it by default
+                if(users.length === 1 && selectedUser.id === -1 && selectedAddressType.id === -1){
+                    this.numUsersToPrint = 1;
+                    users[0].checked = true;
+                }
+            }),
             map(([users, selectedUser, selectedAddressType]) =>
                     users.map((user, requestIndex) => ({
                         ...user,
@@ -118,7 +130,6 @@ export class MainComponent implements OnInit, OnDestroy {
                     }) as User),
                 toArray(),
             ),
-            tap(currentUserActions => this.numPartnersToPrint = currentUserActions.length),
             tap(currentUserActions => this.currentUserActions = currentUserActions),
             catchError(error => {
                 this.errorMsg = error.message;

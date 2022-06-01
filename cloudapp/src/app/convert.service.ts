@@ -43,11 +43,11 @@ export class ConvertService {
             };
     };
 
-    partnerFromAlmaPartner = (addressFormat, showCountry, almaPartner, senders_address) => {
+    partnerFromAlmaPartner = (addressFormat, showCountry, almaPartner, senders_address, index) => {
         return almaPartner === null ?
-            {id: 'N/A', name: 'N/A', receivers_addresses: [], senders_address: ''} :
+            {id: index, name: 'N/A', receivers_addresses: [], senders_address: ''} :
             {
-                id: 0,
+                id: index,
                 name: almaPartner.partner_details.name,
                 receivers_addresses: almaPartner.contact_info.address.map(
                     address => ({
