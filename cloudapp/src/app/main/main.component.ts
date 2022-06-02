@@ -41,6 +41,7 @@ export class MainComponent implements OnInit, OnDestroy {
     numUsersToPrint: number = 0;
     numPartnersToPrint: number = 0;
     logoUrl: string = '';
+    logoInBottom: boolean = false;
     senderAddresses = [];
     senderAddress: string = '';
     printLogoUser: boolean = true;
@@ -175,6 +176,8 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.labelHeight = settings.hasOwnProperty('labelHeight') ? settings.labelHeight : '5.5';
                 this.labelWidth = settings.hasOwnProperty('labelWidth') ? settings.labelWidth : '10';
                 this.defaultTab = settings.hasOwnProperty('defaultTab') ? settings.defaultTab : '0';
+                this.logoInBottom = settings.hasOwnProperty('logoInBottom') ? settings.logoInBottom : false;
+
             },
             err => console.error(err.message)
         );
@@ -443,7 +446,7 @@ export class MainComponent implements OnInit, OnDestroy {
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
                   </div>`;
 
-    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width: 25%"><img alt="logo" src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
+    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width: 25%; ${this.logoInBottom ? 'margin-top: 18cm;' : ''}"><img alt="logo" src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
 
 
     printContent = (content) => {

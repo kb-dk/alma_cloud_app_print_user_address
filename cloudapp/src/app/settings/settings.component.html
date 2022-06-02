@@ -30,6 +30,15 @@
                     </mat-form-field>
                 </td>
             </tr>
+            <tr>
+                <td colspan="2">
+                    <mat-checkbox style="display: block; color: black" [(ngModel)]="settings.logoInBottom"
+                                  (change)="onMoveLogo($event)"
+                                  [checked]="settings.logoInBottom"
+                    > <h3>Move logo to the bottom of the page</h3>
+                    </mat-checkbox>
+                </td>
+            </tr>
         </table>
     </div>
 

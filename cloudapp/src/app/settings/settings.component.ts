@@ -41,6 +41,7 @@ export class SettingsComponent {
         tap(settings => settings.labelWidth === undefined ? this.settings.labelWidth = '10' : true),
         tap(settings => settings.labelHeight === undefined ? this.settings.labelHeight = '5.5' : true),
         tap(settings => settings.defaultTab === undefined ? this.settings.defaultTab = '0' : true),
+        tap(settings => settings.logoInBottom === undefined ? this.settings.logoInBottom = false : true),
         catchError(error => {
             console.log('Error getting settings:', error);
             return EMPTY;
@@ -53,7 +54,7 @@ export class SettingsComponent {
     ]).pipe(
         map(([config, setting]) => {
             let conf = Object.keys(config).length === 0 ? this.config : config;
-            let set = Object.keys(setting).length === 0 ? this.settings : this.settings;
+            let set = Object.keys(setting).length === 0 ? this.settings : setting;
             return {'config': conf, 'settings': set};
         }),
         tap(() => this.loading = false),
@@ -113,4 +114,9 @@ export class SettingsComponent {
     onPartnerLabelHeightChanged = () => {
         this.saveSettings('Your label height is set.');
     };
+
+    onMoveLogo = (event) => {
+        this.settings.logoInBottom = event.checked;
+        this.saveSettings('Your logo position is set.');
+    }
 }

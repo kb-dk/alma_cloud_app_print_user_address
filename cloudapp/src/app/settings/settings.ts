@@ -5,4 +5,5 @@ export interface Settings {
     labelWidth: string;
     labelHeight: string;
     defaultTab: string;
+    logoInBottom: boolean;
 }

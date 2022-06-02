@@ -7,4 +7,5 @@ export const emptySettings : Settings = {
     labelWidth: '10',
     labelHeight: '5.5',
     defaultTab: '0',
+    logoInBottom: false,
 };
