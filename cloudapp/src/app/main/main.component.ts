@@ -312,6 +312,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 div.pageBreak{
                     page-break-after: always;
                     }
+                    
                 @page{
                     margin: 2cm;
                 }
@@ -321,6 +322,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 div.pageBreak{
                     page-break-after: always;
                     }
+                    
                 @page{
                     margin: 0;
                 }
@@ -357,13 +359,13 @@ export class MainComponent implements OnInit, OnDestroy {
                  
                `;
 
-    getContent = (innerHtml) => `
+    getContent = (innerHtml, context) => `
                 <html>
                     <style>
                                                                      
                         ${this.getGeneralStyling()}
                         ${this.getLogoStyling()}
-                        ${this.partnerPrintType === 'paper' ? this.getPageStyling() : this.getLabelStyling()}
+                        ${this.partnerPrintType === 'paper' || context === 'user' ? this.getPageStyling() : this.getLabelStyling()}
                         
                     </style>
                         
@@ -381,7 +383,7 @@ export class MainComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.printContent(this.getContent(innerHtml));
+        this.printContent(this.getContent(innerHtml, 'user'));
     };
 
     onScannedPartnerPrint = () => {
@@ -405,7 +407,7 @@ export class MainComponent implements OnInit, OnDestroy {
             innerHtml = innerHtml.concat(addresses);
         }
 
-        this.printContent(this.getContent(innerHtml));
+        this.printContent(this.getContent(innerHtml, 'partner'));
     };
 
 
@@ -432,7 +434,7 @@ export class MainComponent implements OnInit, OnDestroy {
             }
         });
 
-        this.printContent(this.getContent(innerHtml));
+        this.printContent(this.getContent(innerHtml, 'partner'));
     };
 
     getHtmlForLabel = (partner, addresses) => `<div class='label pageBreak' style="position:relative; padding:0.15cm;">  
