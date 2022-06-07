@@ -3,7 +3,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MaterialModule, getTranslateModule } from '@exlibris/exl-cloudapp-angular-lib';
+import { MaterialModule, CloudAppTranslateModule } from '@exlibris/exl-cloudapp-angular-lib';
 import { ToastrModule } from 'ngx-toastr';
 
 import { AppComponent } from './app.component';
@@ -36,7 +36,7 @@ export function getToastrModule() {
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    getTranslateModule(),
+    CloudAppTranslateModule.forRoot(),
     getToastrModule()
   ],
   providers: [UserService],

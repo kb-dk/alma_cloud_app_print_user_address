@@ -3,5 +3,7 @@
    "description": "It gives the opportunity to select one or more user and partner and print their addresses.",
    "env": "https://kbdk-kgl-psb.alma.exlibrisgroup.com/institution/45KBDK_KGL",
    "port": 4200,
-   "name": "print-address"
+   "name": "print-address",
+   "subtitle": "Print users, partners and vendor's addresses.",
+   "author": "Zahra Mousavi"
 }
