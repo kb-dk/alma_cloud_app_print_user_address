@@ -42,6 +42,7 @@ export class MainComponent implements OnInit, OnDestroy {
     numPartnersToPrint: number = 0;
     logoUrl: string = '';
     logoInBottom: boolean = false;
+    logoWidth: string = '3';
     senderAddresses = [];
     senderAddress: string = '';
     printLogoUser: boolean = true;
@@ -177,7 +178,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.labelWidth = settings.hasOwnProperty('labelWidth') ? settings.labelWidth : '10';
                 this.defaultTab = settings.hasOwnProperty('defaultTab') ? settings.defaultTab : '0';
                 this.logoInBottom = settings.hasOwnProperty('logoInBottom') ? settings.logoInBottom : false;
-
+                this.logoWidth = settings.hasOwnProperty('logoWidth') ? settings.logoWidth : '3';
             },
             err => console.error(err.message)
         );
@@ -283,6 +284,104 @@ export class MainComponent implements OnInit, OnDestroy {
         return string.replaceAll(',', '<br/>')
     };
 
+    getLogoStyling = () => {
+        return `
+               img.logo{
+               width: ${this.logoWidth}cm;
+               max-width: 100%;
+               float: right;
+               }
+               `;
+    };
+
+    getGeneralStyling = () => {
+        return `
+                @media print{
+                    .hidden-print{
+                        display: none !important;
+                    }
+                }
+                
+                body{
+                    font-size:80%; 
+                    font-family: sans-serif; 
+                    font-weight:600; 
+                    margin: 0;
+                }
+                 
+               `;
+    };
+
+    getPageStyling = () => {
+        return `
+                div.pageBreak{
+                    page-break-after: always;
+                    }
+                @page{
+                    margin: 2cm;
+                }
+               `;
+    };
+
+    getLabelStyling = () => {
+        return `
+                div.pageBreak{
+                    page-break-after: always;
+                    }
+                @page{
+                    margin: 0;
+                }
+                
+                html, body, .label{
+                    width: ${this.labelWidth}cm;
+                    height: ${this.labelHeight}cm;
+                }
+                               
+                .sender strong{
+                    font-weight: bold; 
+                    font-size: 18px;
+                }
+                
+                .sender:before{
+                    content:"";
+                    position:absolute;
+                    border-top:1px solid black;
+                    width:7cm;
+                    transform: rotate(13deg);
+                    transform-origin: 0 0;
+                }
+                
+                .sender:after{
+                    content:"";
+                    position:absolute;
+                    left:0;
+                    bottom:0.1cm;
+                    border-bottom:1px solid black;
+                    width:7cm;
+                    transform: rotate(-13deg);
+                    transform-origin: 0 0;
+                }
+                 
+               `;
+    };
+
+    getContent = (innerHtml) => {
+        return `<html>
+                    <style>
+                                                                     
+                        ${this.getGeneralStyling()}
+                        ${this.getLogoStyling()}
+                        ${this.getPageStyling()}
+                        
+                    </style>
+                        
+                    <body onload='window.print();'>
+                        ${innerHtml}
+                    </body>
+                </html>
+                `;
+    };
+
     onUserPrint = () => {
         let innerHtml: string = "";
         this.currentUserActions.map(user => {
@@ -291,13 +390,7 @@ export class MainComponent implements OnInit, OnDestroy {
             }
         });
 
-        let content = `<html>
-                       <style>@media print {.hidden-print {display: none !important;}} div.pageBreak{page-break-after: always}@page {margin-top: 2cm;margin-bottom: 2cm;margin-left: 2cm;margin-right: 2cm;}</style>
-                           <body onload='window.print();' style="font-size:15px; font-family: sans-serif; font-weight:600; margin: 0;">
-                               ${innerHtml}
-                           </body>
-                       </html>`;
-        this.printContent(content);
+        this.printContent(this.getContent(innerHtml));
     };
 
     onScannedPartnerPrint = () => {
@@ -320,49 +413,8 @@ export class MainComponent implements OnInit, OnDestroy {
             }
             innerHtml = innerHtml.concat(addresses);
         }
-        let content = `<html>
-                       <style>
-                       @media print {
-                       .hidden-print {display: none !important;}
-                       }
-                       html, body, .label{
-                       width: ${this.labelWidth}cm;
-                       height: ${this.labelHeight}cm;
-                       } 
-                       div.pageBreak{
-                       page-break-after: always
-                       }
-                       @page{
-                       margin:0;
-                       }
-                       .sender strong{
-                       font-weight: bold; 
-                       font-size: 18px;
-                       }
-                       .sender:before{
-                       content:"";
-                       position:absolute;
-                       border-top:1px solid black;
-                       width:7cm;
-                       transform: rotate(13deg);
-                       transform-origin: 0 0;
-                       }
-                       .sender:after{
-                       content:"";
-                       position:absolute;
-                       left:0;
-                       bottom:0.1cm;
-                       border-bottom:1px solid black;
-                       width:7cm;
-                       transform: rotate(-13deg);
-                       transform-origin: 0 0;
-                       }
-                       </style>
-                           <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600; margin: 0;">
-                               ${innerHtml}
-                           </body>
-                       </html>`;
-        this.printContent(content);
+
+        this.printContent(this.getContent(innerHtml));
     };
 
 
@@ -389,49 +441,7 @@ export class MainComponent implements OnInit, OnDestroy {
             }
         });
 
-        let content = `<html>
-                       <style>
-                       @media print {
-                       .hidden-print {display: none !important;}
-                       } 
-                       html, body, .label{
-                       width: ${this.labelWidth}cm;
-                       height: ${this.labelHeight}cm;
-                       } 
-                       div.pageBreak{
-                       page-break-after: always
-                       }
-                       @page{
-                       margin:0;
-                       }
-                       .sender strong{
-                       font-weight: bold; 
-                       font-size: 18px;
-                       }
-                       .sender:before{
-                       content:"";
-                       position:absolute;
-                       border-top:1px solid black;
-                       width:7cm;
-                       transform: rotate(13deg);
-                       transform-origin: 0 0;
-                       }
-                       .sender:after{
-                       content:"";
-                       position:absolute;
-                       left:0;
-                       bottom:0.1cm;
-                       border-bottom:1px solid black;
-                       width:7cm;
-                       transform: rotate(-13deg);
-                       transform-origin: 0 0;
-                       }
-                       </style>
-                           <body onload='window.print();' style="font-size:80%; font-family: sans-serif; font-weight:600; margin: 0;">
-                               ${innerHtml}
-                           </body>
-                       </html>`;
-        this.printContent(content);
+        this.printContent(this.getContent(innerHtml));
     };
 
     getHtmlForLabel = (partner, addresses) => `<div class='label pageBreak' style="position:relative; padding:0.15cm;">  
@@ -446,7 +456,7 @@ export class MainComponent implements OnInit, OnDestroy {
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
                   </div>`;
 
-    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width: 25%; ${this.logoInBottom ? 'margin-top: 18cm;' : ''}"><img alt="logo" src="${this.logoUrl}" style="max-width: 100%;"/></div>` : '';
+    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width: 25%; ${this.logoInBottom ? 'margin-top: 18cm;' : ''}"><img class="logo" alt="logo" src="${this.logoUrl}"/></div>` : '';
 
 
     printContent = (content) => {

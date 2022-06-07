@@ -8,4 +8,5 @@ export const emptySettings : Settings = {
     labelHeight: '5.5',
     defaultTab: '0',
     logoInBottom: false,
+    logoWidth: '3',
 };

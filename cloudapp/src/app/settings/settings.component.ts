@@ -42,6 +42,8 @@ export class SettingsComponent {
         tap(settings => settings.labelHeight === undefined ? this.settings.labelHeight = '5.5' : true),
         tap(settings => settings.defaultTab === undefined ? this.settings.defaultTab = '0' : true),
         tap(settings => settings.logoInBottom === undefined ? this.settings.logoInBottom = false : true),
+        tap(settings => settings.logoWidth === undefined ? this.settings.logoWidth = '3' : true),
+
         catchError(error => {
             console.log('Error getting settings:', error);
             return EMPTY;
@@ -119,4 +121,8 @@ export class SettingsComponent {
         this.settings.logoInBottom = event.checked;
         this.saveSettings('Your logo position is set.');
     }
+
+    onPartnerLogoWidthChanged = () => {
+        this.saveSettings('Your logo width is set.');
+    };
 }

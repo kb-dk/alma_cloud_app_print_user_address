@@ -145,6 +145,8 @@
                     <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to
                         add sender's address to config.</b></div>
                 </div>
+                <mat-card *ngIf="!partners.length && usersReady" style="color: #17a2b8;"><b>Note:</b> Browse to a lending or borrowing request page to be able to see and print partners addresses.</mat-card>
+
                 <h3 *ngIf="logoUrl && partnerPrintType === 'paper'">
                     <mat-checkbox style="display: block; color: black"
                                   (change)="onPrintLogoPartnerToggled($event)"

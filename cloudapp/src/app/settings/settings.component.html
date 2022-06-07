@@ -30,8 +30,25 @@
                     </mat-form-field>
                 </td>
             </tr>
+        </table>
+
+        <h2>Logo</h2>
+        <table>
             <tr>
-                <td colspan="2">
+                <td>
+                    <h3 class="padding-top">Logo width (cm):</h3></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Logo width</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.logoWidth"
+                               (change)="onPartnerLogoWidthChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td>
                     <mat-checkbox style="display: block; color: black" [(ngModel)]="settings.logoInBottom"
                                   (change)="onMoveLogo($event)"
                                   [checked]="settings.logoInBottom"
@@ -96,7 +113,7 @@
                     <h3 class="padding-top">Label height (cm):</h3></td>
                 <td>
                     <mat-form-field>
-                        <mat-label>Label width</mat-label>
+                        <mat-label>Label height</mat-label>
                         <input matInput
                                [(ngModel)]="settings.labelHeight"
                                (change)="onPartnerLabelHeightChanged()">
