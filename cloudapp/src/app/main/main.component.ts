@@ -284,18 +284,15 @@ export class MainComponent implements OnInit, OnDestroy {
         return string.replaceAll(',', '<br/>')
     };
 
-    getLogoStyling = () => {
-        return `
+    getLogoStyling = () => `
                img.logo{
                width: ${this.logoWidth}cm;
                max-width: 100%;
                float: right;
                }
                `;
-    };
 
-    getGeneralStyling = () => {
-        return `
+    getGeneralStyling = () => `
                 @media print{
                     .hidden-print{
                         display: none !important;
@@ -310,10 +307,8 @@ export class MainComponent implements OnInit, OnDestroy {
                 }
                  
                `;
-    };
 
-    getPageStyling = () => {
-        return `
+    getPageStyling = () => `
                 div.pageBreak{
                     page-break-after: always;
                     }
@@ -321,10 +316,8 @@ export class MainComponent implements OnInit, OnDestroy {
                     margin: 2cm;
                 }
                `;
-    };
 
-    getLabelStyling = () => {
-        return `
+    getLabelStyling = () => `
                 div.pageBreak{
                     page-break-after: always;
                     }
@@ -363,15 +356,14 @@ export class MainComponent implements OnInit, OnDestroy {
                 }
                  
                `;
-    };
 
-    getContent = (innerHtml) => {
-        return `<html>
+    getContent = (innerHtml) => `
+                <html>
                     <style>
                                                                      
                         ${this.getGeneralStyling()}
                         ${this.getLogoStyling()}
-                        ${this.getPageStyling()}
+                        ${this.partnerPrintType === 'paper' ? this.getPageStyling() : this.getLabelStyling()}
                         
                     </style>
                         
@@ -380,7 +372,6 @@ export class MainComponent implements OnInit, OnDestroy {
                     </body>
                 </html>
                 `;
-    };
 
     onUserPrint = () => {
         let innerHtml: string = "";
