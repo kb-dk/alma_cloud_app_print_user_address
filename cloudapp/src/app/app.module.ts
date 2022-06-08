@@ -17,7 +17,6 @@ import {SettingsComponent} from './settings/settings.component';
 export function getToastrModule() {
   return ToastrModule.forRoot({
     positionClass: 'toast-top-right',
-    timeOut: 2000
   });
 }
 
@@ -36,8 +35,8 @@ export function getToastrModule() {
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    CloudAppTranslateModule.forRoot(),
-    getToastrModule()
+    getToastrModule(),
+    CloudAppTranslateModule.forRoot()
   ],
   providers: [UserService],
   bootstrap: [AppComponent]

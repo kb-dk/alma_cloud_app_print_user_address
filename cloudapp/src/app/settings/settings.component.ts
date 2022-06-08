@@ -120,9 +120,9 @@ export class SettingsComponent {
     onMoveLogo = (event) => {
         this.settings.logoInBottom = event.checked;
         this.saveSettings('Your logo position is set.');
-    }
+    };
 
-    onPartnerLogoWidthChanged = () => {
+    onLogoWidthChanged = () => {
         this.saveSettings('Your logo width is set.');
     };
 }

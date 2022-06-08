@@ -333,6 +333,10 @@ export class MainComponent implements OnInit, OnDestroy {
                 .logo-flex-item{
                     order: 2;
                 }
+                .logo-flex-item img{
+                    float: right; 
+                    width:${this.logoWidth}cm; 
+                    ${this.logoInBottom ? 'margin-top: 18cm;' : ''}
                `;
 
     getLabelStyling = () => `
@@ -475,7 +479,7 @@ export class MainComponent implements OnInit, OnDestroy {
                       </div>
                     `;
 
-    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width:${this.logoWidth}cm; ${this.logoInBottom ? 'margin-top: 18cm;' : ''}"><img class="logo" alt="logo" src="${this.logoUrl}"/></div>` : '';
+    getLogo = (printLogo) => printLogo && this.logoUrl ? `<img class="logo" alt="logo" src="${this.logoUrl}"/>` : '';
 
 
     printContent = (content) => {
