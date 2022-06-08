@@ -316,6 +316,23 @@ export class MainComponent implements OnInit, OnDestroy {
                 @page{
                     margin: 2cm;
                 }
+                .flex-container{
+                    display: flex;
+                    flex-direction: row;
+                }
+                .address-flex-item{
+                    order: 1;
+                    flex-grow: 3;
+                    position: relative;
+                    top:2cm; 
+                    font-size: ${this.partnerPrintType === 'paper' ? this.userFontSize || 17 : this.partnerFontSize || 17}px
+                }
+                .address-flex-item p{
+                    width:9cm;                 
+                }
+                .logo-flex-item{
+                    order: 2;
+                }
                `;
 
     getLabelStyling = () => `
@@ -379,7 +396,7 @@ export class MainComponent implements OnInit, OnDestroy {
         let innerHtml: string = "";
         this.currentUserActions.map(user => {
             if (user.checked) {
-                innerHtml = innerHtml.concat(this.getHtmlForPaper(user, user.addresses, this.printLogoUser, this.userFontSize));
+                innerHtml = innerHtml.concat(this.getHtmlForPaper(user, user.addresses, this.printLogoUser));
             }
         });
 
@@ -396,7 +413,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     break;
                 }
                 case 'paper': {
-                    addresses = this.getHtmlForPaper(this.scannedPartner, this.scannedPartner.receivers_addresses, this.printLogoPartner, this.partnerFontSize);
+                    addresses = this.getHtmlForPaper(this.scannedPartner, this.scannedPartner.receivers_addresses, this.printLogoPartner);
                     break;
                 }
                 default: {
@@ -422,7 +439,7 @@ export class MainComponent implements OnInit, OnDestroy {
                         break;
                     }
                     case 'paper': {
-                        addresses = this.getHtmlForPaper(partner, partner.receivers_addresses, this.printLogoPartner, this.partnerFontSize);
+                        addresses = this.getHtmlForPaper(partner, partner.receivers_addresses, this.printLogoPartner);
                         break;
                     }
                     default: {
@@ -437,19 +454,28 @@ export class MainComponent implements OnInit, OnDestroy {
         this.printContent(this.getContent(innerHtml, 'partner'));
     };
 
-    getHtmlForLabel = (partner, addresses) => `<div class='label pageBreak' style="position:relative; padding:0.15cm;">  
+    getHtmlForLabel = (partner, addresses) => `
+                      <div class='label pageBreak' style="position:relative; padding:0.15cm;">  
                       <div class="recipient" style="position: relative; font-size: 16px;">${partner.name}<br/>
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</div>
                       <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
-                  </div>`;
+                      </div>
+                    `;
 
-    getHtmlForPaper = (partner, addresses, printLogo, fontSize) => `<div class='pageBreak'>
-                      ${this.getLogo(printLogo)}  
-                      <p style="position: relative; top:2cm; width:9cm; font-size: ${fontSize || 17}px">${partner.name}<br/>
-                      ${addresses.find(address => address.type === partner.selectedAddress).address}</p>
-                  </div>`;
+    getHtmlForPaper = (partner, addresses, printLogo) => `
+                      <div class='flex-container pageBreak'>
+                      <div class="logo-flex-item">
+                        ${this.getLogo(printLogo)}
+                      </div>  
+                      <div class="address-flex-item">
+                        <p style="">${partner.name}<br/>
+                        ${addresses.find(address => address.type === partner.selectedAddress).address}
+                        </p>
+                      </div>
+                      </div>
+                    `;
 
-    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width: 25%; ${this.logoInBottom ? 'margin-top: 18cm;' : ''}"><img class="logo" alt="logo" src="${this.logoUrl}"/></div>` : '';
+    getLogo = (printLogo) => printLogo && this.logoUrl ? `<div style="float: right; width:${this.logoWidth}cm; ${this.logoInBottom ? 'margin-top: 18cm;' : ''}"><img class="logo" alt="logo" src="${this.logoUrl}"/></div>` : '';
 
 
     printContent = (content) => {
