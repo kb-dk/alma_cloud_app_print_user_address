@@ -43,6 +43,7 @@ export class SettingsComponent {
         tap(settings => settings.defaultTab === undefined ? this.settings.defaultTab = '0' : true),
         tap(settings => settings.logoInBottom === undefined ? this.settings.logoInBottom = false : true),
         tap(settings => settings.logoWidth === undefined ? this.settings.logoWidth = '3' : true),
+        tap(settings => settings.languageDirection === undefined ? this.settings.languageDirection = 'ltr' : true),
 
         catchError(error => {
             console.log('Error getting settings:', error);
@@ -124,5 +125,9 @@ export class SettingsComponent {
 
     onLogoWidthChanged = () => {
         this.saveSettings('Your logo width is set.');
+    };
+
+    onLanguageDirection = () => {
+        this.saveSettings('Your language direction is set.');
     };
 }

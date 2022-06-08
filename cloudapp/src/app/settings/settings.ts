@@ -7,4 +7,5 @@ export interface Settings {
     defaultTab: string;
     logoInBottom: boolean;
     logoWidth: string;
+    languageDirection: string;
 }

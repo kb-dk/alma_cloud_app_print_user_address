@@ -43,6 +43,7 @@ export class MainComponent implements OnInit, OnDestroy {
     logoUrl: string = '';
     logoInBottom: boolean = false;
     logoWidth: string = '3';
+    languageDirection: string = 'ltr';
     senderAddresses = [];
     senderAddress: string = '';
     printLogoUser: boolean = true;
@@ -179,6 +180,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.defaultTab = settings.hasOwnProperty('defaultTab') ? settings.defaultTab : '0';
                 this.logoInBottom = settings.hasOwnProperty('logoInBottom') ? settings.logoInBottom : false;
                 this.logoWidth = settings.hasOwnProperty('logoWidth') ? settings.logoWidth : '3';
+                this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
             },
             err => console.error(err.message)
         );
@@ -381,7 +383,7 @@ export class MainComponent implements OnInit, OnDestroy {
                `;
 
     getContent = (innerHtml, context) => `
-                <html>
+                <html dir = '${this.languageDirection}'>
                     <style>
                                                                      
                         ${this.getGeneralStyling()}

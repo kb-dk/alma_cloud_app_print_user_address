@@ -9,4 +9,5 @@ export const emptySettings : Settings = {
     defaultTab: '0',
     logoInBottom: false,
     logoWidth: '3',
+    languageDirection: 'ltr',
 };

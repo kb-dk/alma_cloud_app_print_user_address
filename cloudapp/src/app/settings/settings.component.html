@@ -30,6 +30,18 @@
                     </mat-form-field>
                 </td>
             </tr>
+            <tr>
+                <td><h3>Language direction</h3></td>
+                <td>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Direction</mat-label>
+                        <mat-select [(value)]="settings.languageDirection" (selectionChange)="onLanguageDirection($event)">
+                            <mat-option value="ltr">Left to right</mat-option>
+                            <mat-option value="rtl">Right to left</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+            </tr>
         </table>
 
         <h2>Logo</h2>
