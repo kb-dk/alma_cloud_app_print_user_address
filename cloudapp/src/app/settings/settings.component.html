@@ -21,7 +21,7 @@
                 <td><h3>Default tab</h3></td>
                 <td>
                     <mat-form-field appearance="fill">
-                        <mat-label>Default tab</mat-label>
+                        <mat-label>Default tab:</mat-label>
                         <mat-select [(value)]="settings.defaultTab" (selectionChange)="onSelectDefaultTab($event)">
                             <mat-option value="0">Partner via barcode</mat-option>
                             <mat-option value="1">Users / Vendors</mat-option>
@@ -31,7 +31,7 @@
                 </td>
             </tr>
             <tr>
-                <td><h3>Language direction</h3></td>
+                <td><h3>Language direction:</h3></td>
                 <td>
                     <mat-form-field appearance="fill">
                         <mat-label>Direction</mat-label>
@@ -42,6 +42,32 @@
                     </mat-form-field>
                 </td>
             </tr>
+        </table>
+
+        <h2>Paper</h2>
+        <table>
+            <tr>
+                <td>
+                    <mat-form-field appearance="fill">
+                        <mat-label>Paper size:</mat-label>
+                        <mat-select [(value)]="settings.paperSize" (selectionChange)="onPaperSizeChanged()">
+                            <mat-option value="21.0X29.7">A4 (21.0 X 29.7 cm)</mat-option>
+                            <mat-option value="14.8X21.0">A5 (14.8 X 21.0 cm)</mat-option>
+                            <mat-option value="10.5X14.7">A6 (10.5 X 14.8 cm)</mat-option>
+                            <mat-option value="7.4X10.5">A7 (7.4 X 10.5 cm)</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <!--<tr>-->
+                <!--<td>-->
+                    <!--<mat-checkbox style="display: block; color: black" [(ngModel)]="settings.logoInBottom"-->
+                                  <!--(change)="onMoveLogo($event)"-->
+                                  <!--[checked]="settings.logoInBottom"-->
+                    <!--&gt; <h3>Move logo to the bottom of the page</h3>-->
+                    <!--</mat-checkbox>-->
+                <!--</td>-->
+            <!--</tr>-->
         </table>
 
         <h2>Logo</h2>

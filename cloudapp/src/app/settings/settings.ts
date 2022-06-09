@@ -8,4 +8,5 @@ export interface Settings {
     logoInBottom: boolean;
     logoWidth: string;
     languageDirection: string;
+    paperSize: string;
 }

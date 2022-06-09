@@ -44,6 +44,7 @@ export class MainComponent implements OnInit, OnDestroy {
     logoInBottom: boolean = false;
     logoWidth: string = '3';
     languageDirection: string = 'ltr';
+    paperSize: string = '21.0X29.7';
     senderAddresses = [];
     senderAddress: string = '';
     printLogoUser: boolean = true;
@@ -181,6 +182,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.logoInBottom = settings.hasOwnProperty('logoInBottom') ? settings.logoInBottom : false;
                 this.logoWidth = settings.hasOwnProperty('logoWidth') ? settings.logoWidth : '3';
                 this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
+                this.paperSize = settings.hasOwnProperty('paperSize') ? settings.paperSize : '21.0X29.7';
             },
             err => console.error(err.message)
         );
@@ -311,9 +313,10 @@ export class MainComponent implements OnInit, OnDestroy {
                `;
 
     getPageStyling = () => `
-                div.pageBreak{
-                    page-break-after: always;
-                    }
+                .paper{
+                    width: ${this.paperSize.substring(0, this.paperSize.search('X'))}cm;
+                    height: ${this.paperSize.substring(this.paperSize.search('X')+1)}cm;
+                }                        
                     
                 @page{
                     margin: 2cm;
@@ -345,7 +348,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 div.pageBreak{
                     page-break-after: always;
                     }
-                    
+                                       
                 @page{
                     margin: 0;
                 }
@@ -469,7 +472,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     `;
 
     getHtmlForPaper = (partner, addresses, printLogo) => `
-                      <div class='flex-container pageBreak'>
+                      <div class='flex-container paper'>
                       <div class="logo-flex-item">
                         ${this.getLogo(printLogo)}
                       </div>  

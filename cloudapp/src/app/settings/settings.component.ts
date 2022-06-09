@@ -44,6 +44,7 @@ export class SettingsComponent {
         tap(settings => settings.logoInBottom === undefined ? this.settings.logoInBottom = false : true),
         tap(settings => settings.logoWidth === undefined ? this.settings.logoWidth = '3' : true),
         tap(settings => settings.languageDirection === undefined ? this.settings.languageDirection = 'ltr' : true),
+        tap(settings => settings.paperSize === undefined ? this.settings.paperSize = '21.0X29.7' : true),
 
         catchError(error => {
             console.log('Error getting settings:', error);
@@ -79,7 +80,7 @@ export class SettingsComponent {
 
     saveSettings = (toastMessage: string) => {
         this.settingsService.set(this.settings).subscribe(
-            response => {
+            () => {
                 this.toastr.success(toastMessage, 'Settings updated', {timeOut: 1000});
             },
             err => this.toastr.error(err.message, '', {timeOut: 1000}),
@@ -129,5 +130,9 @@ export class SettingsComponent {
 
     onLanguageDirection = () => {
         this.saveSettings('Your language direction is set.');
+    };
+
+    onPaperSizeChanged = () => {
+        this.saveSettings('Your paper size is set.');
     };
 }
