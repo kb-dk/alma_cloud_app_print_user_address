@@ -11,4 +11,5 @@ export const emptySettings : Settings = {
     logoWidth: '3',
     languageDirection: 'ltr',
     paperSize: '21.0X29.7',
+    paperMargin: '2',
 };

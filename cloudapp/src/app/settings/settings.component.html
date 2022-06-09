@@ -59,15 +59,15 @@
                     </mat-form-field>
                 </td>
             </tr>
-            <!--<tr>-->
-                <!--<td>-->
-                    <!--<mat-checkbox style="display: block; color: black" [(ngModel)]="settings.logoInBottom"-->
-                                  <!--(change)="onMoveLogo($event)"-->
-                                  <!--[checked]="settings.logoInBottom"-->
-                    <!--&gt; <h3>Move logo to the bottom of the page</h3>-->
-                    <!--</mat-checkbox>-->
-                <!--</td>-->
-            <!--</tr>-->
+            <td>
+                <mat-form-field>
+                    <mat-label>Paper margin:</mat-label>
+                    <input matInput
+                           [(ngModel)]="settings.paperMargin"
+                           (change)="onPaperMarginChanged()">
+                    <mat-hint></mat-hint>
+                </mat-form-field>
+            </td>
         </table>
 
         <h2>Logo</h2>

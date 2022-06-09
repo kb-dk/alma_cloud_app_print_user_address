@@ -45,6 +45,7 @@ export class SettingsComponent {
         tap(settings => settings.logoWidth === undefined ? this.settings.logoWidth = '3' : true),
         tap(settings => settings.languageDirection === undefined ? this.settings.languageDirection = 'ltr' : true),
         tap(settings => settings.paperSize === undefined ? this.settings.paperSize = '21.0X29.7' : true),
+        tap(settings => settings.paperMargin === undefined ? this.settings.paperMargin = '2' : true),
 
         catchError(error => {
             console.log('Error getting settings:', error);
@@ -134,5 +135,9 @@ export class SettingsComponent {
 
     onPaperSizeChanged = () => {
         this.saveSettings('Your paper size is set.');
+    };
+
+    onPaperMarginChanged = () => {
+        this.saveSettings('Your paper margin is set.');
     };
 }

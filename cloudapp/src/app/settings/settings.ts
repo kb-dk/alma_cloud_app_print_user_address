@@ -9,4 +9,5 @@ export interface Settings {
     logoWidth: string;
     languageDirection: string;
     paperSize: string;
+    paperMargin: string;
 }

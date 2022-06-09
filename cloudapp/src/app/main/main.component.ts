@@ -45,6 +45,7 @@ export class MainComponent implements OnInit, OnDestroy {
     logoWidth: string = '3';
     languageDirection: string = 'ltr';
     paperSize: string = '21.0X29.7';
+    paperMargin: string = '2';
     senderAddresses = [];
     senderAddress: string = '';
     printLogoUser: boolean = true;
@@ -183,6 +184,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.logoWidth = settings.hasOwnProperty('logoWidth') ? settings.logoWidth : '3';
                 this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
                 this.paperSize = settings.hasOwnProperty('paperSize') ? settings.paperSize : '21.0X29.7';
+                this.paperMargin = settings.hasOwnProperty('paperMargin') ? settings.paperMargin : '2';
             },
             err => console.error(err.message)
         );
@@ -316,11 +318,10 @@ export class MainComponent implements OnInit, OnDestroy {
                 .paper{
                     width: ${this.paperSize.substring(0, this.paperSize.search('X'))}cm;
                     height: ${this.paperSize.substring(this.paperSize.search('X')+1)}cm;
+                    /* Using padding instead of margin so wouldn't need to calculate 
+                       the width and height of the page based on margin. */
+                    padding: ${this.paperMargin}cm; 
                 }                        
-                    
-                @page{
-                    margin: 2cm;
-                }
                 .flex-container{
                     display: flex;
                     flex-direction: row;
