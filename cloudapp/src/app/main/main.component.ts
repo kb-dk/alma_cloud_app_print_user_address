@@ -26,6 +26,10 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 export class MainComponent implements OnInit, OnDestroy {
 
+    allPartnersSelected: boolean = false;
+    multiAddressPerPage: boolean = false;
+    numAddressPerRow: number = 3;
+    numAddressPerColumn : number = 7;
     entityType: string = 'USER';
     userFontSize: number = 17;
     partnerFontSize: number = 17;
@@ -185,6 +189,9 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
                 this.paperSize = settings.hasOwnProperty('paperSize') ? settings.paperSize : '21.0X29.7';
                 this.paperMargin = settings.hasOwnProperty('paperMargin') ? settings.paperMargin : '2';
+                this.multiAddressPerPage = settings.hasOwnProperty('multiAddressPerPage') ? settings.multiAddressPerPage : false;
+                this.numAddressPerRow = settings.hasOwnProperty('numAddressPerRow') ? settings.numAddressPerRow : 3;
+                this.numAddressPerColumn = settings.hasOwnProperty('numAddressPerColumn') ? settings.numAddressPerColumn : 7;
             },
             err => console.error(err.message)
         );
@@ -314,28 +321,56 @@ export class MainComponent implements OnInit, OnDestroy {
                  
                `;
 
-    getPageStyling = () => `
+
+    getOneAddressPerPageStyling = () => `
+                .address-flex-item{
+                    order: 1;
+                    flex-grow: 3;
+                    top:2cm;
+                }  
+                
+                .address-flex-item p{
+                    width:9cm;                 
+                }  
+               `;
+
+    getMultiAddressPerPageStyling = () => `
+                .address-flex-item{
+                    //flex-grow: 3;
+                }  
+                
+                .address-flex-item p{
+                    width:${(parseInt(this.getPaperWidth())/ this.numAddressPerRow)-1}cm;                 
+                    height:${(parseInt(this.getPaperHeight())/ this.numAddressPerColumn)-1}cm;
+                    padding: 0.5cm;                 
+                }  
+               `;
+
+    getPaperWidth = () => this.paperSize.substring(0, this.paperSize.search('X'));
+
+    getPaperHeight = () => this.paperSize.substring(this.paperSize.search('X')+1);
+
+    getPageStyling = (context) => `
+                ${ this.multiAddressPerPage ? this.getMultiAddressPerPageStyling() : this.getOneAddressPerPageStyling()}
+
                 .paper{
-                    width: ${this.paperSize.substring(0, this.paperSize.search('X'))}cm;
-                    height: ${this.paperSize.substring(this.paperSize.search('X')+1)}cm;
+                    width: ${this.getPaperWidth()}cm;
+                    height: ${this.getPaperHeight()}cm;
                     /* Using padding instead of margin so wouldn't need to calculate 
                        the width and height of the page based on margin. */
                     padding: ${this.paperMargin}cm; 
+                    page-break-after: always;
                 }                        
                 .flex-container{
                     display: flex;
                     flex-direction: row;
+                    flex-wrap: wrap;
                 }
                 .address-flex-item{
-                    order: 1;
-                    flex-grow: 3;
                     position: relative;
-                    top:2cm; 
-                    font-size: ${this.partnerPrintType === 'paper' ? this.userFontSize || 17 : this.partnerFontSize || 17}px
+                    font-size: ${context === 'user' ? this.userFontSize || 17 : (this.partnerPrintType === 'paper' ? this.partnerFontSize || 17 : 17)}px
                 }
-                .address-flex-item p{
-                    width:9cm;                 
-                }
+
                 .logo-flex-item{
                     order: 2;
                 }
@@ -344,6 +379,8 @@ export class MainComponent implements OnInit, OnDestroy {
                     width:${this.logoWidth}cm; 
                     ${this.logoInBottom ? 'margin-top: 18cm;' : ''}
                `;
+
+
 
     getLabelStyling = () => `
                 div.pageBreak{
@@ -392,7 +429,7 @@ export class MainComponent implements OnInit, OnDestroy {
                                                                      
                         ${this.getGeneralStyling()}
                         ${this.getLogoStyling()}
-                        ${this.partnerPrintType === 'paper' || context === 'user' ? this.getPageStyling() : this.getLabelStyling()}
+                        ${this.partnerPrintType === 'paper' || context === 'user' ? this.getPageStyling(context) : this.getLabelStyling()}
                         
                     </style>
                         
@@ -403,18 +440,19 @@ export class MainComponent implements OnInit, OnDestroy {
                 `;
 
     onUserPrint = () => {
-        let innerHtml: string = "";
+        let innerHtml: string = this.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
         this.currentUserActions.map(user => {
             if (user.checked) {
                 innerHtml = innerHtml.concat(this.getHtmlForPaper(user, user.addresses, this.printLogoUser));
             }
         });
+        innerHtml = this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
 
         this.printContent(this.getContent(innerHtml, 'user'));
     };
 
     onScannedPartnerPrint = () => {
-        let innerHtml: string = "";
+        let innerHtml: string = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
         if (this.scannedPartner && this.scannedPartner.checked) {
             let addresses: string;
             switch (this.partnerPrintType) {
@@ -433,13 +471,13 @@ export class MainComponent implements OnInit, OnDestroy {
             }
             innerHtml = innerHtml.concat(addresses);
         }
-
+        innerHtml = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
         this.printContent(this.getContent(innerHtml, 'partner'));
     };
 
 
     onPartnerPrint = () => {
-        let innerHtml: string = "";
+        let innerHtml: string = this.partnerPrintType === 'paper' ? "<div class='paper flex-container'>" : "";
         this.currentPartnerActions.map(partner => {
             if (partner.checked) {
                 let addresses: string;
@@ -460,7 +498,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 innerHtml = innerHtml.concat(addresses);
             }
         });
-
+        innerHtml = this.partnerPrintType === 'paper' ? innerHtml + "</div>" : innerHtml;
         this.printContent(this.getContent(innerHtml, 'partner'));
     };
 
@@ -472,20 +510,19 @@ export class MainComponent implements OnInit, OnDestroy {
                       </div>
                     `;
 
-    getHtmlForPaper = (partner, addresses, printLogo) => `
-                      <div class='flex-container paper'>
-                      <div class="logo-flex-item">
-                        ${this.getLogo(printLogo)}
-                      </div>  
+    getLogo = () =>  `<div class="logo-flex-item"><img class="logo" alt="logo" src="${this.logoUrl}"/></div>`;
+
+    getHtmlForPaper = (partner, addresses, printLogo) => `                     
+                      ${this.multiAddressPerPage ? '' : "<div class='paper flex-container'>"}                                                                 
+                      ${!this.multiAddressPerPage && printLogo && this.logoUrl ? this.getLogo() : ''}
                       <div class="address-flex-item">
                         <p style="">${partner.name}<br/>
                         ${addresses.find(address => address.type === partner.selectedAddress).address}
                         </p>
                       </div>
-                      </div>
-                    `;
+                      ${this.multiAddressPerPage ? '' : "</div>"}                                                                 
 
-    getLogo = (printLogo) => printLogo && this.logoUrl ? `<img class="logo" alt="logo" src="${this.logoUrl}"/>` : '';
+                    `;
 
 
     printContent = (content) => {
@@ -495,4 +532,46 @@ export class MainComponent implements OnInit, OnDestroy {
             win.document.close();
         }
     };
+
+    onSelectDeselectAllPartners(event, partners) {
+        let numPartnersToPrint = 0;
+        if (event.checked) {
+            partners.map((partner, index) => {
+                if (partner.name !== 'N/A') {
+                    if (partner.checked === false){
+                        this.partnerToggledSubject.next({id: +index, checked: true});
+                    }
+                    numPartnersToPrint += 1;
+                }
+            });
+        } else {
+            partners.map((partner, index) => {
+                if ((partner.name !== 'N/A') || (partner.checked === false)) {
+                    this.partnerToggledSubject.next({id: +index, checked: false});
+                }
+            });
+        }
+        this.numPartnersToPrint = numPartnersToPrint;
+    }
+
+    onSelectDeselectAllUsers(event, users) {
+        let numUsersToPrint = 0;
+        if (event.checked) {
+            users.map((user, index) => {
+                if (user.name !== 'N/A'){
+                   if (user.checked === false){
+                        this.userToggledSubject.next({id: +index, checked: true});
+                   }
+                   numUsersToPrint += 1;
+                }
+            });
+        } else {
+            users.map((user, index) => {
+                if ((user.name !== 'N/A') && (user.checked === true)) {
+                    this.userToggledSubject.next({id: +index, checked: false});
+                }
+            });
+        }
+        this.numUsersToPrint = numUsersToPrint;
+    }
 }

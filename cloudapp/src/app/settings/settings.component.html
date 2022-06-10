@@ -59,15 +59,53 @@
                     </mat-form-field>
                 </td>
             </tr>
-            <td>
-                <mat-form-field>
-                    <mat-label>Paper margin:</mat-label>
-                    <input matInput
-                           [(ngModel)]="settings.paperMargin"
-                           (change)="onPaperMarginChanged()">
-                    <mat-hint></mat-hint>
-                </mat-form-field>
-            </td>
+            <tr>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Paper margin:</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.paperMargin"
+                               (change)="onPaperMarginChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <mat-checkbox (change)="onSelectMultipleAddressesPerPage()"
+                                  [checked]="settings.multiAddressPerPage"
+                                  [(ngModel)]="settings.multiAddressPerPage"
+                    >
+                        Multiple addresses per page
+                    </mat-checkbox>
+                </td>
+            </tr>
+            <tr *ngIf="settings.multiAddressPerPage">
+                <td>
+                    <h3 class="padding-top">Number of addresses per row:</h3></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Number of addresses per row</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.numAddressPerRow"
+                               (change)="onNumAddressPerRowChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr *ngIf="settings.multiAddressPerPage">
+                <td>
+                    <h3 class="padding-top">Number of addresses per column:</h3></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Number of addresses per column</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.numAddressPerColumn"
+                               (change)="onNumAddressPerColumnChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
         </table>
 
         <h2>Logo</h2>

@@ -12,4 +12,7 @@ export const emptySettings : Settings = {
     languageDirection: 'ltr',
     paperSize: '21.0X29.7',
     paperMargin: '2',
+    multiAddressPerPage: false,
+    numAddressPerRow: 3,
+    numAddressPerColumn: 7,
 };

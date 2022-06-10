@@ -46,6 +46,9 @@ export class SettingsComponent {
         tap(settings => settings.languageDirection === undefined ? this.settings.languageDirection = 'ltr' : true),
         tap(settings => settings.paperSize === undefined ? this.settings.paperSize = '21.0X29.7' : true),
         tap(settings => settings.paperMargin === undefined ? this.settings.paperMargin = '2' : true),
+        tap(settings => settings.multiAddressPerPage === undefined ? this.settings.multiAddressPerPage = false : true),
+        tap(settings => settings.numAddressPerRow === undefined ? this.settings.numAddressPerRow = 3 : true),
+        tap(settings => settings.numAddressPerColumn === undefined ? this.settings.numAddressPerColumn = 7 : true),
 
         catchError(error => {
             console.log('Error getting settings:', error);
@@ -99,45 +102,57 @@ export class SettingsComponent {
 
     onSelectDefaultTab = (event) => {
         this.settings.defaultTab = event.value;
-        this.saveSettings('Your default tab is set.');
+        this.saveSettings('Default tab is set.');
     };
 
     onSelectMyAddress = (event) => {
         this.settings.myAddress = this.config.partner.addresses[event.value];
-        this.saveSettings('Your address is set.');
+        this.saveSettings('Address is set.');
     };
 
     onPartnerPrintTypeSelected = (event) => {
         this.settings.partnerPrintType = event.value;
-        this.saveSettings('Your print type is set.');
+        this.saveSettings('Print type is set.');
     };
 
     onPartnerLabelWidthChanged = () => {
-        this.saveSettings('Your label width is set.');
+        this.saveSettings('Label width is set.');
     };
 
     onPartnerLabelHeightChanged = () => {
-        this.saveSettings('Your label height is set.');
+        this.saveSettings('Label height is set.');
     };
 
     onMoveLogo = (event) => {
         this.settings.logoInBottom = event.checked;
-        this.saveSettings('Your logo position is set.');
+        this.saveSettings('Logo position is set.');
     };
 
     onLogoWidthChanged = () => {
-        this.saveSettings('Your logo width is set.');
+        this.saveSettings('Logo width is set.');
     };
 
     onLanguageDirection = () => {
-        this.saveSettings('Your language direction is set.');
+        this.saveSettings('Language direction is set.');
     };
 
     onPaperSizeChanged = () => {
-        this.saveSettings('Your paper size is set.');
+        this.saveSettings('Paper size is set.');
     };
 
     onPaperMarginChanged = () => {
-        this.saveSettings('Your paper margin is set.');
+        this.saveSettings('Paper margin is set.');
     };
+
+    onSelectMultipleAddressesPerPage = () => {
+        this.saveSettings('Choice of multiple addresses per page is set.');
+    };
+
+    onNumAddressPerRowChanged() {
+        this.saveSettings('Number of addresses per row is set.');
+    }
+
+    onNumAddressPerColumnChanged() {
+        this.saveSettings('Number of addresses per column is set.');
+    }
 }

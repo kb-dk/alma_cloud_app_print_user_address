@@ -10,4 +10,7 @@ export interface Settings {
     languageDirection: string;
     paperSize: string;
     paperMargin: string;
+    multiAddressPerPage: boolean;
+    numAddressPerRow: number;
+    numAddressPerColumn: number;
 }
