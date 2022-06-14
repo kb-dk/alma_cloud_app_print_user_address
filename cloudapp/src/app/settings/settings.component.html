@@ -21,7 +21,7 @@
                 <td><h3>Default tab</h3></td>
                 <td>
                     <mat-form-field appearance="fill">
-                        <mat-label>Default tab:</mat-label>
+                        <mat-label>Default tab</mat-label>
                         <mat-select [(value)]="settings.defaultTab" (selectionChange)="onSelectDefaultTab($event)">
                             <mat-option value="0">Partner via barcode</mat-option>
                             <mat-option value="1">Users / Vendors</mat-option>
@@ -31,7 +31,7 @@
                 </td>
             </tr>
             <tr>
-                <td><h3>Language direction:</h3></td>
+                <td><h3>Language direction</h3></td>
                 <td>
                     <mat-form-field appearance="fill">
                         <mat-label>Direction</mat-label>
@@ -48,21 +48,30 @@
         <table>
             <tr>
                 <td>
+                    <h3>Paper size</h3>
+                    <em>Don't forget to set it in your browser's print settings as well</em>
+                </td>
+                <td>
                     <mat-form-field appearance="fill">
-                        <mat-label>Paper size:</mat-label>
+                        <mat-label>Paper size</mat-label>
                         <mat-select [(value)]="settings.paperSize" (selectionChange)="onPaperSizeChanged()">
                             <mat-option value="21.0X29.7">A4 (21.0 X 29.7 cm)</mat-option>
                             <mat-option value="14.8X21.0">A5 (14.8 X 21.0 cm)</mat-option>
                             <mat-option value="10.5X14.7">A6 (10.5 X 14.8 cm)</mat-option>
                             <mat-option value="7.4X10.5">A7 (7.4 X 10.5 cm)</mat-option>
+                            <mat-option value="10.0X5.5">label (10.0 X 5.5 cm)</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </td>
             </tr>
             <tr>
                 <td>
+                    <h3>Paper margin (cm)</h3>
+                    <em>Note that your browser's print settings might add some margin as well which will be added to this number.</em>
+                </td>
+                <td>
                     <mat-form-field>
-                        <mat-label>Paper margin:</mat-label>
+                        <mat-label>Paper margin</mat-label>
                         <input matInput
                                [(ngModel)]="settings.paperMargin"
                                (change)="onPaperMarginChanged()">
@@ -71,18 +80,18 @@
                 </td>
             </tr>
             <tr>
-                <td>
+                <td colspan="2">
                     <mat-checkbox (change)="onSelectMultipleAddressesPerPage()"
                                   [checked]="settings.multiAddressPerPage"
                                   [(ngModel)]="settings.multiAddressPerPage"
                     >
-                        Multiple addresses per page
+                        <h3>Multiple addresses per page (without logo)</h3>
                     </mat-checkbox>
                 </td>
             </tr>
             <tr *ngIf="settings.multiAddressPerPage">
                 <td>
-                    <h3 class="padding-top">Number of addresses per row:</h3></td>
+                    <h3 class="padding-top">Number of addresses per row</h3></td>
                 <td>
                     <mat-form-field>
                         <mat-label>Number of addresses per row</mat-label>
@@ -95,7 +104,7 @@
             </tr>
             <tr *ngIf="settings.multiAddressPerPage">
                 <td>
-                    <h3 class="padding-top">Number of addresses per column:</h3></td>
+                    <h3 class="padding-top">Number of addresses per column</h3></td>
                 <td>
                     <mat-form-field>
                         <mat-label>Number of addresses per column</mat-label>
@@ -112,7 +121,8 @@
         <table>
             <tr>
                 <td>
-                    <h3 class="padding-top">Logo width (cm):</h3></td>
+                    <h3 class="padding-top">Logo width (cm)</h3>
+                </td>
                 <td>
                     <mat-form-field>
                         <mat-label>Logo width</mat-label>
@@ -124,7 +134,7 @@
                 </td>
             </tr>
             <tr>
-                <td>
+                <td colspan="2">
                     <mat-checkbox style="display: block; color: black" [(ngModel)]="settings.logoInBottom"
                                   (change)="onMoveLogo($event)"
                                   [checked]="settings.logoInBottom"
@@ -143,12 +153,12 @@
             <mat-radio-button value="paper"
                               [checked]="(configAndSettings.settings.partnerPrintType === 'paper')"
                               (change)="onPartnerPrintTypeSelected($event)"
-            >Print as A4 paper (with or without logo)
+            ><h3>Print partner(s) without sender's address </h3><small>Choose relevant settings under <b>Paper</b> and <b>Logo</b> sections.</small>
             </mat-radio-button>
             <mat-radio-button value="label" class="md-primary"
                               [checked]="(configAndSettings.settings.partnerPrintType === 'label')"
                               (change)="onPartnerPrintTypeSelected($event)"
-            >Print as label (10cm x 5,5cm)
+            ><h3>Print partner(s) with sender's address</h3>
             </mat-radio-button>
         </mat-radio-group>
         <table *ngIf="settings.partnerPrintType === 'label'">
@@ -173,7 +183,7 @@
             <tr></tr>
             <tr>
                 <td>
-                    <h3 class="padding-top">Label width (cm):</h3></td>
+                    <h3 class="padding-top">Label width (cm)</h3></td>
                 <td>
                     <mat-form-field>
                         <mat-label>Label width</mat-label>
@@ -186,7 +196,7 @@
             </tr>
             <tr>
                 <td>
-                    <h3 class="padding-top">Label height (cm):</h3></td>
+                    <h3 class="padding-top">Label height (cm)</h3></td>
                 <td>
                     <mat-form-field>
                         <mat-label>Label height</mat-label>
