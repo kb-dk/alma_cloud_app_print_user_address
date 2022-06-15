@@ -361,12 +361,17 @@ export class MainComponent implements OnInit, OnDestroy {
 
                 .paper{
                     width: ${this.getPaperWidth()}cm;
-                    height: ${this.getPaperHeight()}cm;
+                    /* It is 0.2 cm smaller than the paper size so it 
+                       won't cause a page break. */
+                    height: ${parseInt(this.getPaperHeight())-0.2}cm; 
                     /* Using padding instead of margin so wouldn't need to calculate 
                        the width and height of the page based on margin. */
                     padding: ${this.paperMargin}cm; 
                     page-break-after: always;
-                }                        
+                }  
+                .paper:last-child {
+                    page-break-after: avoid;
+                }                 
                 .flex-container{
                     display: flex;
                     flex-direction: row;
@@ -491,7 +496,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
 
     onPartnerPrint = () => {
-        let innerHtml: string = this.partnerPrintType === 'paper' ? "<div class='paper flex-container'>" : "";
+        let innerHtml: string = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
         this.currentPartnerActions.map(partner => {
             if (partner.checked) {
                 let addresses: string;
@@ -512,7 +517,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 innerHtml = innerHtml.concat(addresses);
             }
         });
-        innerHtml = this.partnerPrintType === 'paper' ? innerHtml + "</div>" : innerHtml;
+        innerHtml = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
         this.printContent(this.getContent(innerHtml, 'partner'));
     };
 
