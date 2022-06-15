@@ -43,6 +43,8 @@ export class SettingsComponent {
         tap(settings => settings.defaultTab === undefined ? this.settings.defaultTab = '0' : true),
         tap(settings => settings.logoInBottom === undefined ? this.settings.logoInBottom = false : true),
         tap(settings => settings.logoWidth === undefined ? this.settings.logoWidth = '3' : true),
+        tap(settings => settings.addressTopMargin === undefined ? this.settings.addressTopMargin = '2' : true),
+        tap(settings => settings.addressWidth === undefined ? this.settings.addressWidth = '9' : true),
         tap(settings => settings.languageDirection === undefined ? this.settings.languageDirection = 'ltr' : true),
         tap(settings => settings.paperSize === undefined ? this.settings.paperSize = '21.0X29.7' : true),
         tap(settings => settings.paperMargin === undefined ? this.settings.paperMargin = '2' : true),
@@ -159,5 +161,13 @@ export class SettingsComponent {
 
     onRepeatAddress() {
         this.saveSettings('Choice of repeat address is set.');
+    }
+
+    onAddressTopMarginChanged() {
+        this.saveSettings("Address's top margin is set.");
+    }
+
+    onAddressWidthChanged() {
+        this.saveSettings("Address's width is set.");
     }
 }

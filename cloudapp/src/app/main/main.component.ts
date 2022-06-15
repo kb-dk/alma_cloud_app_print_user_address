@@ -48,6 +48,8 @@ export class MainComponent implements OnInit, OnDestroy {
     logoUrl: string = '';
     logoInBottom: boolean = false;
     logoWidth: string = '3';
+    addressTopMargin: string = '2';
+    addressWidth: string = '9';
     languageDirection: string = 'ltr';
     paperSize: string = '21.0X29.7';
     paperMargin: string = '2';
@@ -187,6 +189,8 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.defaultTab = settings.hasOwnProperty('defaultTab') ? settings.defaultTab : '0';
                 this.logoInBottom = settings.hasOwnProperty('logoInBottom') ? settings.logoInBottom : false;
                 this.logoWidth = settings.hasOwnProperty('logoWidth') ? settings.logoWidth : '3';
+                this.addressTopMargin = settings.hasOwnProperty('addressTopMargin') ? settings.addressTopMargin : '2';
+                this.addressWidth = settings.hasOwnProperty('addressWidth') ? settings.addressWidth : '9';
                 this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
                 this.paperSize = settings.hasOwnProperty('paperSize') ? settings.paperSize : '21.0X29.7';
                 this.paperMargin = settings.hasOwnProperty('paperMargin') ? settings.paperMargin : '2';
@@ -328,11 +332,11 @@ export class MainComponent implements OnInit, OnDestroy {
                 .address-flex-item{
                     order: 1;
                     flex-grow: 3;
-                    top:2cm;
+                    top:${this.addressTopMargin}cm;
                 }  
                 
                 .address-flex-item p{
-                    width:9cm;                 
+                    width:${this.addressWidth}cm;                 
                 }  
                `;
 

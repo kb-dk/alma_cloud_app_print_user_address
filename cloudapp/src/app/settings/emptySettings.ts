@@ -9,6 +9,8 @@ export const emptySettings : Settings = {
     defaultTab: '0',
     logoInBottom: false,
     logoWidth: '3',
+    addressTopMargin: '2',
+    addressWidth: '9',
     languageDirection: 'ltr',
     paperSize: '21.0X29.7',
     paperMargin: '2',

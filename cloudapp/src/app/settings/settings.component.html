@@ -12,10 +12,9 @@
 </div>
 
 <div *ngIf="configAndSettings$ | async as configAndSettings">
+
     <div class="padding-top">
-
         <h2>General</h2>
-
         <table>
             <tr>
                 <td><h3>Default tab</h3></td>
@@ -43,7 +42,9 @@
                 </td>
             </tr>
         </table>
+    </div>
 
+    <div class="padding-top">
         <h2>Paper</h2>
         <table>
             <tr>
@@ -68,7 +69,8 @@
             <tr>
                 <td>
                     <h3>Paper margin (cm)</h3>
-                    <em>Note that your browser's print settings might add some margin as well which will be added to this number.</em>
+                    <em>Note that your browser's print settings might add some margin as well which will be added to
+                        this number.</em>
                 </td>
                 <td>
                     <mat-form-field>
@@ -127,7 +129,9 @@
                 </td>
             </tr>
         </table>
+    </div>
 
+    <div class="padding-top">
         <h2>Logo</h2>
         <table>
             <tr>
@@ -149,7 +153,7 @@
                     <mat-checkbox style="display: block; color: black" [(ngModel)]="settings.logoInBottom"
                                   (change)="onMoveLogo($event)"
                                   [checked]="settings.logoInBottom"
-                    > <h3>Move logo to the bottom of the page</h3>
+                    ><h3>Move logo to the bottom of the page</h3>
                     </mat-checkbox>
                 </td>
             </tr>
@@ -157,14 +161,49 @@
     </div>
 
     <div class="padding-top">
+        <h2>Address</h2>
+        <table>
+            <tr>
+                <td>
+                    <h3 class="padding-top">Address width (cm)</h3>
+                    <em>Only for <b>paper</b> mode and <b>one address per page</b></em>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Address width</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.addressWidth"
+                               (change)="onAddressWidthChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3 class="padding-top">Address top margin (cm)</h3>
+                    <em>Only for <b>paper</b> mode and <b>one address per page</b></em>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Address top margin</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.addressTopMargin"
+                               (change)="onAddressTopMarginChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+        </table>
+    </div>
 
+    <div class="padding-top">
         <h2>Partners</h2>
-
         <mat-radio-group [(ngModel)]="settings.partnerPrintType">
             <mat-radio-button value="paper"
                               [checked]="(configAndSettings.settings.partnerPrintType === 'paper')"
                               (change)="onPartnerPrintTypeSelected($event)"
-            ><h3>Print partner(s) without sender's address </h3><small>Choose relevant settings under <b>Paper</b> and <b>Logo</b> sections.</small>
+            ><h3>Print partner(s) without sender's address </h3>
+                <small>Choose relevant settings under <b>Paper</b> and <b>Logo</b> sections.</small>
             </mat-radio-button>
             <mat-radio-button value="label" class="md-primary"
                               [checked]="(configAndSettings.settings.partnerPrintType === 'label')"

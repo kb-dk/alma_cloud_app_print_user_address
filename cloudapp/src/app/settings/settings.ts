@@ -7,6 +7,8 @@ export interface Settings {
     defaultTab: string;
     logoInBottom: boolean;
     logoWidth: string;
+    addressTopMargin: string;
+    addressWidth: string;
     languageDirection: string;
     paperSize: string;
     paperMargin: string;
