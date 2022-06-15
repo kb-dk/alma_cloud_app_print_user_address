@@ -13,6 +13,7 @@ export const emptySettings : Settings = {
     paperSize: '21.0X29.7',
     paperMargin: '2',
     multiAddressPerPage: false,
+    repeatAddress: false,
     numAddressPerRow: 3,
     numAddressPerColumn: 7,
 };

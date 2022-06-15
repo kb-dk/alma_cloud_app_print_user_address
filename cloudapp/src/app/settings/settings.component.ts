@@ -47,6 +47,7 @@ export class SettingsComponent {
         tap(settings => settings.paperSize === undefined ? this.settings.paperSize = '21.0X29.7' : true),
         tap(settings => settings.paperMargin === undefined ? this.settings.paperMargin = '2' : true),
         tap(settings => settings.multiAddressPerPage === undefined ? this.settings.multiAddressPerPage = false : true),
+        tap(settings => settings.repeatAddress === undefined ? this.settings.repeatAddress = false : true),
         tap(settings => settings.numAddressPerRow === undefined ? this.settings.numAddressPerRow = 3 : true),
         tap(settings => settings.numAddressPerColumn === undefined ? this.settings.numAddressPerColumn = 7 : true),
 
@@ -154,5 +155,9 @@ export class SettingsComponent {
 
     onNumAddressPerColumnChanged() {
         this.saveSettings('Number of addresses per column is set.');
+    }
+
+    onRepeatAddress() {
+        this.saveSettings('Choice of repeat address is set.');
     }
 }

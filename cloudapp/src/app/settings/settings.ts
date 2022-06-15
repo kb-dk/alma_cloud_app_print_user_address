@@ -11,6 +11,7 @@ export interface Settings {
     paperSize: string;
     paperMargin: string;
     multiAddressPerPage: boolean;
+    repeatAddress: boolean;
     numAddressPerRow: number;
     numAddressPerColumn: number;
 }

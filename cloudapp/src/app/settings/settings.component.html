@@ -90,6 +90,16 @@
                 </td>
             </tr>
             <tr *ngIf="settings.multiAddressPerPage">
+                <td colspan="2">
+                    <mat-checkbox (change)="onRepeatAddress()"
+                                  [checked]="settings.repeatAddress"
+                                  [(ngModel)]="settings.repeatAddress"
+                    >
+                        <h3>Repeat the address if only one address is selected.</h3>
+                    </mat-checkbox>
+                </td>
+            </tr>
+            <tr *ngIf="settings.multiAddressPerPage">
                 <td>
                     <h3 class="padding-top">Number of addresses per row</h3></td>
                 <td>

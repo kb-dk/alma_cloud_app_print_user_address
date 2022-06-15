@@ -28,6 +28,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
     allPartnersSelected: boolean = false;
     multiAddressPerPage: boolean = false;
+    repeatAddress: boolean = false;
     numAddressPerRow: number = 3;
     numAddressPerColumn : number = 7;
     entityType: string = 'USER';
@@ -190,8 +191,9 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.paperSize = settings.hasOwnProperty('paperSize') ? settings.paperSize : '21.0X29.7';
                 this.paperMargin = settings.hasOwnProperty('paperMargin') ? settings.paperMargin : '2';
                 this.multiAddressPerPage = settings.hasOwnProperty('multiAddressPerPage') ? settings.multiAddressPerPage : false;
-                this.numAddressPerRow = settings.hasOwnProperty('numAddressPerRow') ? settings.numAddressPerRow : 3;
-                this.numAddressPerColumn = settings.hasOwnProperty('numAddressPerColumn') ? settings.numAddressPerColumn : 7;
+                this.repeatAddress = settings.hasOwnProperty('repeatAddress') ? settings.repeatAddress : false;
+                this.numAddressPerRow = settings.hasOwnProperty('numAddressPerRow') ? parseInt(settings.numAddressPerRow.toString()) : 3;
+                this.numAddressPerColumn = settings.hasOwnProperty('numAddressPerColumn') ? parseInt(settings.numAddressPerColumn.toString()) : 7;
             },
             err => console.error(err.message)
         );
@@ -439,11 +441,19 @@ export class MainComponent implements OnInit, OnDestroy {
                 </html>
                 `;
 
+    getNumberOfSelectedAddresses = (partnerOrUsers) => {
+        let count = 0;
+        partnerOrUsers.forEach(partnerOrUser => {
+            count = partnerOrUser.checked === true ? count +1 : count;
+        });
+        return count;
+    };
+
     onUserPrint = () => {
         let innerHtml: string = this.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
         this.currentUserActions.map(user => {
             if (user.checked) {
-                innerHtml = innerHtml.concat(this.getHtmlForPaper(user, user.addresses, this.printLogoUser));
+                innerHtml = innerHtml.concat(this.getHtmlForPaper(user, this.getNumberOfSelectedAddresses(this.currentUserActions), user.addresses, this.printLogoUser));
             }
         });
         innerHtml = this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
@@ -461,7 +471,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     break;
                 }
                 case 'paper': {
-                    addresses = this.getHtmlForPaper(this.scannedPartner, this.scannedPartner.receivers_addresses, this.printLogoPartner);
+                    addresses = this.getHtmlForPaper(this.scannedPartner, 1, this.scannedPartner.receivers_addresses, this.printLogoPartner);
                     break;
                 }
                 default: {
@@ -487,7 +497,7 @@ export class MainComponent implements OnInit, OnDestroy {
                         break;
                     }
                     case 'paper': {
-                        addresses = this.getHtmlForPaper(partner, partner.receivers_addresses, this.printLogoPartner);
+                        addresses = this.getHtmlForPaper(partner, this.getNumberOfSelectedAddresses(this.currentPartnerActions), partner.receivers_addresses, this.printLogoPartner);
                         break;
                     }
                     default: {
@@ -512,12 +522,26 @@ export class MainComponent implements OnInit, OnDestroy {
 
     getLogo = () =>  `<div class="logo-flex-item"><img class="logo" alt="logo" src="${this.logoUrl}"/></div>`;
 
-    getHtmlForPaper = (partner, addresses, printLogo) => `                     
+    getHtmlForPaper = (partnerOrUser, numberOfAddresses, addresses, printLogo) => {
+        let html = this.getOneAddress(partnerOrUser, addresses, printLogo);
+        // Repeat the address if needed.
+        if (numberOfAddresses === 1 && this.repeatAddress){
+            let length : number = this.numAddressPerRow * this.numAddressPerColumn;
+            for (let i = 2; i<= length; i++){
+                html = html.concat(this.getOneAddress(partnerOrUser, addresses, printLogo));
+            }
+        }
+
+        return html ;
+
+    };
+
+    getOneAddress = (partnerOrUser, addresses, printLogo) => `                    
                       ${this.multiAddressPerPage ? '' : "<div class='paper flex-container'>"}                                                                 
                       ${!this.multiAddressPerPage && printLogo && this.logoUrl ? this.getLogo() : ''}
                       <div class="address-flex-item">
-                        <p style="">${partner.name}<br/>
-                        ${addresses.find(address => address.type === partner.selectedAddress).address}
+                        <p style="">${partnerOrUser.name}<br/>
+                        ${addresses.find(address => address.type === partnerOrUser.selectedAddress).address}
                         </p>
                       </div>
                       ${this.multiAddressPerPage ? '' : "</div>"}                                                                 
