@@ -340,15 +340,11 @@ export class MainComponent implements OnInit, OnDestroy {
                 }  
                `;
 
-    getMultiAddressPerPageStyling = () => `
-                .address-flex-item{
-                    //flex-grow: 3;
-                }  
-                
+    getMultiAddressPerPageStyling = () => `              
                 .address-flex-item p{
                     width:${(parseInt(this.getPaperWidth())/ this.numAddressPerRow)-1}cm;                 
-                    height:${(parseInt(this.getPaperHeight())/ this.numAddressPerColumn)-1}cm;
-                    padding: 0.5cm;                 
+                    max-height:${(parseInt(this.getPaperHeight())/ this.numAddressPerColumn)-1}cm;
+                    margin: 0.5cm;                 
                 }  
                `;
 
@@ -363,11 +359,12 @@ export class MainComponent implements OnInit, OnDestroy {
                     width: ${this.getPaperWidth()}cm;
                     /* It is 0.2 cm smaller than the paper size so it 
                        won't cause a page break. */
-                    height: ${parseInt(this.getPaperHeight())-0.2}cm; 
+                    height: ${parseInt(this.getPaperHeight())}cm; 
                     /* Using padding instead of margin so wouldn't need to calculate 
                        the width and height of the page based on margin. */
                     padding: ${this.paperMargin}cm; 
                     page-break-after: always;
+                    max-height: 100vh;
                 }  
                 .paper:last-child {
                     page-break-after: avoid;
