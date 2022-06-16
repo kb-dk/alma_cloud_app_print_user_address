@@ -19,7 +19,7 @@
     "@angular/router": "~11.2.14",
     "@exlibris/exl-cloudapp-angular-lib": "^1.4.3",
     "@exlibris/exl-cloudapp-base": "^1.4.3",
-    "@exlibris/exl-cloudapp-cli": "^0.3.0",
+    "@exlibris/exl-cloudapp-cli": "^1.4.3",
     "@ngx-translate/core": "~13.0.0",
     "bootstrap": "^4.6.0",
     "lodash": "~4.17.21",
