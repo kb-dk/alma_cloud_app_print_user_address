@@ -30,7 +30,6 @@ export class ScanService {
                 private eventsService: CloudAppEventsService,
                 private userService: UserService,
                 private partnerService: PartnerService,
-                private scanService: ScanService,
                 private fixConfigService: FixConfigService,
                 private convertService: ConvertService,
     ) {
