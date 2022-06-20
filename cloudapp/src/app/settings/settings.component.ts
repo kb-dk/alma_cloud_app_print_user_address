@@ -104,79 +104,18 @@ export class SettingsComponent {
         return string.replaceAll(',', '<br/>')
     };
 
-    onSelectDefaultTab = (event) => {
+    onSelectDefaultTab = (event, message) => {
         this.settings.defaultTab = event.value;
-        this.saveSettings('Default tab is set.');
+        this.saveSettings(message);
     };
 
-    onSelectMyAddress = (event) => {
+    onSelectMyAddress = (event, message) => {
         this.settings.myAddress = this.config.partner.addresses[event.value];
-        this.saveSettings('Address is set.');
+        this.saveSettings(message);
     };
 
-    onPartnerPrintTypeSelected = (event) => {
+    onPartnerPrintTypeSelected = (event, message) => {
         this.settings.partnerPrintType = event.value;
-        this.saveSettings('Print type is set.');
+        this.saveSettings(message);
     };
-
-    onPartnerLabelWidthChanged = () => {
-        this.saveSettings('Label width is set.');
-    };
-
-    onPartnerLabelHeightChanged = () => {
-        this.saveSettings('Label height is set.');
-    };
-
-    onMoveLogo = (event) => {
-        this.settings.logoInBottom = event.checked;
-        this.saveSettings('Logo position is set.');
-    };
-
-    onLogoWidthChanged = () => {
-        this.saveSettings('Logo width is set.');
-    };
-
-    onLanguageDirection = () => {
-        this.saveSettings('Language direction is set.');
-    };
-
-    onPaperSizeChanged = () => {
-        this.saveSettings('Paper size is set.');
-    };
-
-    onPaperMarginChanged = () => {
-        this.saveSettings('Paper margin is set.');
-    };
-
-    onSelectMultipleAddressesPerPage = () => {
-        this.saveSettings('Choice of multiple addresses per page is set.');
-    };
-
-    onNumAddressPerRowChanged() {
-        this.saveSettings('Number of addresses per row is set.');
-    }
-
-    onNumAddressPerColumnChanged() {
-        this.saveSettings('Number of addresses per column is set.');
-    }
-
-    onRepeatAddress() {
-        this.saveSettings('Choice of repeat address is set.');
-    }
-
-    onAddressTopMarginChanged() {
-        this.saveSettings("Address's top margin is set.");
-    }
-
-    onAddressWidthChanged() {
-        this.saveSettings("Address's width is set.");
-    }
-
-    onCellPaddingLeftChanged() {
-        this.saveSettings("Cell padding left is set.");
-    }
-
-    onCellPaddingRightChanged() {
-        this.saveSettings("Cell padding right is set.");
-    }
 }

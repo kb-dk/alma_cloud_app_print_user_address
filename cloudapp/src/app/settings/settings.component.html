@@ -21,7 +21,7 @@
                 <td>
                     <mat-form-field appearance="fill">
                         <mat-label>Default tab</mat-label>
-                        <mat-select [(value)]="settings.defaultTab" (selectionChange)="onSelectDefaultTab($event)">
+                        <mat-select [(value)]="settings.defaultTab" (selectionChange)="onSelectDefaultTab($event, 'Default tab is set.')">
                             <mat-option value="0">Partner via barcode</mat-option>
                             <mat-option value="1">Users / Vendors</mat-option>
                             <mat-option value="2">Partners</mat-option>
@@ -34,7 +34,7 @@
                 <td>
                     <mat-form-field appearance="fill">
                         <mat-label>Direction</mat-label>
-                        <mat-select [(value)]="settings.languageDirection" (selectionChange)="onLanguageDirection()">
+                        <mat-select [(value)]="settings.languageDirection" (selectionChange)="saveSettings('Language direction is set.')">
                             <mat-option value="ltr">Left to right</mat-option>
                             <mat-option value="rtl">Right to left</mat-option>
                         </mat-select>
@@ -55,7 +55,7 @@
                 <td>
                     <mat-form-field appearance="fill">
                         <mat-label>Paper size</mat-label>
-                        <mat-select [(value)]="settings.paperSize" (selectionChange)="onPaperSizeChanged()">
+                        <mat-select [(value)]="settings.paperSize" (selectionChange)="saveSettings('Paper size is set.')">
                             <mat-option value="21.0X29.7">A4 (21.0 X 29.7 cm)</mat-option>
                             <mat-option value="14.8X21.0">A5 (14.8 X 21.0 cm)</mat-option>
                             <mat-option value="10.5X14.7">A6 (10.5 X 14.8 cm)</mat-option>
@@ -77,14 +77,14 @@
                         <mat-label>Paper margin</mat-label>
                         <input matInput
                                [(ngModel)]="settings.paperMargin"
-                               (change)="onPaperMarginChanged()">
+                               (change)="saveSettings('Paper margin is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <mat-checkbox (change)="onSelectMultipleAddressesPerPage()"
+                    <mat-checkbox (change)="saveSettings('Choice of multiple addresses per page is set.')"
                                   [checked]="settings.multiAddressPerPage"
                                   [(ngModel)]="settings.multiAddressPerPage"
                     >
@@ -94,7 +94,7 @@
             </tr>
             <tr *ngIf="settings.multiAddressPerPage">
                 <td colspan="2">
-                    <mat-checkbox (change)="onRepeatAddress()"
+                    <mat-checkbox (change)="saveSettings('Choice of repeat address is set.')"
                                   [checked]="settings.repeatAddress"
                                   [(ngModel)]="settings.repeatAddress"
                     >
@@ -110,7 +110,7 @@
                         <mat-label>Number of addresses per row</mat-label>
                         <input matInput
                                [(ngModel)]="settings.numAddressPerRow"
-                               (change)="onNumAddressPerRowChanged()">
+                               (change)="saveSettings('Number of addresses per row is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
@@ -123,7 +123,7 @@
                         <mat-label>Number of addresses per column</mat-label>
                         <input matInput
                                [(ngModel)]="settings.numAddressPerColumn"
-                               (change)="onNumAddressPerColumnChanged()">
+                               (change)="saveSettings('Number of addresses per column is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
@@ -136,7 +136,7 @@
                         <mat-label>Padding left</mat-label>
                         <input matInput
                                [(ngModel)]="settings.cellPaddingLeft"
-                               (change)="onCellPaddingLeftChanged()">
+                               (change)="saveSettings('Cell padding left is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
@@ -149,7 +149,7 @@
                         <mat-label>Padding right</mat-label>
                         <input matInput
                                [(ngModel)]="settings.cellPaddingRight"
-                               (change)="onCellPaddingRightChanged()">
+                               (change)="saveSettings('Cell padding right is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
@@ -169,15 +169,16 @@
                         <mat-label>Logo width</mat-label>
                         <input matInput
                                [(ngModel)]="settings.logoWidth"
-                               (change)="onLogoWidthChanged()">
+                               (change)="saveSettings('Logo width is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <mat-checkbox style="display: block; color: black" [(ngModel)]="settings.logoInBottom"
-                                  (change)="onMoveLogo($event)"
+                    <mat-checkbox style="display: block; color: black"
+                                  [(ngModel)]="settings.logoInBottom"
+                                  (change)="saveSettings('Logo position is set.')"
                                   [checked]="settings.logoInBottom"
                     ><h3>Move logo to the bottom of the page</h3>
                     </mat-checkbox>
@@ -199,7 +200,7 @@
                         <mat-label>Address width</mat-label>
                         <input matInput
                                [(ngModel)]="settings.addressWidth"
-                               (change)="onAddressWidthChanged()">
+                               (change)="saveSettings('Address\'s width is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
@@ -214,7 +215,7 @@
                         <mat-label>Address top margin</mat-label>
                         <input matInput
                                [(ngModel)]="settings.addressTopMargin"
-                               (change)="onAddressTopMarginChanged()">
+                               (change)="saveSettings('Address\'s top margin is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
@@ -227,13 +228,13 @@
         <mat-radio-group [(ngModel)]="settings.partnerPrintType">
             <mat-radio-button value="paper"
                               [checked]="(configAndSettings.settings.partnerPrintType === 'paper')"
-                              (change)="onPartnerPrintTypeSelected($event)"
+                              (change)="onPartnerPrintTypeSelected($event, 'Print type is set.')"
             ><h3>Print partner(s) without sender's address </h3>
                 <small>Choose relevant settings under <b>Paper</b> and <b>Logo</b> sections.</small>
             </mat-radio-button>
             <mat-radio-button value="label" class="md-primary"
                               [checked]="(configAndSettings.settings.partnerPrintType === 'label')"
-                              (change)="onPartnerPrintTypeSelected($event)"
+                              (change)="onPartnerPrintTypeSelected($event, 'Print type is set.')"
             ><h3>Print partner(s) with sender's address</h3>
             </mat-radio-button>
         </mat-radio-group>
@@ -245,7 +246,7 @@
             <tr *ngFor="let address of configAndSettings.config.partner.addresses; let i = index">
                 <td>
                     <mat-radio-button style="display: block; color: black"
-                                      (change)="onSelectMyAddress($event)"
+                                      (change)="onSelectMyAddress($event, 'Address is set.')"
                                       [value]=i
                                       checked="{{configAndSettings.settings.myAddress===address}}">
                     </mat-radio-button>
@@ -265,7 +266,7 @@
                         <mat-label>Label width</mat-label>
                         <input matInput
                                [(ngModel)]="settings.labelWidth"
-                               (change)="onPartnerLabelWidthChanged()">
+                               (change)="saveSettings('Label width is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
@@ -278,7 +279,7 @@
                         <mat-label>Label height</mat-label>
                         <input matInput
                                [(ngModel)]="settings.labelHeight"
-                               (change)="onPartnerLabelHeightChanged()">
+                               (change)="saveSettings('Label height is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>
