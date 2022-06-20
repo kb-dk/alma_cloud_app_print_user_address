@@ -28,6 +28,8 @@ export class MainComponent implements OnInit, OnDestroy {
 
     allPartnersSelected: boolean = false;
     multiAddressPerPage: boolean = false;
+    cellPaddingLeft: number = 0;
+    cellPaddingRight: number = 0;
     repeatAddress: boolean = false;
     numAddressPerRow: number = 3;
     numAddressPerColumn : number = 7;
@@ -198,6 +200,8 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.repeatAddress = settings.hasOwnProperty('repeatAddress') ? settings.repeatAddress : false;
                 this.numAddressPerRow = settings.hasOwnProperty('numAddressPerRow') ? parseInt(settings.numAddressPerRow.toString()) : 3;
                 this.numAddressPerColumn = settings.hasOwnProperty('numAddressPerColumn') ? parseInt(settings.numAddressPerColumn.toString()) : 7;
+                this.cellPaddingLeft = settings.hasOwnProperty('cellPaddingLeft') ? parseFloat(settings.cellPaddingLeft.toString()) : 0;
+                this.cellPaddingRight = settings.hasOwnProperty('cellPaddingRight') ? parseFloat(settings.cellPaddingRight.toString()) : 0;
             },
             err => console.error(err.message)
         );
@@ -342,9 +346,11 @@ export class MainComponent implements OnInit, OnDestroy {
 
     getMultiAddressPerPageStyling = () => `              
                 .address-flex-item p{
-                    width:${(parseInt(this.getPaperWidth())/ this.numAddressPerRow)-1}cm;                 
-                    max-height:${(parseInt(this.getPaperHeight())/ this.numAddressPerColumn)-1}cm;
-                    margin: 0.5cm;                 
+                    width:${(parseFloat(this.getPaperWidth())/ this.numAddressPerRow)- 1 - this.cellPaddingLeft - this.cellPaddingRight}cm;                 
+                    max-height:${(parseFloat(this.getPaperHeight())/ this.numAddressPerColumn)-1}cm;
+                    margin: 0.5cm;
+                    padding-left: ${this.cellPaddingLeft}cm;                
+                    padding-right: ${this.cellPaddingRight}cm;                
                 }  
                `;
 
@@ -357,9 +363,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
                 .paper{
                     width: ${this.getPaperWidth()}cm;
-                    /* It is 0.2 cm smaller than the paper size so it 
-                       won't cause a page break. */
-                    height: ${parseInt(this.getPaperHeight())}cm; 
+                    height: ${parseFloat(this.getPaperHeight())}cm; 
                     /* Using padding instead of margin so wouldn't need to calculate 
                        the width and height of the page based on margin. */
                     padding: ${this.paperMargin}cm; 

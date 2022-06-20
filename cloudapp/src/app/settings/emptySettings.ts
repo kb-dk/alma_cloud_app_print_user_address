@@ -18,4 +18,6 @@ export const emptySettings : Settings = {
     repeatAddress: false,
     numAddressPerRow: 3,
     numAddressPerColumn: 7,
+    cellPaddingLeft: 0,
+    cellPaddingRight: 0,
 };

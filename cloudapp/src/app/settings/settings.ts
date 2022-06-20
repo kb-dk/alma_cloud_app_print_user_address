@@ -16,4 +16,6 @@ export interface Settings {
     repeatAddress: boolean;
     numAddressPerRow: number;
     numAddressPerColumn: number;
+    cellPaddingLeft: number;
+    cellPaddingRight: number;
 }

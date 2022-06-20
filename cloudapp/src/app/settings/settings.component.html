@@ -128,6 +128,32 @@
                     </mat-form-field>
                 </td>
             </tr>
+            <tr *ngIf="settings.multiAddressPerPage">
+                <td>
+                    <h3 class="padding-top">Padding left for each cell(cm)</h3></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Padding left</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.cellPaddingLeft"
+                               (change)="onCellPaddingLeftChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr *ngIf="settings.multiAddressPerPage">
+                <td>
+                    <h3 class="padding-top">Padding right for each cell(cm)</h3></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Padding right</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.cellPaddingRight"
+                               (change)="onCellPaddingRightChanged()">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
         </table>
     </div>
 

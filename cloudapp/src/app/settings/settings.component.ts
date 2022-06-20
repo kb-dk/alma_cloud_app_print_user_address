@@ -52,7 +52,8 @@ export class SettingsComponent {
         tap(settings => settings.repeatAddress === undefined ? this.settings.repeatAddress = false : true),
         tap(settings => settings.numAddressPerRow === undefined ? this.settings.numAddressPerRow = 3 : true),
         tap(settings => settings.numAddressPerColumn === undefined ? this.settings.numAddressPerColumn = 7 : true),
-
+        tap(settings => settings.cellPaddingLeft === undefined ? this.settings.cellPaddingLeft = 0 : true),
+        tap(settings => settings.cellPaddingRight === undefined ? this.settings.cellPaddingRight = 0 : true),
         catchError(error => {
             console.log('Error getting settings:', error);
             return EMPTY;
@@ -169,5 +170,13 @@ export class SettingsComponent {
 
     onAddressWidthChanged() {
         this.saveSettings("Address's width is set.");
+    }
+
+    onCellPaddingLeftChanged() {
+        this.saveSettings("Cell padding left is set.");
+    }
+
+    onCellPaddingRightChanged() {
+        this.saveSettings("Cell padding right is set.");
     }
 }
