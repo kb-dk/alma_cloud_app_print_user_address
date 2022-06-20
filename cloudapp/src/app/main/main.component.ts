@@ -50,6 +50,7 @@ export class MainComponent implements OnInit, OnDestroy {
     logoUrl: string = '';
     logoInBottom: boolean = false;
     logoWidth: string = '3';
+    textBeforeAddress: string = '';
     addressTopMargin: string = '2';
     addressWidth: string = '9';
     languageDirection: string = 'ltr';
@@ -193,6 +194,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.logoWidth = settings.hasOwnProperty('logoWidth') ? settings.logoWidth : '3';
                 this.addressTopMargin = settings.hasOwnProperty('addressTopMargin') ? settings.addressTopMargin : '2';
                 this.addressWidth = settings.hasOwnProperty('addressWidth') ? settings.addressWidth : '9';
+                this.textBeforeAddress = settings.hasOwnProperty('textBeforeAddress') ? settings.textBeforeAddress : '';
                 this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
                 this.paperSize = settings.hasOwnProperty('paperSize') ? settings.paperSize : '21.0X29.7';
                 this.paperMargin = settings.hasOwnProperty('paperMargin') ? settings.paperMargin : '2';
@@ -546,19 +548,6 @@ export class MainComponent implements OnInit, OnDestroy {
 
     };
 
-    getOneAddress = (partnerOrUser, addresses, printLogo) => `                    
-                      ${this.multiAddressPerPage ? '' : "<div class='paper flex-container'>"}                                                                 
-                      ${!this.multiAddressPerPage && printLogo && this.logoUrl ? this.getLogo() : ''}
-                      <div class="address-flex-item">
-                        <p style="">${partnerOrUser.name}<br/>
-                        ${addresses.find(address => address.type === partnerOrUser.selectedAddress).address}
-                        </p>
-                      </div>
-                      ${this.multiAddressPerPage ? '' : "</div>"}                                                                 
-
-                    `;
-
-
     printContent = (content) => {
         let win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
         if (win.document) {
@@ -587,6 +576,19 @@ export class MainComponent implements OnInit, OnDestroy {
         }
         this.numPartnersToPrint = numPartnersToPrint;
     }
+
+    getOneAddress = (partnerOrUser, addresses, printLogo) => `                    
+                      ${this.multiAddressPerPage ? '' : "<div class='paper flex-container'>"}                                                                 
+                      ${!this.multiAddressPerPage && printLogo && this.logoUrl ? this.getLogo() : ''}
+                      <div class="address-flex-item">
+                        <p style="">${this.textBeforeAddress ? '<u>' + this.textBeforeAddress + '</u><br/>' : ''}                      
+                        ${partnerOrUser.name}<br/>
+                        ${addresses.find(address => address.type === partnerOrUser.selectedAddress).address}
+                        </p>
+                      </div>
+                      ${this.multiAddressPerPage ? '' : "</div>"}                                                                 
+
+                    `;
 
     onSelectDeselectAllUsers(event, users) {
         let numUsersToPrint = 0;

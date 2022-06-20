@@ -9,6 +9,7 @@ export interface Settings {
     logoWidth: string;
     addressTopMargin: string;
     addressWidth: string;
+    textBeforeAddress: string;
     languageDirection: string;
     paperSize: string;
     paperMargin: string;

@@ -45,6 +45,7 @@ export class SettingsComponent {
         tap(settings => settings.logoWidth === undefined ? this.settings.logoWidth = '3' : true),
         tap(settings => settings.addressTopMargin === undefined ? this.settings.addressTopMargin = '2' : true),
         tap(settings => settings.addressWidth === undefined ? this.settings.addressWidth = '9' : true),
+        tap(settings => settings.textBeforeAddress === undefined ? this.settings.textBeforeAddress = '' : true),
         tap(settings => settings.languageDirection === undefined ? this.settings.languageDirection = 'ltr' : true),
         tap(settings => settings.paperSize === undefined ? this.settings.paperSize = '21.0X29.7' : true),
         tap(settings => settings.paperMargin === undefined ? this.settings.paperMargin = '2' : true),

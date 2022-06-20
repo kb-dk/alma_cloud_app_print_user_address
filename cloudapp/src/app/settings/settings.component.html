@@ -220,6 +220,20 @@
                     </mat-form-field>
                 </td>
             </tr>
+            <tr>
+                <td>
+                    <h3 class="padding-top">Predefined text on top of address</h3>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Text on top of address</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.textBeforeAddress"
+                               (change)="saveSettings('Text is set.')">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
         </table>
     </div>
 
