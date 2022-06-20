@@ -535,7 +535,7 @@ export class MainComponent implements OnInit, OnDestroy {
     getHtmlForPaper = (partnerOrUser, numberOfAddresses, addresses, printLogo) => {
         let html = this.getOneAddress(partnerOrUser, addresses, printLogo);
         // Repeat the address if needed.
-        if (numberOfAddresses === 1 && this.repeatAddress){
+        if (numberOfAddresses === 1 && this.repeatAddress && this.multiAddressPerPage){
             let length : number = this.numAddressPerRow * this.numAddressPerColumn;
             for (let i = 2; i<= length; i++){
                 html = html.concat(this.getOneAddress(partnerOrUser, addresses, printLogo));
