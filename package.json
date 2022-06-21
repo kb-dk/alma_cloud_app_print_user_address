@@ -1,6 +1,8 @@
 {
   "name": "print-address",
-  "version": "5.0.0",
+  "version": "6.8.2",
+  "description": "Cloud App for printing user, vendor and partner address from Alma.",
+  "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
     "start": "eca start"
@@ -19,14 +21,13 @@
     "@angular/router": "~11.2.14",
     "@exlibris/exl-cloudapp-angular-lib": "^1.4.3",
     "@exlibris/exl-cloudapp-base": "^1.4.3",
-    "@exlibris/exl-cloudapp-cli": "^1.4.3",
     "@ngx-translate/core": "~13.0.0",
-    "bootstrap": "^4.6.0",
     "lodash": "~4.17.21",
-    "ngx-toastr": "^12.0.0",
     "rxjs": "~6.5.5",
+    "zone.js": "~0.10.3",
     "uuid": "^8.0.0",
-    "zone.js": "~0.10.3"
+    "ngx-toastr": "^12.0.0",
+    "bootstrap": "^4.6.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.1102.14",
