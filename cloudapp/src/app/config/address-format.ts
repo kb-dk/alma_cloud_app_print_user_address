@@ -17,5 +17,14 @@ export let AddressFormats = {
         ['line2', 'line3', 'line4', 'line5'],
         ['postal_code', 'city', 'state_province'],
         ['country']
+    ],
+    '4': [
+        ['recipient'],
+        ['line1'],
+        ['line2'],
+        ['line3'],
+        ['line4', 'line5'],
+        ['postal_code', 'city'],
+        ['state_province', 'country']
     ]
 };
