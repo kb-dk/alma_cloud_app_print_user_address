@@ -13,6 +13,7 @@ export const emptySettings : Settings = {
     addressLeftMargin: '0',
     addressRightMargin: '0',
     addressBottomMargin: '0',
+    addressDefaultFontSize: 17,
     addressWidth: '9',
     textBeforeAddress: '',
     languageDirection: 'ltr',

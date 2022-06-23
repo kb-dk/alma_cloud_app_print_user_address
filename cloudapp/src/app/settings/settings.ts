@@ -11,6 +11,7 @@ export interface Settings {
     addressLeftMargin: string;
     addressRightMargin: string;
     addressBottomMargin: string;
+    addressDefaultFontSize: number;
     addressWidth: string;
     textBeforeAddress: string;
     languageDirection: string;

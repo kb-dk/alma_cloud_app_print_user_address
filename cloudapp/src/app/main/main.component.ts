@@ -34,8 +34,9 @@ export class MainComponent implements OnInit, OnDestroy {
     numAddressPerRow: number = 3;
     numAddressPerColumn : number = 7;
     entityType: string = 'USER';
-    userFontSize: number = 17;
-    partnerFontSize: number = 17;
+    addressDefaultFontSize: number = 17;
+    userFontSize: number = this.addressDefaultFontSize;
+    partnerFontSize: number = this.addressDefaultFontSize;
     barcode: number;  // Borrowing request, status: "Returned by patron" for scan in items
     errorMessage: string = '';
     barcodeError: boolean = false;
@@ -201,6 +202,9 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.addressLeftMargin = settings.hasOwnProperty('addressLeftMargin') ? settings.addressLeftMargin : '0';
                 this.addressRightMargin = settings.hasOwnProperty('addressRightMargin') ? settings.addressRightMargin : '0';
                 this.addressBottomMargin = settings.hasOwnProperty('addressBottomMargin') ? settings.addressBottomMargin : '0';
+                this.addressDefaultFontSize = settings.hasOwnProperty('addressDefaultFontSize') ? settings.addressDefaultFontSize : 17;
+                this.userFontSize = this.addressDefaultFontSize;
+                this.partnerFontSize = this.addressDefaultFontSize;
                 this.addressWidth = settings.hasOwnProperty('addressWidth') ? settings.addressWidth : '9';
                 this.textBeforeAddress = settings.hasOwnProperty('textBeforeAddress') ? settings.textBeforeAddress : '';
                 this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';

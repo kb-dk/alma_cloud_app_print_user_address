@@ -47,6 +47,7 @@ export class SettingsComponent {
         tap(settings => settings.addressLeftMargin === undefined ? this.settings.addressLeftMargin = '0' : true),
         tap(settings => settings.addressRightMargin === undefined ? this.settings.addressRightMargin = '0' : true),
         tap(settings => settings.addressBottomMargin === undefined ? this.settings.addressBottomMargin = '0' : true),
+        tap(settings => settings.addressDefaultFontSize === undefined ? this.settings.addressDefaultFontSize = 17 : true),
         tap(settings => settings.addressWidth === undefined ? this.settings.addressWidth = '9' : true),
         tap(settings => settings.textBeforeAddress === undefined ? this.settings.textBeforeAddress = '' : true),
         tap(settings => settings.languageDirection === undefined ? this.settings.languageDirection = 'ltr' : true),
