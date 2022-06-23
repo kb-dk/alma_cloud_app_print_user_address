@@ -23,6 +23,7 @@ export class ScanService {
     senders_address: string = '';
     addressFormat = AddressFormats['1'];
     showCountry = true;
+    showRecipient = true;
 
     constructor(private restService: CloudAppRestService,
                 private configService: CloudAppConfigService,
@@ -41,6 +42,7 @@ export class ScanService {
             map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
             tap(config => this.showCountry = config.addressFormat.showCountry),
+            tap(config => this.showRecipient = config.addressFormat.showRecipient),
             catchError(err => this.handleError(err))
         );
 

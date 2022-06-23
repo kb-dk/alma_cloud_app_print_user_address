@@ -105,6 +105,14 @@
                         </mat-checkbox>
                     </th>
                 </tr>
+                <tr>
+                    <th valign="top" align="left">
+                        <mat-checkbox (change)="onSelectShowRecipient($event)"
+                                      [checked]="config.addressFormat.showRecipient">
+                            Print recipient in the address
+                        </mat-checkbox>
+                    </th>
+                </tr>
             </table>
 
         </div>

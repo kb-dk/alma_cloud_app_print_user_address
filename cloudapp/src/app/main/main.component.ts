@@ -48,6 +48,7 @@ export class MainComponent implements OnInit, OnDestroy {
     numUsersToPrint: number = 0;
     numPartnersToPrint: number = 0;
     logoUrl: string = '';
+    showRecipient: boolean = true;
     logoInBottom: boolean = false;
     logoWidth: string = '3';
     textBeforeAddress: string = '';
@@ -171,6 +172,7 @@ export class MainComponent implements OnInit, OnDestroy {
             (config: Config) => {
                 config = this.fixConfigService.fixOldOrEmptyConfigElements(config);
                 this.logoUrl = config.user.logo;
+                this.showRecipient = config.addressFormat.showRecipient;
                 this.senderAddresses = config.partner.addresses;
                 if (this.senderAddresses.length && !this.senderAddress) {
                     this.senderAddress = this.replaceComma(this.senderAddresses[0]);
@@ -525,8 +527,9 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     getHtmlForLabel = (partner, addresses) => `
-                      <div class='label pageBreak' style="position:relative; padding:0.15cm;">  
-                      <div class="recipient" style="position: relative; font-size: 16px;">${partner.name}<br/>
+                      <div class='label pageBreak' style="position:relative; padding:0.15cm;"> 
+                      <div class="recipient" style="position: relative; font-size: 16px;"> 
+                      ${this.showRecipient ? partner.name + '<br/>' : ''} 
                       ${addresses.find(address => address.type === partner.selectedAddress).address}</div>
                       <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
                       </div>
@@ -582,7 +585,7 @@ export class MainComponent implements OnInit, OnDestroy {
                       ${!this.multiAddressPerPage && printLogo && this.logoUrl ? this.getLogo() : ''}
                       <div class="address-flex-item">
                         <p style="">${this.textBeforeAddress ? '<u>' + this.textBeforeAddress + '</u><br/>' : ''}                      
-                        ${partnerOrUser.name}<br/>
+                        ${this.showRecipient ? partnerOrUser.name + '<br/>' : ''} 
                         ${addresses.find(address => address.type === partnerOrUser.selectedAddress).address}
                         </p>
                       </div>

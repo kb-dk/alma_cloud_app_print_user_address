@@ -45,6 +45,10 @@ export class FixConfigService {
         if (!config.addressFormat.hasOwnProperty('showCountry')) {
             config.addressFormat.showCountry = true;
         }
+        // Fix if showRecipient is not defined
+        if (!config.addressFormat.hasOwnProperty('showRecipient')) {
+            config.addressFormat.showRecipient = true;
+        }
 
         return config;
     };

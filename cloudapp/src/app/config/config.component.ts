@@ -65,6 +65,11 @@ export class ConfigComponent {
         this.saveConfig('Your address format is set.');
     };
 
+    onSelectShowRecipient = (event) => {
+        this.config.addressFormat.showRecipient = event.checked;
+        this.saveConfig('Your address format is set.');
+    };
+
     clearLogo = () => {
         this.config.user.logo = '';
         this.saveConfig('Your logo is cleared.');

@@ -10,5 +10,6 @@ export interface Config {
         addresses: {},
         default: string,
         showCountry: boolean
+        showRecipient: boolean
     }
 }

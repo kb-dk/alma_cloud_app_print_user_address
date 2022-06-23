@@ -15,6 +15,7 @@ export class PartnerService {
     senders_address : string = '';
     addressFormat = AddressFormats['1'];
     showCountry = true;
+    showRecipient = true;
 
 
     partners$ = (entities: Entity[]) => {
@@ -22,6 +23,7 @@ export class PartnerService {
             map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
             tap(config => this.showCountry = config.addressFormat.showCountry),
+            tap(config => this.showRecipient = config.addressFormat.showRecipient),
             catchError(err => this.handleError(err))
         );
         let calls = entities.filter(entity => [EntityType.LOAN, EntityType.BORROWING_REQUEST, EntityType.LENDING_REQUEST].includes(entity.type))
