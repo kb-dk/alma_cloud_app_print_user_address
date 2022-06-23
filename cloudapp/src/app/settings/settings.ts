@@ -8,6 +8,9 @@ export interface Settings {
     logoInBottom: boolean;
     logoWidth: string;
     addressTopMargin: string;
+    addressLeftMargin: string;
+    addressRightMargin: string;
+    addressBottomMargin: string;
     addressWidth: string;
     textBeforeAddress: string;
     languageDirection: string;

@@ -221,6 +221,52 @@
                 </td>
             </tr>
             <tr>
+            <tr>
+                <td>
+                    <h3 class="padding-top">Address bottom margin (cm)</h3>
+                    <em>Only for <b>paper</b> mode and <b>one address per page</b></em>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Address bottom margin</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.addressBottomMargin"
+                               (change)="saveSettings('Address\'s bottom margin is set.')">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3 class="padding-top">Address left margin (cm)</h3>
+                    <em>Only for <b>paper</b> mode</em>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Address left margin</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.addressLeftMargin"
+                               (change)="saveSettings('Address\'s left margin is set.')">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <h3 class="padding-top">Address right margin (cm)</h3>
+                    <em>Only for <b>paper</b> mode</em>
+                </td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Address right margin</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.addressRightMargin"
+                               (change)="saveSettings('Address\'s right margin is set.')">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
                 <td>
                     <h3 class="padding-top">Predefined text on top of address</h3>
                 </td>

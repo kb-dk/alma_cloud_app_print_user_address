@@ -53,6 +53,9 @@ export class MainComponent implements OnInit, OnDestroy {
     logoWidth: string = '3';
     textBeforeAddress: string = '';
     addressTopMargin: string = '2';
+    addressLeftMargin: string = '0';
+    addressRightMargin: string = '0';
+    addressBottomMargin: string = '0';
     addressWidth: string = '9';
     languageDirection: string = 'ltr';
     paperSize: string = '21.0X29.7';
@@ -195,6 +198,9 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.logoInBottom = settings.hasOwnProperty('logoInBottom') ? settings.logoInBottom : false;
                 this.logoWidth = settings.hasOwnProperty('logoWidth') ? settings.logoWidth : '3';
                 this.addressTopMargin = settings.hasOwnProperty('addressTopMargin') ? settings.addressTopMargin : '2';
+                this.addressLeftMargin = settings.hasOwnProperty('addressLeftMargin') ? settings.addressLeftMargin : '0';
+                this.addressRightMargin = settings.hasOwnProperty('addressRightMargin') ? settings.addressRightMargin : '0';
+                this.addressBottomMargin = settings.hasOwnProperty('addressBottomMargin') ? settings.addressBottomMargin : '0';
                 this.addressWidth = settings.hasOwnProperty('addressWidth') ? settings.addressWidth : '9';
                 this.textBeforeAddress = settings.hasOwnProperty('textBeforeAddress') ? settings.textBeforeAddress : '';
                 this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
@@ -348,13 +354,16 @@ export class MainComponent implements OnInit, OnDestroy {
                 }  
                `;
 
-    getMultiAddressPerPageStyling = () => `              
-                .address-flex-item p{
-                    width:${(parseFloat(this.getPaperWidth())/ this.numAddressPerRow)- 1 - this.cellPaddingLeft - this.cellPaddingRight}cm;                 
-                    max-height:${(parseFloat(this.getPaperHeight())/ this.numAddressPerColumn)-1}cm;
-                    margin: 0.5cm;
+    getMultiAddressPerPageStyling = () => `
+                .address-flex-item{
                     padding-left: ${this.cellPaddingLeft}cm;                
-                    padding-right: ${this.cellPaddingRight}cm;                
+                    padding-right: ${this.cellPaddingRight}cm;                 
+                } 
+                             
+                .address-flex-item p{
+                    width:${(parseFloat(this.getPaperWidth())/ this.numAddressPerRow) - parseFloat(this.addressLeftMargin) - parseFloat(this.addressRightMargin) - this.cellPaddingLeft - this.cellPaddingRight}cm;                 
+                    max-height:${(parseFloat(this.getPaperHeight())/ this.numAddressPerColumn)-1}cm;
+                    margin-top: ${this.addressTopMargin}cm;               
                 }  
                `;
 
@@ -386,7 +395,11 @@ export class MainComponent implements OnInit, OnDestroy {
                     position: relative;
                     font-size: ${context === 'user' ? this.userFontSize || 17 : (this.partnerPrintType === 'paper' ? this.partnerFontSize || 17 : 17)}px
                 }
-
+                .address-flex-item p{
+                    margin-left: ${this.addressLeftMargin}cm;
+                    margin-right: ${this.addressRightMargin}cm;
+                    margin-bottom: ${this.addressBottomMargin}cm;
+                }
                 .logo-flex-item{
                     order: 2;
                 }
