@@ -1,6 +1,6 @@
 {
   "name": "print-address",
-  "version": "6.7.0",
+  "version": "6.9.0",
   "description": "Cloud App for printing user, vendor and partner address from Alma.",
   "license": "BSD-3-Clause",
   "private": true,
