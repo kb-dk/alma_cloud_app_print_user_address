@@ -16,7 +16,11 @@ export interface Settings {
     textBeforeAddress: string;
     languageDirection: string;
     paperSize: string;
-    paperMargin: string;
+    paperMargin: string; // deprecated but kept for compatibility reasons.
+    paperMarginTop: string;
+    paperMarginBottom: string;
+    paperMarginLeft: string;
+    paperMarginRight: string;
     multiAddressPerPage: boolean;
     repeatAddress: boolean;
     numAddressPerRow: number;

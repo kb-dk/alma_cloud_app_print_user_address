@@ -68,16 +68,52 @@
             </tr>
             <tr>
                 <td>
-                    <h3>Paper margin (cm)</h3>
+                    <h3>Paper margins (cm)</h3>
                     <em>Note that your browser's print settings might add some margin as well which will be added to
                         this number.</em>
                 </td>
                 <td>
                     <mat-form-field>
-                        <mat-label>Paper margin</mat-label>
+                        <mat-label>Paper's top margin</mat-label>
                         <input matInput
-                               [(ngModel)]="settings.paperMargin"
-                               (change)="saveSettings('Paper margin is set.')">
+                               [(ngModel)]="settings.paperMarginTop"
+                               (change)="saveSettings('Paper\'s top margin is set.')">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Paper's bottom margin</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.paperMarginBottom"
+                               (change)="saveSettings('Paper\'s bottom margin is set.')">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Paper's left margin</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.paperMarginLeft"
+                               (change)="saveSettings('Paper\'s left margin is set.')">
+                        <mat-hint></mat-hint>
+                    </mat-form-field>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <mat-form-field>
+                        <mat-label>Paper's right margin</mat-label>
+                        <input matInput
+                               [(ngModel)]="settings.paperMarginRight"
+                               (change)="saveSettings('Paper\'s right margin is set.')">
                         <mat-hint></mat-hint>
                     </mat-form-field>
                 </td>

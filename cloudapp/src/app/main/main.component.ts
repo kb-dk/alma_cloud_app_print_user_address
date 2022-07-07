@@ -60,7 +60,10 @@ export class MainComponent implements OnInit, OnDestroy {
     addressWidth: string = '9';
     languageDirection: string = 'ltr';
     paperSize: string = '21.0X29.7';
-    paperMargin: string = '2';
+    paperMarginTop: string = '2';
+    paperMarginBottom: string = '2';
+    paperMarginLeft: string = '2';
+    paperMarginRight: string = '2';
     senderAddresses = [];
     senderAddress: string = '';
     printLogoUser: boolean = true;
@@ -209,7 +212,10 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.textBeforeAddress = settings.hasOwnProperty('textBeforeAddress') ? settings.textBeforeAddress : '';
                 this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
                 this.paperSize = settings.hasOwnProperty('paperSize') ? settings.paperSize : '21.0X29.7';
-                this.paperMargin = settings.hasOwnProperty('paperMargin') ? settings.paperMargin : '2';
+                this.paperMarginTop = settings.hasOwnProperty('paperMarginTop') ? settings.paperMarginTop : '2';
+                this.paperMarginBottom = settings.hasOwnProperty('paperMarginBottom') ? settings.paperMarginBottom : '2';
+                this.paperMarginLeft = settings.hasOwnProperty('paperMarginLeft') ? settings.paperMarginLeft : '2';
+                this.paperMarginRight = settings.hasOwnProperty('paperMarginRight') ? settings.paperMarginRight : '2';
                 this.multiAddressPerPage = settings.hasOwnProperty('multiAddressPerPage') ? settings.multiAddressPerPage : false;
                 this.repeatAddress = settings.hasOwnProperty('repeatAddress') ? settings.repeatAddress : false;
                 this.numAddressPerRow = settings.hasOwnProperty('numAddressPerRow') ? parseInt(settings.numAddressPerRow.toString()) : 3;
@@ -383,7 +389,10 @@ export class MainComponent implements OnInit, OnDestroy {
                     height: ${parseFloat(this.getPaperHeight())}cm; 
                     /* Using padding instead of margin so wouldn't need to calculate 
                        the width and height of the page based on margin. */
-                    padding: ${this.paperMargin}cm; 
+                    padding-top: ${this.paperMarginTop}cm; 
+                    padding-bottom: ${this.paperMarginBottom}cm; 
+                    padding-left: ${this.paperMarginLeft}cm; 
+                    padding-right: ${this.paperMarginRight}cm; 
                     page-break-after: always;
                     max-height: 100vh;
                 }  
