@@ -60,10 +60,10 @@ export class MainComponent implements OnInit, OnDestroy {
     addressWidth: string = '9';
     languageDirection: string = 'ltr';
     paperSize: string = '21.0X29.7';
-    paperMarginTop: string = '2';
-    paperMarginBottom: string = '2';
-    paperMarginLeft: string = '2';
-    paperMarginRight: string = '2';
+    paperMarginTop: string = '1';
+    paperMarginBottom: string = '1';
+    paperMarginLeft: string = '1';
+    paperMarginRight: string = '1';
     senderAddresses = [];
     senderAddress: string = '';
     printLogoUser: boolean = true;
@@ -212,10 +212,10 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.textBeforeAddress = settings.hasOwnProperty('textBeforeAddress') ? settings.textBeforeAddress : '';
                 this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
                 this.paperSize = settings.hasOwnProperty('paperSize') ? settings.paperSize : '21.0X29.7';
-                this.paperMarginTop = settings.hasOwnProperty('paperMarginTop') ? settings.paperMarginTop : '2';
-                this.paperMarginBottom = settings.hasOwnProperty('paperMarginBottom') ? settings.paperMarginBottom : '2';
-                this.paperMarginLeft = settings.hasOwnProperty('paperMarginLeft') ? settings.paperMarginLeft : '2';
-                this.paperMarginRight = settings.hasOwnProperty('paperMarginRight') ? settings.paperMarginRight : '2';
+                this.paperMarginTop = settings.hasOwnProperty('paperMarginTop') ? settings.paperMarginTop : '1';
+                this.paperMarginBottom = settings.hasOwnProperty('paperMarginBottom') ? settings.paperMarginBottom : '1';
+                this.paperMarginLeft = settings.hasOwnProperty('paperMarginLeft') ? settings.paperMarginLeft : '1';
+                this.paperMarginRight = settings.hasOwnProperty('paperMarginRight') ? settings.paperMarginRight : '1';
                 this.multiAddressPerPage = settings.hasOwnProperty('multiAddressPerPage') ? settings.multiAddressPerPage : false;
                 this.repeatAddress = settings.hasOwnProperty('repeatAddress') ? settings.repeatAddress : false;
                 this.numAddressPerRow = settings.hasOwnProperty('numAddressPerRow') ? parseInt(settings.numAddressPerRow.toString()) : 3;
@@ -371,22 +371,22 @@ export class MainComponent implements OnInit, OnDestroy {
                 } 
                              
                 .address-flex-item p{
-                    width:${(parseFloat(this.getPaperWidth())/ this.numAddressPerRow) - parseFloat(this.addressLeftMargin) - parseFloat(this.addressRightMargin) - this.cellPaddingLeft - this.cellPaddingRight}cm;                 
-                    max-height:${(parseFloat(this.getPaperHeight())/ this.numAddressPerColumn)-1}cm;
+                    width:${(this.getPaperWidth()/ this.numAddressPerRow) - parseFloat(this.addressLeftMargin) - parseFloat(this.addressRightMargin) - this.cellPaddingLeft - this.cellPaddingRight}cm;                 
+                    max-height:${(this.getPaperHeight()/ this.numAddressPerColumn)-1 - parseFloat(this.addressTopMargin) - parseFloat(this.addressBottomMargin)}cm;
                     margin-top: ${this.addressTopMargin}cm;               
                 }  
                `;
 
-    getPaperWidth = () => this.paperSize.substring(0, this.paperSize.search('X'));
+    getPaperWidth = () => parseFloat(this.paperSize.substring(0, this.paperSize.search('X'))) - parseFloat(this.paperMarginLeft) - parseFloat(this.paperMarginRight);
 
-    getPaperHeight = () => this.paperSize.substring(this.paperSize.search('X')+1);
+    getPaperHeight = () => parseFloat(this.paperSize.substring(this.paperSize.search('X')+1))  - parseFloat(this.paperMarginTop) - parseFloat(this.paperMarginBottom);
 
     getPageStyling = (context) => `
                 ${ this.multiAddressPerPage ? this.getMultiAddressPerPageStyling() : this.getOneAddressPerPageStyling()}
 
                 .paper{
                     width: ${this.getPaperWidth()}cm;
-                    height: ${parseFloat(this.getPaperHeight())}cm; 
+                    height: ${this.getPaperHeight()}cm; 
                     /* Using padding instead of margin so wouldn't need to calculate 
                        the width and height of the page based on margin. */
                     padding-top: ${this.paperMarginTop}cm; 
