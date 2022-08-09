@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
-import {of, forkJoin, throwError} from "rxjs";
+import {forkJoin, of, throwError} from "rxjs";
 import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
 import {AddressFormats} from "./config/address-format";
 import {FixConfigService} from "./fix-config.service";
@@ -26,7 +26,9 @@ export class PartnerService {
             tap(config => this.showRecipient = config.addressFormat.showRecipient),
             catchError(err => this.handleError(err))
         );
-        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.BORROWING_REQUEST, EntityType.LENDING_REQUEST].includes(entity.type))
+        // TODO In exl-cloudapp-angular-lib / public-interface.d.ts PARTNER is not added as an entityType yet
+        // When it is added by Exlibris, the last part needs to be removed and EntityType.PARTNER be added to the array of EntityTypes
+        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.BORROWING_REQUEST, EntityType.LENDING_REQUEST].includes(entity.type) || entity.type.toString() === 'PARTNER')
             .map(
                 entity => {
                     switch (entity.type) {
@@ -35,6 +37,11 @@ export class PartnerService {
                         case EntityType.BORROWING_REQUEST:
                         case EntityType.LENDING_REQUEST:
                             return this.partnerAddressFromBorrowingOrLendingRequest(entity.link);
+                    }
+                    // TODO In exl-cloudapp-angular-lib / public-interface.d.ts PARTNER is not added as an entityType yet
+                    // When it is added by Exlibris, this line needs to move inside the switch
+                    if (entity.type.toString() === 'PARTNER'){
+                        return this.getLoanOrPartnerFromAlma(entity.link);
                     }
 
                 });
