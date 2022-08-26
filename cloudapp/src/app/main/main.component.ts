@@ -182,7 +182,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.showRecipient = config.addressFormat.showRecipient;
                 this.senderAddresses = config.partner.addresses;
                 if (this.senderAddresses.length && !this.senderAddress) {
-                    this.senderAddress = this.replaceComma(this.senderAddresses[0]);
+                    this.senderAddress = this.replaceCommaWithLineBreak(this.senderAddresses[0]);
                 }
             },
             err => console.error(err.message));
@@ -190,9 +190,9 @@ export class MainComponent implements OnInit, OnDestroy {
         this.settingsService.get().subscribe(
             (settings: Settings) => {
                 if (settings.hasOwnProperty('myAddress')){
-                    this.senderAddress = settings.myAddress ? this.replaceComma(settings.myAddress) : this.senderAddresses[0] ? this.replaceComma(this.senderAddresses[0]) : '';
+                    this.senderAddress = settings.myAddress ? this.replaceCommaWithLineBreak(settings.myAddress) : this.senderAddresses[0] ? this.replaceCommaWithLineBreak(this.senderAddresses[0]) : '';
                 } else {
-                    this.senderAddress = this.senderAddresses.length ? this.replaceComma(this.senderAddresses[0]) : this.senderAddress;
+                    this.senderAddress = this.senderAddresses.length ? this.replaceCommaWithLineBreak(this.senderAddresses[0]) : this.senderAddress;
                 }
 
                 this.partnerPrintType = settings.hasOwnProperty('partnerPrintType') ? settings.partnerPrintType : 'label';
@@ -320,7 +320,7 @@ export class MainComponent implements OnInit, OnDestroy {
         }
     };
 
-    replaceComma = (string) => {
+    replaceCommaWithLineBreak = (string) => {
         let title = string.substring(0, string.indexOf(','));
         let address = string.substring(string.indexOf(','));
         string = '<strong>' + title + '</strong>' + address;
