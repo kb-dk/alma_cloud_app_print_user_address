@@ -16,6 +16,7 @@ import {ConfigComponent} from './config/config.component';
 import {SettingsComponent} from './settings/settings.component';
 import { PartnerComponent } from './main/partner/partner.component';
 import {DefaultsService} from "./main/shared/defaults.service";
+import {HtmlService} from "./main/shared/html.service";
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -42,7 +43,7 @@ export function getToastrModule() {
     getToastrModule(),
     CloudAppTranslateModule.forRoot()
   ],
-  providers: [UserService, DefaultsService],
+  providers: [UserService, DefaultsService, HtmlService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
