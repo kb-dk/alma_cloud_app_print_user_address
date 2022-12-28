@@ -3,6 +3,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from '../user.service';
 import {PartnerService} from '../partner.service';
 import {ScanService} from "../scan.service";
+import {HtmlService} from "./shared/html.service";
 import {AddressFormats} from '../config/address-format';
 import {FixConfigService} from "../fix-config.service";
 import {
@@ -42,7 +43,7 @@ export class MainComponent implements OnInit, OnDestroy {
     barcodeError: boolean = false;
     labelWidth: string = '10';
     labelHeight: string = '5.5';
-    defaultTab: string = '0';
+    defaultTab: number = 0;
     scannedPartner;
     loading: boolean = false;
     scannedPartnerReady: boolean = false;
@@ -166,6 +167,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 private eventsService: CloudAppEventsService,
                 private userService: UserService,
                 private partnerService: PartnerService,
+                private htmlService: HtmlService,
                 private scanService: ScanService,
                 private fixConfigService: FixConfigService
     ) {
@@ -198,7 +200,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.partnerPrintType = settings.hasOwnProperty('partnerPrintType') ? settings.partnerPrintType : 'label';
                 this.labelHeight = settings.hasOwnProperty('labelHeight') ? settings.labelHeight : '5.5';
                 this.labelWidth = settings.hasOwnProperty('labelWidth') ? settings.labelWidth : '10';
-                this.defaultTab = settings.hasOwnProperty('defaultTab') ? settings.defaultTab : '0';
+                this.defaultTab = settings.hasOwnProperty('defaultTab') ? Number(settings.defaultTab) : 0;
                 this.logoInBottom = settings.hasOwnProperty('logoInBottom') ? settings.logoInBottom : false;
                 this.logoWidth = settings.hasOwnProperty('logoWidth') ? settings.logoWidth : '3';
                 this.addressTopMargin = settings.hasOwnProperty('addressTopMargin') ? settings.addressTopMargin : '2';
@@ -327,160 +329,6 @@ export class MainComponent implements OnInit, OnDestroy {
         return string.replaceAll(',', '<br/>')
     };
 
-    getLogoStyling = () => `
-               img.logo{
-               width: ${this.logoWidth}cm;
-               max-width: 100%;
-               float: right;
-               }
-               `;
-
-    getGeneralStyling = () => `
-                @media print{
-                    .hidden-print{
-                        display: none !important;
-                    }
-                }
-                
-                body{
-                    font-size:80%; 
-                    font-family: sans-serif; 
-                    font-weight:600; 
-                    margin: 0;
-                }
-                 
-               `;
-
-
-    getOneAddressPerPageStyling = () => `
-                .address-flex-item{
-                    order: 1;
-                    flex-grow: 3;
-                    top:${this.addressTopMargin}cm;
-                }  
-                
-                .address-flex-item p{
-                    width:${this.addressWidth}cm;                 
-                }  
-               `;
-
-    getMultiAddressPerPageStyling = () => `
-                .address-flex-item{
-                    padding-left: ${this.cellPaddingLeft}cm;                
-                    padding-right: ${this.cellPaddingRight}cm;                 
-                } 
-                             
-                .address-flex-item p{
-                    width:${(this.getPaperWidth()/ this.numAddressPerRow) - parseFloat(this.addressLeftMargin) - parseFloat(this.addressRightMargin) - this.cellPaddingLeft - this.cellPaddingRight}cm;                 
-                    max-height:${(this.getPaperHeight()/ this.numAddressPerColumn)-1 - parseFloat(this.addressTopMargin) - parseFloat(this.addressBottomMargin)}cm;
-                    margin-top: ${this.addressTopMargin}cm;               
-                }  
-               `;
-
-    getPaperWidth = () => parseFloat(this.paperSize.substring(0, this.paperSize.search('X'))) - parseFloat(this.paperMarginLeft) - parseFloat(this.paperMarginRight);
-
-    getPaperHeight = () => parseFloat(this.paperSize.substring(this.paperSize.search('X')+1))  - parseFloat(this.paperMarginTop) - parseFloat(this.paperMarginBottom);
-
-    getPageStyling = (context) => `
-                ${ this.multiAddressPerPage ? this.getMultiAddressPerPageStyling() : this.getOneAddressPerPageStyling()}
-
-                .paper{
-                    width: ${this.getPaperWidth()}cm;
-                    height: ${this.getPaperHeight()}cm; 
-                    /* Using padding instead of margin so wouldn't need to calculate 
-                       the width and height of the page based on margin. */
-                    padding-top: ${this.paperMarginTop}cm; 
-                    padding-bottom: ${this.paperMarginBottom}cm; 
-                    padding-left: ${this.paperMarginLeft}cm; 
-                    padding-right: ${this.paperMarginRight}cm; 
-                    page-break-after: always;
-                    max-height: 100vh;
-                }  
-                .paper:last-child {
-                    page-break-after: avoid;
-                }                 
-                .flex-container{
-                    display: flex;
-                    flex-direction: row;
-                    flex-wrap: wrap;
-                }
-                .address-flex-item{
-                    position: relative;
-                    font-size: ${context === 'user' ? this.userFontSize || 17 : (this.partnerPrintType === 'paper' ? this.partnerFontSize || 17 : 17)}px
-                }
-                .address-flex-item p{
-                    margin-left: ${this.addressLeftMargin}cm;
-                    margin-right: ${this.addressRightMargin}cm;
-                    margin-bottom: ${this.addressBottomMargin}cm;
-                }
-                .logo-flex-item{
-                    order: 2;
-                }
-                .logo-flex-item img{
-                    float: right; 
-                    width:${this.logoWidth}cm; 
-                    ${this.logoInBottom ? 'margin-top: 18cm;' : ''}
-               `;
-
-
-
-    getLabelStyling = () => `
-                div.pageBreak{
-                    page-break-after: always;
-                    }
-                                       
-                @page{
-                    margin: 0;
-                }
-                
-                html, body, .label{
-                    width: ${this.labelWidth}cm;
-                    height: ${this.labelHeight}cm;
-                }
-                               
-                .sender strong{
-                    font-weight: bold; 
-                    font-size: 18px;
-                }
-                
-                .sender:before{
-                    content:"";
-                    position:absolute;
-                    border-top:1px solid black;
-                    width:7cm;
-                    transform: rotate(13deg);
-                    transform-origin: 0 0;
-                }
-                
-                .sender:after{
-                    content:"";
-                    position:absolute;
-                    left:0;
-                    bottom:0.1cm;
-                    border-bottom:1px solid black;
-                    width:7cm;
-                    transform: rotate(-13deg);
-                    transform-origin: 0 0;
-                }
-                 
-               `;
-
-    getContent = (innerHtml, context) => `
-                <html dir = '${this.languageDirection}'>
-                    <style>
-                                                                     
-                        ${this.getGeneralStyling()}
-                        ${this.getLogoStyling()}
-                        ${this.partnerPrintType === 'paper' || context === 'user' ? this.getPageStyling(context) : this.getLabelStyling()}
-                        
-                    </style>
-                        
-                    <body onload='window.print();'>
-                        ${innerHtml}
-                    </body>
-                </html>
-                `;
-
     getNumberOfSelectedAddresses = (partnerOrUsers) => {
         let count = 0;
         partnerOrUsers.forEach(partnerOrUser => {
@@ -493,12 +341,12 @@ export class MainComponent implements OnInit, OnDestroy {
         let innerHtml: string = this.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
         this.currentUserActions.map(user => {
             if (user.checked) {
-                innerHtml = innerHtml.concat(this.getHtmlForPaper(user, this.getNumberOfSelectedAddresses(this.currentUserActions), user.addresses, this.printLogoUser));
+                innerHtml = innerHtml.concat(this.htmlService.getHtmlForPaper(user, this.getNumberOfSelectedAddresses(this.currentUserActions), user.addresses, this.printLogoUser, this.repeatAddress, this.multiAddressPerPage, this.numAddressPerRow, this.numAddressPerColumn, this.logoUrl, this.textBeforeAddress, this.showRecipient));
             }
         });
         innerHtml = this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
 
-        this.printContent(this.getContent(innerHtml, 'user'));
+        this.htmlService.printContent(innerHtml, 'user', this.languageDirection, this.logoWidth, this.partnerPrintType, this.multiAddressPerPage, this.cellPaddingLeft, this.cellPaddingRight, this.numAddressPerRow, this.addressLeftMargin, this.addressRightMargin, this.paperSize, this.paperMarginLeft, this.paperMarginRight, this.paperMarginTop, this.paperMarginBottom, this.numAddressPerColumn, this.addressTopMargin, this.addressBottomMargin, this.addressWidth, this.userFontSize, this.partnerFontSize, this.logoInBottom, this.labelWidth, this.labelHeight);
     };
 
     onScannedPartnerPrint = () => {
@@ -507,24 +355,23 @@ export class MainComponent implements OnInit, OnDestroy {
             let addresses: string;
             switch (this.partnerPrintType) {
                 case 'label': {
-                    addresses = this.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses);
+                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.showRecipient, this.senderAddress);
                     break;
                 }
                 case 'paper': {
-                    addresses = this.getHtmlForPaper(this.scannedPartner, 1, this.scannedPartner.receivers_addresses, this.printLogoPartner);
+                    addresses = this.htmlService.getHtmlForPaper(this.scannedPartner, 1, this.scannedPartner.receivers_addresses, this.printLogoPartner, this.repeatAddress, this.multiAddressPerPage, this.numAddressPerRow, this.numAddressPerColumn, this.logoUrl, this.textBeforeAddress, this.showRecipient);
                     break;
                 }
                 default: {
-                    addresses = this.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses);
+                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.showRecipient, this.senderAddress);
                     break;
                 }
             }
             innerHtml = innerHtml.concat(addresses);
         }
         innerHtml = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
-        this.printContent(this.getContent(innerHtml, 'partner'));
+        this.htmlService.printContent(innerHtml, 'partner', this.languageDirection, this.logoWidth, this.partnerPrintType, this.multiAddressPerPage, this.cellPaddingLeft, this.cellPaddingRight, this.numAddressPerRow, this.addressLeftMargin, this.addressRightMargin, this.paperSize, this.paperMarginLeft, this.paperMarginRight, this.paperMarginTop, this.paperMarginBottom, this.numAddressPerColumn, this.addressTopMargin, this.addressBottomMargin, this.addressWidth, this.userFontSize, this.partnerFontSize, this.logoInBottom, this.labelWidth, this.labelHeight);
     };
-
 
     onPartnerPrint = () => {
         let innerHtml: string = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
@@ -533,15 +380,15 @@ export class MainComponent implements OnInit, OnDestroy {
                 let addresses: string;
                 switch (this.partnerPrintType) {
                     case 'label': {
-                        addresses = this.getHtmlForLabel(partner, partner.receivers_addresses);
+                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.showRecipient, this.senderAddress);
                         break;
                     }
                     case 'paper': {
-                        addresses = this.getHtmlForPaper(partner, this.getNumberOfSelectedAddresses(this.currentPartnerActions), partner.receivers_addresses, this.printLogoPartner);
+                        addresses = this.htmlService.getHtmlForPaper(partner, this.getNumberOfSelectedAddresses(this.currentPartnerActions), partner.receivers_addresses, this.printLogoPartner, this.repeatAddress, this.multiAddressPerPage, this.numAddressPerRow, this.numAddressPerColumn, this.logoUrl, this.textBeforeAddress, this.showRecipient);
                         break;
                     }
                     default: {
-                        addresses = this.getHtmlForLabel(partner, partner.receivers_addresses);
+                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.showRecipient, this.senderAddress);
                         break;
                     }
                 }
@@ -549,40 +396,7 @@ export class MainComponent implements OnInit, OnDestroy {
             }
         });
         innerHtml = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
-        this.printContent(this.getContent(innerHtml, 'partner'));
-    };
-
-    getHtmlForLabel = (partner, addresses) => `
-                      <div class='label pageBreak' style="position:relative; padding:0.15cm;"> 
-                      <div class="recipient" style="position: relative; font-size: 16px;"> 
-                      ${this.showRecipient ? partner.name + '<br/>' : ''} 
-                      ${addresses.find(address => address.type === partner.selectedAddress).address}</div>
-                      <div class="sender" style="position: absolute; bottom:0.15cm; left:0.8cm;">${this.senderAddress}</div>
-                      </div>
-                    `;
-
-    getLogo = () =>  `<div class="logo-flex-item"><img class="logo" alt="logo" src="${this.logoUrl}"/></div>`;
-
-    getHtmlForPaper = (partnerOrUser, numberOfAddresses, addresses, printLogo) => {
-        let html = this.getOneAddress(partnerOrUser, addresses, printLogo);
-        // Repeat the address if needed.
-        if (numberOfAddresses === 1 && this.repeatAddress && this.multiAddressPerPage){
-            let length : number = this.numAddressPerRow * this.numAddressPerColumn;
-            for (let i = 2; i<= length; i++){
-                html = html.concat(this.getOneAddress(partnerOrUser, addresses, printLogo));
-            }
-        }
-
-        return html ;
-
-    };
-
-    printContent = (content) => {
-        let win = window.open('', '', 'left=0,top=0,width=552,height=477,toolbar=0,scrollbars=0,status =0');
-        if (win.document) {
-            win.document.write(content);
-            win.document.close();
-        }
+        this.htmlService.printContent(innerHtml, 'partner', this.languageDirection, this.logoWidth, this.partnerPrintType, this.multiAddressPerPage, this.cellPaddingLeft, this.cellPaddingRight, this.numAddressPerRow, this.addressLeftMargin, this.addressRightMargin, this.paperSize, this.paperMarginLeft, this.paperMarginRight, this.paperMarginTop, this.paperMarginBottom, this.numAddressPerColumn, this.addressTopMargin, this.addressBottomMargin, this.addressWidth, this.userFontSize, this.partnerFontSize, this.logoInBottom, this.labelWidth, this.labelHeight);
     };
 
     onSelectDeselectAllPartners(event, partners) {
@@ -606,18 +420,6 @@ export class MainComponent implements OnInit, OnDestroy {
         this.numPartnersToPrint = numPartnersToPrint;
     }
 
-    getOneAddress = (partnerOrUser, addresses, printLogo) => `                    
-                      ${this.multiAddressPerPage ? '' : "<div class='paper flex-container'>"}                                                                 
-                      ${!this.multiAddressPerPage && printLogo && this.logoUrl ? this.getLogo() : ''}
-                      <div class="address-flex-item">
-                        <p style="">${this.textBeforeAddress ? '<u>' + this.textBeforeAddress + '</u><br/>' : ''}                      
-                        ${this.showRecipient ? partnerOrUser.name + '<br/>' : ''} 
-                        ${addresses.find(address => address.type === partnerOrUser.selectedAddress).address}
-                        </p>
-                      </div>
-                      ${this.multiAddressPerPage ? '' : "</div>"}                                                                 
-
-                    `;
 
     onSelectDeselectAllUsers(event, users) {
         let numUsersToPrint = 0;
