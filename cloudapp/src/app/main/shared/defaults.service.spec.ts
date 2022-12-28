@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ConstantsService } from './constants.service';
+import { DefaultsService } from './defaults.service';
 
 describe('ConstantsService', () => {
-  let service: ConstantsService;
+  let service: DefaultsService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(ConstantsService);
+    service = TestBed.inject(DefaultsService);
   });
 
   it('should be created', () => {
