@@ -13,6 +13,7 @@ import { MainComponent } from './main/main.component';
 import {UserService} from './user.service';
 import {ConfigComponent} from './config/config.component';
 import {SettingsComponent} from './settings/settings.component';
+import { PartnerComponent } from './main/partner/partner.component';
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -26,6 +27,7 @@ export function getToastrModule() {
     MainComponent,
     ConfigComponent,
     SettingsComponent,
+    PartnerComponent,
   ],
   imports: [
     MaterialModule,
