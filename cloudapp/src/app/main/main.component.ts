@@ -1,10 +1,18 @@
 import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
 import {Component, OnDestroy, OnInit} from '@angular/core';
+
+import {Config} from "../config/config";
+import {Settings} from "../settings/settings";
+import {User} from "../user";
+
 import {UserService} from '../user.service';
 import {PartnerService} from '../partner.service';
 import {ScanService} from "../scan.service";
 import {HtmlService} from "./shared/html.service";
-import {AddressFormats} from '../config/address-format';
+
+import {emptySettings} from "../settings/emptySettings"
+import {emptyConfig} from "../config/emptyConfig";
+
 import {FixConfigService} from "../fix-config.service";
 import {
     CloudAppEventsService,
@@ -14,9 +22,6 @@ import {
     Entity,
     PageInfo
 } from '@exlibris/exl-cloudapp-angular-lib';
-import {Config} from "../config/config";
-import {Settings} from "../settings/settings";
-import {User} from "../user";
 import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 @Component({
@@ -27,53 +32,27 @@ import {catchError, concatMap, map, tap, toArray} from "rxjs/operators";
 
 export class MainComponent implements OnInit, OnDestroy {
 
+    settings: Settings = emptySettings;
+    config: Config = emptyConfig;
     allPartnersSelected: boolean = false;
-    multiAddressPerPage: boolean = false;
-    cellPaddingLeft: number = 0;
-    cellPaddingRight: number = 0;
-    repeatAddress: boolean = false;
-    numAddressPerRow: number = 3;
-    numAddressPerColumn : number = 7;
     entityType: string = 'USER';
-    addressDefaultFontSize: number = 17;
-    userFontSize: number = this.addressDefaultFontSize;
-    partnerFontSize: number = this.addressDefaultFontSize;
+    userFontSize: number = this.settings.addressDefaultFontSize;
+    partnerFontSize: number = this.settings.addressDefaultFontSize;
     barcode: number;  // Borrowing request, status: "Returned by patron" for scan in items
     errorMessage: string = '';
     barcodeError: boolean = false;
-    labelWidth: string = '10';
-    labelHeight: string = '5.5';
-    defaultTab: number = 0;
+    defaultTab: number = Number(this.settings.defaultTab);
     scannedPartner;
     loading: boolean = false;
     scannedPartnerReady: boolean = false;
     numUsersToPrint: number = 0;
     numPartnersToPrint: number = 0;
-    logoUrl: string = '';
-    showRecipient: boolean = true;
-    logoInBottom: boolean = false;
-    logoWidth: string = '3';
-    textBeforeAddress: string = '';
-    addressTopMargin: string = '2';
-    addressLeftMargin: string = '0';
-    addressRightMargin: string = '0';
-    addressBottomMargin: string = '0';
-    addressWidth: string = '9';
-    languageDirection: string = 'ltr';
-    paperSize: string = '21.0X29.7';
-    paperMarginTop: string = '1';
-    paperMarginBottom: string = '1';
-    paperMarginLeft: string = '1';
-    paperMarginRight: string = '1';
-    senderAddresses = [];
     senderAddress: string = '';
     printLogoUser: boolean = true;
     printLogoPartner: boolean = true;
     errorMsg: string = '';
     partnersReady: boolean = false;
     usersReady: boolean = false;
-    addressFormats = AddressFormats;
-    partnerPrintType: string = '';
 
     private currentUserActions;
     private currentPartnerActions;
@@ -180,50 +159,51 @@ export class MainComponent implements OnInit, OnDestroy {
         this.configService.get().subscribe(
             (config: Config) => {
                 config = this.fixConfigService.fixOldOrEmptyConfigElements(config);
-                this.logoUrl = config.user.logo;
-                this.showRecipient = config.addressFormat.showRecipient;
-                this.senderAddresses = config.partner.addresses;
-                if (this.senderAddresses.length && !this.senderAddress) {
-                    this.senderAddress = this.replaceCommaWithLineBreak(this.senderAddresses[0]);
+                this.config.user.logo = config.user.logo;
+                this.config.addressFormat.showRecipient = config.addressFormat.showRecipient;
+                this.config.partner.addresses = config.partner.addresses;
+                if (this.config.partner.addresses.length && !this.senderAddress) {
+                    this.senderAddress = this.replaceCommaWithLineBreak(this.config.partner.addresses[0]);
                 }
             },
             err => console.error(err.message));
 
         this.settingsService.get().subscribe(
             (settings: Settings) => {
+                console.log(settings);
                 if (settings.hasOwnProperty('myAddress')){
-                    this.senderAddress = settings.myAddress ? this.replaceCommaWithLineBreak(settings.myAddress) : this.senderAddresses[0] ? this.replaceCommaWithLineBreak(this.senderAddresses[0]) : '';
+                    this.senderAddress = settings.myAddress ? this.replaceCommaWithLineBreak(settings.myAddress) : this.config.partner.addresses[0] ? this.replaceCommaWithLineBreak(this.config.partner.addresses[0]) : '';
                 } else {
-                    this.senderAddress = this.senderAddresses.length ? this.replaceCommaWithLineBreak(this.senderAddresses[0]) : this.senderAddress;
+                    this.senderAddress = this.config.partner.addresses.length ? this.replaceCommaWithLineBreak(this.config.partner.addresses[0]) : this.senderAddress;
                 }
 
-                this.partnerPrintType = settings.hasOwnProperty('partnerPrintType') ? settings.partnerPrintType : 'label';
-                this.labelHeight = settings.hasOwnProperty('labelHeight') ? settings.labelHeight : '5.5';
-                this.labelWidth = settings.hasOwnProperty('labelWidth') ? settings.labelWidth : '10';
-                this.defaultTab = settings.hasOwnProperty('defaultTab') ? Number(settings.defaultTab) : 0;
-                this.logoInBottom = settings.hasOwnProperty('logoInBottom') ? settings.logoInBottom : false;
-                this.logoWidth = settings.hasOwnProperty('logoWidth') ? settings.logoWidth : '3';
-                this.addressTopMargin = settings.hasOwnProperty('addressTopMargin') ? settings.addressTopMargin : '2';
-                this.addressLeftMargin = settings.hasOwnProperty('addressLeftMargin') ? settings.addressLeftMargin : '0';
-                this.addressRightMargin = settings.hasOwnProperty('addressRightMargin') ? settings.addressRightMargin : '0';
-                this.addressBottomMargin = settings.hasOwnProperty('addressBottomMargin') ? settings.addressBottomMargin : '0';
-                this.addressDefaultFontSize = settings.hasOwnProperty('addressDefaultFontSize') ? settings.addressDefaultFontSize : 17;
-                this.userFontSize = this.addressDefaultFontSize;
-                this.partnerFontSize = this.addressDefaultFontSize;
-                this.addressWidth = settings.hasOwnProperty('addressWidth') ? settings.addressWidth : '9';
-                this.textBeforeAddress = settings.hasOwnProperty('textBeforeAddress') ? settings.textBeforeAddress : '';
-                this.languageDirection = settings.hasOwnProperty('languageDirection') ? settings.languageDirection : 'ltr';
-                this.paperSize = settings.hasOwnProperty('paperSize') ? settings.paperSize : '21.0X29.7';
-                this.paperMarginTop = settings.hasOwnProperty('paperMarginTop') ? settings.paperMarginTop : '1';
-                this.paperMarginBottom = settings.hasOwnProperty('paperMarginBottom') ? settings.paperMarginBottom : '1';
-                this.paperMarginLeft = settings.hasOwnProperty('paperMarginLeft') ? settings.paperMarginLeft : '1';
-                this.paperMarginRight = settings.hasOwnProperty('paperMarginRight') ? settings.paperMarginRight : '1';
-                this.multiAddressPerPage = settings.hasOwnProperty('multiAddressPerPage') ? settings.multiAddressPerPage : false;
-                this.repeatAddress = settings.hasOwnProperty('repeatAddress') ? settings.repeatAddress : false;
-                this.numAddressPerRow = settings.hasOwnProperty('numAddressPerRow') ? parseInt(settings.numAddressPerRow.toString()) : 3;
-                this.numAddressPerColumn = settings.hasOwnProperty('numAddressPerColumn') ? parseInt(settings.numAddressPerColumn.toString()) : 7;
-                this.cellPaddingLeft = settings.hasOwnProperty('cellPaddingLeft') ? parseFloat(settings.cellPaddingLeft.toString()) : 0;
-                this.cellPaddingRight = settings.hasOwnProperty('cellPaddingRight') ? parseFloat(settings.cellPaddingRight.toString()) : 0;
+                this.settings.partnerPrintType = settings.hasOwnProperty('partnerPrintType') && settings.partnerPrintType;
+                this.settings.labelHeight = settings.hasOwnProperty('labelHeight') && settings.labelHeight;
+                this.settings.labelWidth = settings.hasOwnProperty('labelWidth') && settings.labelWidth;
+                this.defaultTab = settings.hasOwnProperty('defaultTab') && Number(settings.defaultTab);
+                this.settings.logoInBottom = settings.hasOwnProperty('logoInBottom') && settings.logoInBottom;
+                this.settings.logoWidth = settings.hasOwnProperty('logoWidth') && settings.logoWidth;
+                this.settings.addressTopMargin = settings.hasOwnProperty('addressTopMargin') && settings.addressTopMargin;
+                this.settings.addressLeftMargin = settings.hasOwnProperty('addressLeftMargin') && settings.addressLeftMargin;
+                this.settings.addressRightMargin = settings.hasOwnProperty('addressRightMargin') && settings.addressRightMargin;
+                this.settings.addressBottomMargin = settings.hasOwnProperty('addressBottomMargin') && settings.addressBottomMargin;
+                this.settings.addressDefaultFontSize = settings.hasOwnProperty('addressDefaultFontSize') && settings.addressDefaultFontSize;
+                this.userFontSize = this.settings.addressDefaultFontSize;
+                this.partnerFontSize = this.settings.addressDefaultFontSize;
+                this.settings.addressWidth = settings.hasOwnProperty('addressWidth') && settings.addressWidth;
+                this.settings.textBeforeAddress = settings.hasOwnProperty('textBeforeAddress') && settings.textBeforeAddress;
+                this.settings.languageDirection = settings.hasOwnProperty('languageDirection') && settings.languageDirection;
+                this.settings.paperSize = settings.hasOwnProperty('paperSize') && settings.paperSize;
+                this.settings.paperMarginTop = settings.hasOwnProperty('paperMarginTop') && settings.paperMarginTop;
+                this.settings.paperMarginBottom = settings.hasOwnProperty('paperMarginBottom') && settings.paperMarginBottom;
+                this.settings.paperMarginLeft = settings.hasOwnProperty('paperMarginLeft') && settings.paperMarginLeft;
+                this.settings.paperMarginRight = settings.hasOwnProperty('paperMarginRight') && settings.paperMarginRight;
+                this.settings.multiAddressPerPage = settings.hasOwnProperty('multiAddressPerPage') && settings.multiAddressPerPage;
+                this.settings.repeatAddress = settings.hasOwnProperty('repeatAddress') && settings.repeatAddress;
+                this.settings.numAddressPerRow = settings.hasOwnProperty('numAddressPerRow') && parseInt(settings.numAddressPerRow.toString());
+                this.settings.numAddressPerColumn = settings.hasOwnProperty('numAddressPerColumn') && parseInt(settings.numAddressPerColumn.toString());
+                this.settings.cellPaddingLeft = settings.hasOwnProperty('cellPaddingLeft') && parseFloat(settings.cellPaddingLeft.toString());
+                this.settings.cellPaddingRight = settings.hasOwnProperty('cellPaddingRight') && parseFloat(settings.cellPaddingRight.toString());
             },
             err => console.error(err.message)
         );
@@ -278,7 +258,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 },
                 error => {
                     console.error('Error getting data from API:', error);
-                    this.showError("Barcode is incorrect or partner dosn't exist");
+                    this.showError("Barcode is incorrect or partner doesn't exist");
                     this.loading = false;
 
                 }
@@ -311,13 +291,13 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     onAddressSelected = (e) => {
-        let selectedId, selectedAddressType, userOrPartnerOrscannedPartner;
-        [userOrPartnerOrscannedPartner, selectedId, selectedAddressType] = e.source.value.split('_');
-        if (userOrPartnerOrscannedPartner === 'user') {
+        let selectedId, selectedAddressType, userOrPartnerOrScannedPartner;
+        [userOrPartnerOrScannedPartner, selectedId, selectedAddressType] = e.source.value.split('_');
+        if (userOrPartnerOrScannedPartner === 'user') {
             this.userAddressSelectedSubject.next({id: +selectedId, value: selectedAddressType});
-        } else if (userOrPartnerOrscannedPartner === 'partner') {
+        } else if (userOrPartnerOrScannedPartner === 'partner') {
             this.partnerAddressSelectedSubject.next({id: +selectedId, value: selectedAddressType});
-        } else if (userOrPartnerOrscannedPartner === 'scannedPartner') {
+        } else if (userOrPartnerOrScannedPartner === 'scannedPartner') {
             this.scannedPartner.selectedAddress = selectedAddressType;
         }
     };
@@ -338,65 +318,65 @@ export class MainComponent implements OnInit, OnDestroy {
     };
 
     onUserPrint = () => {
-        let innerHtml: string = this.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
+        let innerHtml: string = this.settings.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
         this.currentUserActions.map(user => {
             if (user.checked) {
-                innerHtml = innerHtml.concat(this.htmlService.getHtmlForPaper(user, this.getNumberOfSelectedAddresses(this.currentUserActions), user.addresses, this.printLogoUser, this.repeatAddress, this.multiAddressPerPage, this.numAddressPerRow, this.numAddressPerColumn, this.logoUrl, this.textBeforeAddress, this.showRecipient));
+                innerHtml = innerHtml.concat(this.htmlService.getHtmlForPaper(user, this.getNumberOfSelectedAddresses(this.currentUserActions), user.addresses, this.printLogoUser, this.settings.repeatAddress, this.settings.multiAddressPerPage, this.settings.numAddressPerRow, this.settings.numAddressPerColumn, this.config.user.logo, this.settings.textBeforeAddress, this.config.addressFormat.showRecipient));
             }
         });
-        innerHtml = this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
+        innerHtml = this.settings.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
 
-        this.htmlService.printContent(innerHtml, 'user', this.languageDirection, this.logoWidth, this.partnerPrintType, this.multiAddressPerPage, this.cellPaddingLeft, this.cellPaddingRight, this.numAddressPerRow, this.addressLeftMargin, this.addressRightMargin, this.paperSize, this.paperMarginLeft, this.paperMarginRight, this.paperMarginTop, this.paperMarginBottom, this.numAddressPerColumn, this.addressTopMargin, this.addressBottomMargin, this.addressWidth, this.userFontSize, this.partnerFontSize, this.logoInBottom, this.labelWidth, this.labelHeight);
+        this.htmlService.printContent(innerHtml, 'user', this.settings.languageDirection, this.settings.logoWidth, this.settings.partnerPrintType, this.settings.multiAddressPerPage, this.settings.cellPaddingLeft, this.settings.cellPaddingRight, this.settings.numAddressPerRow, this.settings.addressLeftMargin, this.settings.addressRightMargin, this.settings.paperSize, this.settings.paperMarginLeft, this.settings.paperMarginRight, this.settings.paperMarginTop, this.settings.paperMarginBottom, this.settings.numAddressPerColumn, this.settings.addressTopMargin, this.settings.addressBottomMargin, this.settings.addressWidth, this.userFontSize, this.partnerFontSize, this.settings.logoInBottom, this.settings.labelWidth, this.settings.labelHeight);
     };
 
     onScannedPartnerPrint = () => {
-        let innerHtml: string = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
+        let innerHtml: string = this.settings.partnerPrintType === 'paper' && this.settings.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
         if (this.scannedPartner && this.scannedPartner.checked) {
             let addresses: string;
-            switch (this.partnerPrintType) {
+            switch (this.settings.partnerPrintType) {
                 case 'label': {
-                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.showRecipient, this.senderAddress);
+                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.senderAddress);
                     break;
                 }
                 case 'paper': {
-                    addresses = this.htmlService.getHtmlForPaper(this.scannedPartner, 1, this.scannedPartner.receivers_addresses, this.printLogoPartner, this.repeatAddress, this.multiAddressPerPage, this.numAddressPerRow, this.numAddressPerColumn, this.logoUrl, this.textBeforeAddress, this.showRecipient);
+                    addresses = this.htmlService.getHtmlForPaper(this.scannedPartner, 1, this.scannedPartner.receivers_addresses, this.printLogoPartner, this.settings.repeatAddress, this.settings.multiAddressPerPage, this.settings.numAddressPerRow, this.settings.numAddressPerColumn, this.config.user.logo, this.settings.textBeforeAddress, this.config.addressFormat.showRecipient);
                     break;
                 }
                 default: {
-                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.showRecipient, this.senderAddress);
+                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.senderAddress);
                     break;
                 }
             }
             innerHtml = innerHtml.concat(addresses);
         }
-        innerHtml = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
-        this.htmlService.printContent(innerHtml, 'partner', this.languageDirection, this.logoWidth, this.partnerPrintType, this.multiAddressPerPage, this.cellPaddingLeft, this.cellPaddingRight, this.numAddressPerRow, this.addressLeftMargin, this.addressRightMargin, this.paperSize, this.paperMarginLeft, this.paperMarginRight, this.paperMarginTop, this.paperMarginBottom, this.numAddressPerColumn, this.addressTopMargin, this.addressBottomMargin, this.addressWidth, this.userFontSize, this.partnerFontSize, this.logoInBottom, this.labelWidth, this.labelHeight);
+        innerHtml = this.settings.partnerPrintType === 'paper' && this.settings.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
+        this.htmlService.printContent(innerHtml, 'partner', this.settings.languageDirection, this.settings.logoWidth, this.settings.partnerPrintType, this.settings.multiAddressPerPage, this.settings.cellPaddingLeft, this.settings.cellPaddingRight, this.settings.numAddressPerRow, this.settings.addressLeftMargin, this.settings.addressRightMargin, this.settings.paperSize, this.settings.paperMarginLeft, this.settings.paperMarginRight, this.settings.paperMarginTop, this.settings.paperMarginBottom, this.settings.numAddressPerColumn, this.settings.addressTopMargin, this.settings.addressBottomMargin, this.settings.addressWidth, this.userFontSize, this.partnerFontSize, this.settings.logoInBottom, this.settings.labelWidth, this.settings.labelHeight);
     };
 
     onPartnerPrint = () => {
-        let innerHtml: string = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
+        let innerHtml: string = this.settings.partnerPrintType === 'paper' && this.settings.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
         this.currentPartnerActions.map(partner => {
             if (partner.checked) {
                 let addresses: string;
-                switch (this.partnerPrintType) {
+                switch (this.settings.partnerPrintType) {
                     case 'label': {
-                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.showRecipient, this.senderAddress);
+                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.senderAddress);
                         break;
                     }
                     case 'paper': {
-                        addresses = this.htmlService.getHtmlForPaper(partner, this.getNumberOfSelectedAddresses(this.currentPartnerActions), partner.receivers_addresses, this.printLogoPartner, this.repeatAddress, this.multiAddressPerPage, this.numAddressPerRow, this.numAddressPerColumn, this.logoUrl, this.textBeforeAddress, this.showRecipient);
+                        addresses = this.htmlService.getHtmlForPaper(partner, this.getNumberOfSelectedAddresses(this.currentPartnerActions), partner.receivers_addresses, this.printLogoPartner, this.settings.repeatAddress, this.settings.multiAddressPerPage, this.settings.numAddressPerRow, this.settings.numAddressPerColumn, this.config.user.logo, this.settings.textBeforeAddress, this.config.addressFormat.showRecipient);
                         break;
                     }
                     default: {
-                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.showRecipient, this.senderAddress);
+                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.senderAddress);
                         break;
                     }
                 }
                 innerHtml = innerHtml.concat(addresses);
             }
         });
-        innerHtml = this.partnerPrintType === 'paper' && this.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
-        this.htmlService.printContent(innerHtml, 'partner', this.languageDirection, this.logoWidth, this.partnerPrintType, this.multiAddressPerPage, this.cellPaddingLeft, this.cellPaddingRight, this.numAddressPerRow, this.addressLeftMargin, this.addressRightMargin, this.paperSize, this.paperMarginLeft, this.paperMarginRight, this.paperMarginTop, this.paperMarginBottom, this.numAddressPerColumn, this.addressTopMargin, this.addressBottomMargin, this.addressWidth, this.userFontSize, this.partnerFontSize, this.logoInBottom, this.labelWidth, this.labelHeight);
+        innerHtml = this.settings.partnerPrintType === 'paper' && this.settings.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
+        this.htmlService.printContent(innerHtml, 'partner', this.settings.languageDirection, this.settings.logoWidth, this.settings.partnerPrintType, this.settings.multiAddressPerPage, this.settings.cellPaddingLeft, this.settings.cellPaddingRight, this.settings.numAddressPerRow, this.settings.addressLeftMargin, this.settings.addressRightMargin, this.settings.paperSize, this.settings.paperMarginLeft, this.settings.paperMarginRight, this.settings.paperMarginTop, this.settings.paperMarginBottom, this.settings.numAddressPerColumn, this.settings.addressTopMargin, this.settings.addressBottomMargin, this.settings.addressWidth, this.userFontSize, this.partnerFontSize, this.settings.logoInBottom, this.settings.labelWidth, this.settings.labelHeight);
     };
 
     onSelectDeselectAllPartners(event, partners) {

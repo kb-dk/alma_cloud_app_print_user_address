@@ -5,7 +5,6 @@ import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
 import {emptyConfig} from "./emptyConfig";
 import {ToastrService} from 'ngx-toastr';
-import {AddressFormats} from "./address-format";
 import {FixConfigService} from "../fix-config.service";
 
 @Component({
