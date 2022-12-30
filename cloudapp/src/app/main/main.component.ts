@@ -278,15 +278,15 @@ export class MainComponent implements OnInit, OnDestroy {
 
     onUserToggled = (e) => {
         this.numUsersToPrint = (e.checked) ? this.numUsersToPrint + 1 : this.numUsersToPrint - 1;
-        let user, id;
-        [user, id] = e.source.value.split('_');
+        let id;
+        [, id] = e.source.value.split('_');
         this.userToggledSubject.next({id: +id, checked: e.checked});
     };
 
     onPartnerToggled = (e) => {
         this.numPartnersToPrint = (e.checked) ? this.numPartnersToPrint + 1 : this.numPartnersToPrint - 1;
-        let partner, id;
-        [partner, id] = e.source.value.split('_');
+        let id;
+        [, id] = e.source.value.split('_');
         this.partnerToggledSubject.next({id: +id, checked: e.checked});
     };
 
