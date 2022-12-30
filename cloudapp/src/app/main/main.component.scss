@@ -41,3 +41,9 @@ textarea {
 h3{
   margin: 0!important;
 }
+
+table.outline {
+  &, tr, th, td {
+    border: solid 1px gray;
+  }
+}
