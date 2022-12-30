@@ -4,7 +4,7 @@ export interface Settings {
     partnerPrintType: string;
     labelWidth: string;
     labelHeight: string;
-    defaultTab: string;
+    defaultTab: number;
     logoInBottom: boolean;
     logoWidth: string;
     addressTopMargin: string;

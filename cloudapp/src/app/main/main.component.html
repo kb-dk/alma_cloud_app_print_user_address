@@ -4,7 +4,7 @@
     <mat-progress-spinner mode="indeterminate" diameter="50"></mat-progress-spinner>
 </div>
 
-<mat-tab-group [(selectedIndex)]="defaultTab">
+<mat-tab-group [(selectedIndex)]="settings.defaultTab">
 
     <div>
         <mat-tab label="Partner via barcode">
@@ -39,7 +39,7 @@
                     <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to
                         add sender's address to config.</b></div>
                 </div>
-                <h3 *ngIf="logoUrl && partnerPrintType === 'paper'">
+                <h3 *ngIf="config.user.logo && settings.partnerPrintType === 'paper'">
                     <mat-checkbox style="display: block; color: black"
                                   (change)="onPrintLogoPartnerToggled($event)"
                                   [checked]=true
@@ -47,7 +47,7 @@
                     </mat-checkbox>
                 </h3>
                 <h3>Select partner address to print:</h3>
-                <table border="1px">
+                <table style="border:solid 1px gray">
                     <tr>
                         <th></th>
                         <th>Name</th>
@@ -86,7 +86,7 @@
                     <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear
                     </button>
                 </div>
-                <h3 *ngIf="logoUrl && users.length && partnersReady">
+                <h3 *ngIf="config.user.logo && users.length && partnersReady">
                     <mat-checkbox style="display: block; color: black"
                                   (change)="onPrintLogoUserToggled($event)"
                                   [checked]=true
@@ -152,14 +152,14 @@
                 </div>
                 <mat-card *ngIf="!partners.length && usersReady" style="color: #17a2b8;"><b>Note:</b> Browse to a partner list/page or to a lending or borrowing request list/page to be able to see and print partners addresses.</mat-card>
 
-                <h3 *ngIf="logoUrl && partnerPrintType === 'paper'">
+                <h3 *ngIf="config.user.logo && settings.partnerPrintType === 'paper'">
                     <mat-checkbox style="display: block; color: black"
                                   (change)="onPrintLogoPartnerToggled($event)"
                                   [checked]=true
                     >Add institution logo to page
                     </mat-checkbox>
                 </h3>
-                <h3 *ngIf="partnerPrintType === 'paper'">Font size:
+                <h3 *ngIf="settings.partnerPrintType === 'paper'">Font size:
                     <mat-form-field style="width: 30px" class="font-form-field">
                         <input matInput maxlength="2" type="text" [(ngModel)]="partnerFontSize">
                     </mat-form-field>
@@ -173,7 +173,7 @@
                 > <h3>Select/deselect all</h3>
                 </mat-checkbox>
 
-                <table border="1px">
+                <table style="border:solid 1px gray">
                     <tr>
                         <th></th>
                         <th>Name</th>

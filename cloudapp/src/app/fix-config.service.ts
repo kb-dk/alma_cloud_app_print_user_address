@@ -1,5 +1,6 @@
 import {Injectable} from "@angular/core";
 import {AddressFormats} from "./config/address-format";
+import {Config} from "./config/config";
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,7 @@ export class FixConfigService {
     ) {
     }
 
-    fixOldOrEmptyConfigElements = (config) => {
+    fixOldOrEmptyConfigElements = (config): Config => {
         // Fix it if config is an empty object
         if (!Object.keys(config).length) {
             config = {user: {logo: ''}, partner: {addresses: []}, addressFormat: {addresses: {}, default: "1"}};

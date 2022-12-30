@@ -6,7 +6,7 @@ export const emptySettings : Settings = {
     partnerPrintType: 'label',
     labelWidth: '10',
     labelHeight: '5.5',
-    defaultTab: '0',
+    defaultTab: 0,
     logoInBottom: false,
     logoWidth: '3',
     addressTopMargin: '2',

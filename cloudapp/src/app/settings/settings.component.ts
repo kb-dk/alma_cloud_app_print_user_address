@@ -40,7 +40,7 @@ export class SettingsComponent {
         tap(settings => settings.partnerPrintType === undefined ? this.settings.partnerPrintType = 'label' : true),
         tap(settings => settings.labelWidth === undefined ? this.settings.labelWidth = '10' : true),
         tap(settings => settings.labelHeight === undefined ? this.settings.labelHeight = '5.5' : true),
-        tap(settings => settings.defaultTab === undefined ? this.settings.defaultTab = '0' : true),
+        tap(settings => settings.defaultTab === undefined ? this.settings.defaultTab = 0 : true),
         tap(settings => settings.logoInBottom === undefined ? this.settings.logoInBottom = false : true),
         tap(settings => settings.logoWidth === undefined ? this.settings.logoWidth = '3' : true),
         tap(settings => settings.addressTopMargin === undefined ? this.settings.addressTopMargin = '2' : true),
@@ -109,7 +109,7 @@ export class SettingsComponent {
         let title = string.substring(0, string.indexOf(','));
         let address = string.substring(string.indexOf(','));
         string = '<strong>' + title + '</strong>' + address;
-        return string.replaceAll(',', '<br/>')
+        return string.replace(/,/g, '<br/>')
     };
 
     onSelectDefaultTab = (event, message) => {

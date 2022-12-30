@@ -41,7 +41,6 @@ export class MainComponent implements OnInit, OnDestroy {
     barcode: number;  // Borrowing request, status: "Returned by patron" for scan in items
     errorMessage: string = '';
     barcodeError: boolean = false;
-    defaultTab: number = Number(this.settings.defaultTab);
     scannedPartner;
     loading: boolean = false;
     scannedPartnerReady: boolean = false;
@@ -180,7 +179,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.settings.partnerPrintType = settings.hasOwnProperty('partnerPrintType') && settings.partnerPrintType;
                 this.settings.labelHeight = settings.hasOwnProperty('labelHeight') && settings.labelHeight;
                 this.settings.labelWidth = settings.hasOwnProperty('labelWidth') && settings.labelWidth;
-                this.defaultTab = settings.hasOwnProperty('defaultTab') && Number(settings.defaultTab);
+                this.settings.defaultTab = settings.hasOwnProperty('defaultTab') && settings.defaultTab;
                 this.settings.logoInBottom = settings.hasOwnProperty('logoInBottom') && settings.logoInBottom;
                 this.settings.logoWidth = settings.hasOwnProperty('logoWidth') && settings.logoWidth;
                 this.settings.addressTopMargin = settings.hasOwnProperty('addressTopMargin') && settings.addressTopMargin;
