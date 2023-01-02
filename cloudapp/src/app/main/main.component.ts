@@ -325,7 +325,7 @@ export class MainComponent implements OnInit, OnDestroy {
         });
         innerHtml = this.settings.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
 
-        this.htmlService.printContent(innerHtml, 'user', this.settings.languageDirection, this.settings.logoWidth, this.settings.partnerPrintType, this.settings.multiAddressPerPage, this.settings.cellPaddingLeft, this.settings.cellPaddingRight, this.settings.numAddressPerRow, this.settings.addressLeftMargin, this.settings.addressRightMargin, this.settings.paperSize, this.settings.paperMarginLeft, this.settings.paperMarginRight, this.settings.paperMarginTop, this.settings.paperMarginBottom, this.settings.numAddressPerColumn, this.settings.addressTopMargin, this.settings.addressBottomMargin, this.settings.addressWidth, this.userFontSize, this.partnerFontSize, this.settings.logoInBottom, this.settings.labelWidth, this.settings.labelHeight);
+        this.htmlService.printContent(innerHtml, 'user', this.settings, this.userFontSize);
     };
 
     onScannedPartnerPrint = () => {
@@ -349,7 +349,7 @@ export class MainComponent implements OnInit, OnDestroy {
             innerHtml = innerHtml.concat(addresses);
         }
         innerHtml = this.settings.partnerPrintType === 'paper' && this.settings.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
-        this.htmlService.printContent(innerHtml, 'partner', this.settings.languageDirection, this.settings.logoWidth, this.settings.partnerPrintType, this.settings.multiAddressPerPage, this.settings.cellPaddingLeft, this.settings.cellPaddingRight, this.settings.numAddressPerRow, this.settings.addressLeftMargin, this.settings.addressRightMargin, this.settings.paperSize, this.settings.paperMarginLeft, this.settings.paperMarginRight, this.settings.paperMarginTop, this.settings.paperMarginBottom, this.settings.numAddressPerColumn, this.settings.addressTopMargin, this.settings.addressBottomMargin, this.settings.addressWidth, this.userFontSize, this.partnerFontSize, this.settings.logoInBottom, this.settings.labelWidth, this.settings.labelHeight);
+        this.htmlService.printContent(innerHtml, 'partner', this.settings, this.partnerFontSize);
     };
 
     onPartnerPrint = () => {
@@ -375,7 +375,7 @@ export class MainComponent implements OnInit, OnDestroy {
             }
         });
         innerHtml = this.settings.partnerPrintType === 'paper' && this.settings.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;
-        this.htmlService.printContent(innerHtml, 'partner', this.settings.languageDirection, this.settings.logoWidth, this.settings.partnerPrintType, this.settings.multiAddressPerPage, this.settings.cellPaddingLeft, this.settings.cellPaddingRight, this.settings.numAddressPerRow, this.settings.addressLeftMargin, this.settings.addressRightMargin, this.settings.paperSize, this.settings.paperMarginLeft, this.settings.paperMarginRight, this.settings.paperMarginTop, this.settings.paperMarginBottom, this.settings.numAddressPerColumn, this.settings.addressTopMargin, this.settings.addressBottomMargin, this.settings.addressWidth, this.userFontSize, this.partnerFontSize, this.settings.logoInBottom, this.settings.labelWidth, this.settings.labelHeight);
+        this.htmlService.printContent(innerHtml, 'partner', this.settings, this.partnerFontSize);
     };
 
     onSelectDeselectAllPartners(event, partners) {
