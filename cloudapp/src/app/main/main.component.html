@@ -32,11 +32,11 @@
             </div>
             <div *ngIf="scannedPartner && scannedPartnerReady">
                 <div class="buttonsContainer">
-                    <button class="float-right" [disabled]="!senderAddress" mat-stroked-button color="primary"
+                    <button class="float-right" [disabled]="!settings.myAddress" mat-stroked-button color="primary"
                             (click)="onScannedPartnerPrint()">
                         Print partner's address
                     </button>
-                    <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to
+                    <div *ngIf="!settings.myAddress" class="mat-error"><b>Please contact your general system administrator to
                         add sender's address to config.</b></div>
                 </div>
                 <h3 *ngIf="config.user.logo && settings.partnerPrintType === 'paper'">
@@ -141,13 +141,13 @@
         <mat-tab label="Partners">
             <div *ngIf="partnerActions$ | async as partners" class="padding-top">
                 <div class="buttonsContainer" *ngIf="partners.length && usersReady">
-                    <button class="float-right" [disabled]="!senderAddress" mat-stroked-button color="primary"
+                    <button class="float-right" [disabled]="!settings.myAddress" mat-stroked-button color="primary"
                             (click)="onPartnerPrint()">
                         Print {{numPartnersToPrint}} partner address(es)
                     </button>
                     <button class="float-right" mat-stroked-button color="primary" (click)="onClear()">Clear
                     </button>
-                    <div *ngIf="!senderAddress" class="mat-error"><b>Please contact your general system administrator to
+                    <div *ngIf="!settings.myAddress" class="mat-error"><b>Please contact your general system administrator to
                         add sender's address to config.</b></div>
                 </div>
                 <mat-card *ngIf="!partners.length && usersReady" style="color: #17a2b8;"><b>Note:</b> Browse to a partner list/page or to a lending or borrowing request list/page to be able to see and print partners addresses.</mat-card>

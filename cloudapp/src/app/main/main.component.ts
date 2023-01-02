@@ -46,7 +46,6 @@ export class MainComponent implements OnInit, OnDestroy {
     scannedPartnerReady: boolean = false;
     numUsersToPrint: number = 0;
     numPartnersToPrint: number = 0;
-    senderAddress: string = '';
     printLogoUser: boolean = true;
     printLogoPartner: boolean = true;
     errorMsg: string = '';
@@ -161,48 +160,17 @@ export class MainComponent implements OnInit, OnDestroy {
                 this.config.user.logo = config.user.logo;
                 this.config.addressFormat.showRecipient = config.addressFormat.showRecipient;
                 this.config.partner.addresses = config.partner.addresses;
-                if (this.config.partner.addresses.length && !this.senderAddress) {
-                    this.senderAddress = this.replaceCommaWithLineBreak(this.config.partner.addresses[0]);
+                if (this.config.partner.addresses.length && !this.settings.myAddress) {
+                    this.settings.myAddress = this.config.partner.addresses[0];
                 }
             },
             err => console.error(err.message));
 
         this.settingsService.get().subscribe(
             (settings: Settings) => {
-                console.log(settings);
-                if (settings.hasOwnProperty('myAddress')){
-                    this.senderAddress = settings.myAddress ? this.replaceCommaWithLineBreak(settings.myAddress) : this.config.partner.addresses[0] ? this.replaceCommaWithLineBreak(this.config.partner.addresses[0]) : '';
-                } else {
-                    this.senderAddress = this.config.partner.addresses.length ? this.replaceCommaWithLineBreak(this.config.partner.addresses[0]) : this.senderAddress;
-                }
-
-                this.settings.partnerPrintType = settings.hasOwnProperty('partnerPrintType') && settings.partnerPrintType;
-                this.settings.labelHeight = settings.hasOwnProperty('labelHeight') && settings.labelHeight;
-                this.settings.labelWidth = settings.hasOwnProperty('labelWidth') && settings.labelWidth;
-                this.settings.defaultTab = settings.hasOwnProperty('defaultTab') && settings.defaultTab;
-                this.settings.logoInBottom = settings.hasOwnProperty('logoInBottom') && settings.logoInBottom;
-                this.settings.logoWidth = settings.hasOwnProperty('logoWidth') && settings.logoWidth;
-                this.settings.addressTopMargin = settings.hasOwnProperty('addressTopMargin') && settings.addressTopMargin;
-                this.settings.addressLeftMargin = settings.hasOwnProperty('addressLeftMargin') && settings.addressLeftMargin;
-                this.settings.addressRightMargin = settings.hasOwnProperty('addressRightMargin') && settings.addressRightMargin;
-                this.settings.addressBottomMargin = settings.hasOwnProperty('addressBottomMargin') && settings.addressBottomMargin;
-                this.settings.addressDefaultFontSize = settings.hasOwnProperty('addressDefaultFontSize') && settings.addressDefaultFontSize;
-                this.userFontSize = this.settings.addressDefaultFontSize;
-                this.partnerFontSize = this.settings.addressDefaultFontSize;
-                this.settings.addressWidth = settings.hasOwnProperty('addressWidth') && settings.addressWidth;
-                this.settings.textBeforeAddress = settings.hasOwnProperty('textBeforeAddress') && settings.textBeforeAddress;
-                this.settings.languageDirection = settings.hasOwnProperty('languageDirection') && settings.languageDirection;
-                this.settings.paperSize = settings.hasOwnProperty('paperSize') && settings.paperSize;
-                this.settings.paperMarginTop = settings.hasOwnProperty('paperMarginTop') && settings.paperMarginTop;
-                this.settings.paperMarginBottom = settings.hasOwnProperty('paperMarginBottom') && settings.paperMarginBottom;
-                this.settings.paperMarginLeft = settings.hasOwnProperty('paperMarginLeft') && settings.paperMarginLeft;
-                this.settings.paperMarginRight = settings.hasOwnProperty('paperMarginRight') && settings.paperMarginRight;
-                this.settings.multiAddressPerPage = settings.hasOwnProperty('multiAddressPerPage') && settings.multiAddressPerPage;
-                this.settings.repeatAddress = settings.hasOwnProperty('repeatAddress') && settings.repeatAddress;
-                this.settings.numAddressPerRow = settings.hasOwnProperty('numAddressPerRow') && parseInt(settings.numAddressPerRow.toString());
-                this.settings.numAddressPerColumn = settings.hasOwnProperty('numAddressPerColumn') && parseInt(settings.numAddressPerColumn.toString());
-                this.settings.cellPaddingLeft = settings.hasOwnProperty('cellPaddingLeft') && parseFloat(settings.cellPaddingLeft.toString());
-                this.settings.cellPaddingRight = settings.hasOwnProperty('cellPaddingRight') && parseFloat(settings.cellPaddingRight.toString());
+                this.settings = Object.assign(this.settings, settings);
+                this.userFontSize = this.partnerFontSize = this.settings.addressDefaultFontSize;
+                this.fixSettings();
             },
             err => console.error(err.message)
         );
@@ -334,7 +302,7 @@ export class MainComponent implements OnInit, OnDestroy {
             let addresses: string;
             switch (this.settings.partnerPrintType) {
                 case 'label': {
-                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.senderAddress);
+                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.replaceCommaWithLineBreak(this.settings.myAddress));
                     break;
                 }
                 case 'paper': {
@@ -342,7 +310,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     break;
                 }
                 default: {
-                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.senderAddress);
+                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.replaceCommaWithLineBreak(this.settings.myAddress));
                     break;
                 }
             }
@@ -359,7 +327,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 let addresses: string;
                 switch (this.settings.partnerPrintType) {
                     case 'label': {
-                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.senderAddress);
+                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.replaceCommaWithLineBreak(this.settings.myAddress));
                         break;
                     }
                     case 'paper': {
@@ -367,7 +335,7 @@ export class MainComponent implements OnInit, OnDestroy {
                         break;
                     }
                     default: {
-                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.senderAddress);
+                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.replaceCommaWithLineBreak(this.settings.myAddress));
                         break;
                     }
                 }
@@ -419,5 +387,15 @@ export class MainComponent implements OnInit, OnDestroy {
             });
         }
         this.numUsersToPrint = numUsersToPrint;
+    }
+
+    private fixSettings() {
+        this.settings.numAddressPerRow = parseInt(this.settings.numAddressPerRow.toString());
+        this.settings.numAddressPerColumn = parseInt(this.settings.numAddressPerColumn.toString());
+        this.settings.cellPaddingLeft = parseFloat(this.settings.cellPaddingLeft.toString());
+        this.settings.cellPaddingRight = parseFloat(this.settings.cellPaddingRight.toString());
+        if (!this.settings.myAddress && this.config.partner.addresses.length) {
+            this.settings.myAddress = this.config.partner.addresses[0];
+        }
     }
 }
