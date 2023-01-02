@@ -13,7 +13,8 @@ import {HtmlService} from "./shared/html.service";
 import {emptySettings} from "../settings/emptySettings"
 import {emptyConfig} from "../config/emptyConfig";
 
-import {FixConfigService} from "../fix-config.service";
+import {FixConfigService} from "../config/fix-config.service";
+import {FixSettingsService} from "../settings/fix-settings.service";
 import {
     CloudAppEventsService,
     CloudAppRestService,
@@ -146,7 +147,8 @@ export class MainComponent implements OnInit, OnDestroy {
                 private partnerService: PartnerService,
                 private htmlService: HtmlService,
                 private scanService: ScanService,
-                private fixConfigService: FixConfigService
+                private fixConfigService: FixConfigService,
+                private fixSettingsService: FixSettingsService
     ) {
     }
 
@@ -168,7 +170,7 @@ export class MainComponent implements OnInit, OnDestroy {
             (settings: Settings) => {
                 this.settings = Object.assign(this.settings, settings);
                 this.userFontSize = this.partnerFontSize = this.settings.addressDefaultFontSize;
-                this.fixSettings();
+                this.settings = Object.assign(this.settings, this.fixSettingsService.fixSettings(this.settings, this.config));
             },
             err => console.error(err.message)
         );
@@ -365,7 +367,6 @@ export class MainComponent implements OnInit, OnDestroy {
         this.numPartnersToPrint = numPartnersToPrint;
     }
 
-
     onSelectDeselectAllUsers(event, users) {
         let numUsersToPrint = 0;
         if (event.checked) {
@@ -387,13 +388,4 @@ export class MainComponent implements OnInit, OnDestroy {
         this.numUsersToPrint = numUsersToPrint;
     }
 
-    private fixSettings() {
-        this.settings.numAddressPerRow = parseInt(this.settings.numAddressPerRow.toString());
-        this.settings.numAddressPerColumn = parseInt(this.settings.numAddressPerColumn.toString());
-        this.settings.cellPaddingLeft = parseFloat(this.settings.cellPaddingLeft.toString());
-        this.settings.cellPaddingRight = parseFloat(this.settings.cellPaddingRight.toString());
-        if (!this.settings.myAddress && this.config.partner.addresses.length) {
-            this.settings.myAddress = this.config.partner.addresses[0];
-        }
-    }
 }

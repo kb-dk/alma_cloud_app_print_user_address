@@ -3,7 +3,7 @@ import {CloudAppConfigService, CloudAppRestService, Entity, EntityType} from "@e
 import {forkJoin, of, throwError} from "rxjs";
 import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
 import {AddressFormats} from "./config/address-format";
-import {FixConfigService} from "./fix-config.service";
+import {FixConfigService} from "./config/fix-config.service";
 import {ConvertService} from "./convert.service";
 
 @Injectable({

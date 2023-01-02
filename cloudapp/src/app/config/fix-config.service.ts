@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
-import {AddressFormats} from "./config/address-format";
-import {Config} from "./config/config";
+import {AddressFormats} from "./address-format";
+import {Config} from "./config";
 
 @Injectable({
     providedIn: 'root'

@@ -5,7 +5,7 @@ import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
 import {emptyConfig} from "./emptyConfig";
 import {ToastrService} from 'ngx-toastr';
-import {FixConfigService} from "../fix-config.service";
+import {FixConfigService} from "./fix-config.service";
 
 @Component({
     selector: 'app-config',
@@ -22,7 +22,7 @@ export class ConfigComponent {
     config$: Observable<Config> = this.configService.get()
         .pipe(
             map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
-            tap(config => this.config = config),
+            tap(config => this.config = Object.assign(this.config, config)),
             tap(() => this.loading = false),
             catchError(error => {
                 console.log('Error getting configuration:', error);

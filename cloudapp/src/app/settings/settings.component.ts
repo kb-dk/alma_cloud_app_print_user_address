@@ -10,7 +10,8 @@ import {emptyConfig} from "../config/emptyConfig";
 import {emptySettings} from "./emptySettings";
 import {Settings} from './settings';
 import {AddressFormats} from "../config/address-format";
-import {FixConfigService} from "../fix-config.service";
+import {FixConfigService} from "../config/fix-config.service";
+import {FixSettingsService} from "./fix-settings.service";
 
 @Component({
     selector: 'app-settings',
@@ -27,7 +28,7 @@ export class SettingsComponent {
 
     config$: Observable<Config> = this.configService.get().pipe(
         map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
-        tap(config => this.config = config),
+        tap(config => this.config = Object.assign(this.config, config)),
         catchError(error => {
             console.log('Error getting configuration:', error);
             return EMPTY;
@@ -36,32 +37,8 @@ export class SettingsComponent {
 
     settings$ = this.settingsService.get().pipe(
         map(settings => Object.keys(settings).length === 0 ? this.settings : settings),
-        tap(settings => this.settings = settings),
-        tap(settings => settings.partnerPrintType === undefined ? this.settings.partnerPrintType = 'label' : true),
-        tap(settings => settings.labelWidth === undefined ? this.settings.labelWidth = '10' : true),
-        tap(settings => settings.labelHeight === undefined ? this.settings.labelHeight = '5.5' : true),
-        tap(settings => settings.defaultTab === undefined ? this.settings.defaultTab = 0 : true),
-        tap(settings => settings.logoInBottom === undefined ? this.settings.logoInBottom = false : true),
-        tap(settings => settings.logoWidth === undefined ? this.settings.logoWidth = '3' : true),
-        tap(settings => settings.addressTopMargin === undefined ? this.settings.addressTopMargin = '2' : true),
-        tap(settings => settings.addressLeftMargin === undefined ? this.settings.addressLeftMargin = '0' : true),
-        tap(settings => settings.addressRightMargin === undefined ? this.settings.addressRightMargin = '0' : true),
-        tap(settings => settings.addressBottomMargin === undefined ? this.settings.addressBottomMargin = '0' : true),
-        tap(settings => settings.addressDefaultFontSize === undefined ? this.settings.addressDefaultFontSize = 17 : true),
-        tap(settings => settings.addressWidth === undefined ? this.settings.addressWidth = '9' : true),
-        tap(settings => settings.textBeforeAddress === undefined ? this.settings.textBeforeAddress = '' : true),
-        tap(settings => settings.languageDirection === undefined ? this.settings.languageDirection = 'ltr' : true),
-        tap(settings => settings.paperSize === undefined ? this.settings.paperSize = '21.0X29.7' : true),
-        tap(settings => settings.paperMarginTop === undefined ? this.settings.paperMarginTop = '1' : true),
-        tap(settings => settings.paperMarginBottom === undefined ? this.settings.paperMarginBottom = '1' : true),
-        tap(settings => settings.paperMarginLeft === undefined ? this.settings.paperMarginLeft = '1' : true),
-        tap(settings => settings.paperMarginRight === undefined ? this.settings.paperMarginRight = '1' : true),
-        tap(settings => settings.multiAddressPerPage === undefined ? this.settings.multiAddressPerPage = false : true),
-        tap(settings => settings.repeatAddress === undefined ? this.settings.repeatAddress = false : true),
-        tap(settings => settings.numAddressPerRow === undefined ? this.settings.numAddressPerRow = 3 : true),
-        tap(settings => settings.numAddressPerColumn === undefined ? this.settings.numAddressPerColumn = 7 : true),
-        tap(settings => settings.cellPaddingLeft === undefined ? this.settings.cellPaddingLeft = 0 : true),
-        tap(settings => settings.cellPaddingRight === undefined ? this.settings.cellPaddingRight = 0 : true),
+        tap(settings => this.settings = Object.assign(this.settings, settings)),
+        tap(() => this.settings = Object.assign(this.settings, this.fixSettingsService.fixSettings(this.settings, this.config))),
         catchError(error => {
             console.log('Error getting settings:', error);
             return EMPTY;
@@ -90,6 +67,7 @@ export class SettingsComponent {
         private configService: CloudAppConfigService,
         private toastr: ToastrService,
         private fixConfigService: FixConfigService,
+        private fixSettingsService: FixSettingsService,
         public dialog: MatDialog
     ) {
     }
