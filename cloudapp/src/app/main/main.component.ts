@@ -157,9 +157,7 @@ export class MainComponent implements OnInit, OnDestroy {
         this.configService.get().subscribe(
             (config: Config) => {
                 config = this.fixConfigService.fixOldOrEmptyConfigElements(config);
-                this.config.user.logo = config.user.logo;
-                this.config.addressFormat.showRecipient = config.addressFormat.showRecipient;
-                this.config.partner.addresses = config.partner.addresses;
+                this.config = Object.assign(this.config, config);
                 if (this.config.partner.addresses.length && !this.settings.myAddress) {
                     this.settings.myAddress = this.config.partner.addresses[0];
                 }
