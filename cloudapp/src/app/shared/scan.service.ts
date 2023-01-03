@@ -9,7 +9,7 @@ import {
 } from '@exlibris/exl-cloudapp-angular-lib';
 import {UserService} from "./user.service";
 import {PartnerService} from "./partner.service";
-import {AddressFormats} from "./config/address-format";
+import {AddressFormats} from "../config/address-format";
 import {ConvertService} from "./convert.service";
 import {ToolboxService} from "./toolbox.service";
 

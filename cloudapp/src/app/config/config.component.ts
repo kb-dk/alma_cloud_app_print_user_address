@@ -5,7 +5,7 @@ import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
 import {emptyConfig} from "./emptyConfig";
 import {ToastrService} from 'ngx-toastr';
-import {ToolboxService} from "../toolbox.service";
+import {ToolboxService} from "../shared/toolbox.service";
 
 @Component({
     selector: 'app-config',

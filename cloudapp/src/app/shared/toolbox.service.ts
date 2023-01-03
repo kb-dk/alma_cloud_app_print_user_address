@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
-import {Settings} from "./settings/settings";
-import {Config} from "./config/config";
-import {AddressFormats} from "./config/address-format";
+import {Settings} from "../settings/settings";
+import {Config} from "../config/config";
+import {AddressFormats} from "../config/address-format";
 
 @Injectable({
     providedIn: 'root'

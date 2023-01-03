@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {AddressFormats} from "./config/address-format";
+import {AddressFormats} from "../config/address-format";
 import {ConvertService} from "./convert.service";
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType,} from "@exlibris/exl-cloudapp-angular-lib";
 import {forkJoin, iif, of, throwError} from "rxjs";

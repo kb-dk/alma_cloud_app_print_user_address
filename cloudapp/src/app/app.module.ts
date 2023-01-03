@@ -11,12 +11,11 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
 import { MainComponent } from './main/main.component';
-import {UserService} from './user.service';
+import {UserService} from './shared/user.service';
 import {ConfigComponent} from './config/config.component';
 import {SettingsComponent} from './settings/settings.component';
 import { PartnerComponent } from './main/partner/partner.component';
-import {DefaultsService} from "./main/shared/defaults.service";
-import {HtmlService} from "./main/shared/html.service";
+import {HtmlService} from "./shared/html.service";
 
 export function getToastrModule() {
   return ToastrModule.forRoot({
@@ -43,7 +42,7 @@ export function getToastrModule() {
     getToastrModule(),
     CloudAppTranslateModule.forRoot()
   ],
-  providers: [UserService, DefaultsService, HtmlService],
+  providers: [UserService, HtmlService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

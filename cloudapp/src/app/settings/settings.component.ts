@@ -10,7 +10,7 @@ import {emptyConfig} from "../config/emptyConfig";
 import {emptySettings} from "./emptySettings";
 import {Settings} from './settings';
 import {AddressFormats} from "../config/address-format";
-import {ToolboxService} from "../toolbox.service";
+import {ToolboxService} from "../shared/toolbox.service";
 
 @Component({
     selector: 'app-settings',

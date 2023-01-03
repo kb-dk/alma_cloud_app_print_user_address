@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
 import {forkJoin, of, throwError} from "rxjs";
 import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
-import {AddressFormats} from "./config/address-format";
+import {AddressFormats} from "../config/address-format";
 import {ConvertService} from "./convert.service";
 import {ToolboxService} from "./toolbox.service";
 

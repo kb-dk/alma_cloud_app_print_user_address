@@ -3,15 +3,15 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 
 import {Config} from "../config/config";
 import {Settings} from "../settings/settings";
-import {User} from "../user";
+import {User} from "../shared/user";
 
-import {UserService} from '../user.service';
-import {PartnerService} from '../partner.service';
-import {ScanService} from "../scan.service";
-import {HtmlService} from "./shared/html.service";
+import {UserService} from '../shared/user.service';
+import {PartnerService} from '../shared/partner.service';
+import {ScanService} from "../shared/scan.service";
+import {HtmlService} from "../shared/html.service";
 import {emptySettings} from "../settings/emptySettings"
 import {emptyConfig} from "../config/emptyConfig";
-import {ToolboxService} from "../toolbox.service";
+import {ToolboxService} from "../shared/toolbox.service";
 import {
     CloudAppEventsService,
     CloudAppRestService,
