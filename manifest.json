@@ -15,7 +15,11 @@
    "entities": [
       "LOAN",
       "USER",
-      "REQUEST"
+      "REQUEST",
+      "BORROWING_REQUEST",
+      "LENDING_REQUEST",
+      "PARTNER",
+      "VENDOR"
    ],
    "pages": {
       "config": "/#/config",
