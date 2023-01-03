@@ -106,9 +106,9 @@ export class HtmlService {
     getContent = (innerHtml, context, settings: Settings, fontSize) => `
                 <html dir = '${settings.languageDirection}'>
                     <style>                                                                     
-                        ${this.getGeneralStyling()},
-                        ${this.getLogoStyling(settings.logoWidth)},
-                        ${settings.partnerPrintType === 'paper' || context === 'user' ? this.getPageStyling(context, settings, fontSize) : this.getLabelStyling(settings.labelWidth, settings.labelHeight)},                        
+                        ${this.getGeneralStyling()}
+                        ${this.getLogoStyling(settings.logoWidth)}
+                        ${settings.partnerPrintType === 'paper' || context === 'user' ? this.getPageStyling(context, settings, fontSize) : this.getLabelStyling(settings.labelWidth, settings.labelHeight)}                        
                     </style>
                         
                     <body onload='window.print();'>
