@@ -35,16 +35,18 @@ export class ConfigComponent {
                 private toastr: ToastrService) {
     }
 
-    onLogoChanged = (images: File[]) => {
-        let logo = images[0];
-        let logoReader = new FileReader();
-        logoReader.readAsDataURL(logo);
-        logoReader.onload = () => {
-            this.config.user.logo = logoReader.result.toString();
-            this.saveConfig('Your logo is set.');
-        };
-        logoReader.onerror = error => console.log('Error reading image' + error);
+    onLogoChanged = (event: Event) => {
+        let files: FileList = (<HTMLInputElement>event.target).files;
+        if (files && this.isFileImage(files[0])) {
+            this.loadAndSaveLogo(files[0]);
+        } else {
+            this.toastr.error('The selected file must be an image.', 'Please select an image', {timeOut: 2000})
+        }
     };
+
+    isFileImage = (file) => {
+        return file && file['type'].split('/')[0] === 'image';
+    }
 
     saveConfig = (toastMessage) => {
         this.configService.set(this.config).pipe(
@@ -86,5 +88,15 @@ export class ConfigComponent {
         this.config.partner.addresses.splice(i, 1);
         this.saveConfig('The address is removed.');
     };
+
+    private loadAndSaveLogo = (logo: File): void => {
+        let logoReader = new FileReader();
+        logoReader.readAsDataURL(logo);
+        logoReader.onload = () => {
+            this.config.user.logo = logoReader.result.toString();
+            this.saveConfig('Your logo is set.');
+        };
+        logoReader.onerror = error => console.log('Error reading image' + error);
+    }
 }
 
