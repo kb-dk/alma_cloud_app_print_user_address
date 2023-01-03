@@ -1,9 +1,9 @@
-import {BehaviorSubject, combineLatest, EMPTY, Subject, Subscription} from 'rxjs';
+import {BehaviorSubject, combineLatest, EMPTY, Observable, Subject, Subscription} from 'rxjs';
 import {Component, OnDestroy, OnInit} from '@angular/core';
 
 import {Config} from "../config/config";
 import {Settings} from "../settings/settings";
-import {User} from "../shared/receiver";
+import {User, Partner} from "../shared/receiver";
 
 import {UserService} from '../shared/user.service';
 import {PartnerService} from '../shared/partner.service';
@@ -39,7 +39,7 @@ export class MainComponent implements OnInit, OnDestroy {
     barcode: number;  // Borrowing request, status: "Returned by patron" for scan in items
     errorMessage: string = '';
     barcodeError: boolean = false;
-    scannedPartner;
+    scannedPartner: Partner;
     loading: boolean = false;
     scannedPartnerReady: boolean = false;
     numUsersToPrint: number = 0;
@@ -82,7 +82,7 @@ export class MainComponent implements OnInit, OnDestroy {
     private partnerAddressSelectedSubject = new BehaviorSubject<{ id: number, value: string }>({id: -1, value: ''});
     partnerAddressSelectedAction$ = this.partnerAddressSelectedSubject.asObservable();
 
-    partnerActions$ = combineLatest([
+    partnerActions$: Observable<Partner[]>= combineLatest([
         this.partnerAction$,
         this.partnerToggledAction$,
         this.partnerAddressSelectedAction$
@@ -99,7 +99,7 @@ export class MainComponent implements OnInit, OnDestroy {
                         ...partner,
                         selectedAddress: partner.id === selectedAddressType.id ? selectedAddressType.value : this.currentPartnerActions[requestIndex].selectedAddress,
                         checked: partner.id === selectedPartner.id ? selectedPartner.checked : this.currentPartnerActions[requestIndex].checked,
-                    }) as User),
+                    }) as Partner),
                 toArray(),
             ),
             tap(currentPartnerActions => this.currentPartnerActions = currentPartnerActions),
@@ -109,7 +109,7 @@ export class MainComponent implements OnInit, OnDestroy {
             }),
         );
 
-    userActions$ = combineLatest([
+    userActions$: Observable<User[]> = combineLatest([
         this.pageLoadedAction$,
         this.userToggledAction$,
         this.userAddressSelectedAction$
