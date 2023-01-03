@@ -118,13 +118,13 @@
                                 <mat-checkbox value="user_{{user.id}}"
                                               (change)="onUserToggled($event)"
                                               [checked]="user.checked"
-                                              [disabled]="user.addresses.length==0"
+                                              [disabled]="user.receivers_addresses.length==0"
                                 >{{user.name}}</mat-checkbox>
                             </div>
                         </td>
                         <td style="width: 75%">
                             <mat-radio-group aria-label="Select an option">
-                                <mat-radio-button *ngFor="let address of user.addresses"
+                                <mat-radio-button *ngFor="let address of user.receivers_addresses"
                                                   (change)="onAddressSelected($event)"
                                                   [checked]="(user.selectedAddress == address.type)"
                                                   value="user_{{user.id}}_{{address.type}}"

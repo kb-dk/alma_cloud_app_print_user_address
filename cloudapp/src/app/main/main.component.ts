@@ -215,7 +215,7 @@ export class MainComponent implements OnInit, OnDestroy {
             this.scanService.scan(this.barcode).subscribe(
                 (data) => {
                     this.loading = false;
-                    this.scannedPartner = data;
+                    this.scannedPartner = data as Partner;
                     this.scannedPartnerReady = true;
                     this.onScannedPartnerPrint();
                 },
@@ -277,7 +277,7 @@ export class MainComponent implements OnInit, OnDestroy {
         let innerHtml: string = this.settings.multiAddressPerPage ? "<div class='paper flex-container'>" : "";
         this.currentUserActions.map(user => {
             if (user.checked) {
-                innerHtml = innerHtml.concat(this.htmlService.getHtmlForPaper(user, this.getNumberOfSelectedAddresses(this.currentUserActions), user.addresses, this.printLogoUser, this.settings.repeatAddress, this.settings.multiAddressPerPage, this.settings.numAddressPerRow, this.settings.numAddressPerColumn, this.config.user.logo, this.settings.textBeforeAddress, this.config.addressFormat.showRecipient));
+                innerHtml = innerHtml.concat(this.htmlService.getHtmlForPaper(user, this.getNumberOfSelectedAddresses(this.currentUserActions), user.receivers_addresses, this.printLogoUser, this.settings.repeatAddress, this.settings.multiAddressPerPage, this.settings.numAddressPerRow, this.settings.numAddressPerColumn, this.config.user.logo, this.settings.textBeforeAddress, this.config.addressFormat.showRecipient));
             }
         });
         innerHtml = this.settings.multiAddressPerPage ? innerHtml + "</div>" : innerHtml;

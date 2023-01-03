@@ -1,5 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Address} from "./address";
+import {User} from "./receiver";
 
 @Injectable({
     providedIn: 'root'
@@ -24,13 +25,13 @@ export class ConvertService {
         return address;
     };
 
-    userFromAlmaUser = (addressFormat, showCountry, almaUser, index) => {
+    userFromAlmaUser = (addressFormat, showCountry, almaUser, index: number): User => {
         return almaUser === null ?
-            {id: index, name: 'N/A', addresses: []} :
+            {id: index, name: 'N/A', receivers_addresses: [{}]} as User :
             {
                 id: index,
                 name: almaUser.full_name ? (almaUser.full_name.search('null ') === 0 ? almaUser.full_name.replace('null ', '') : almaUser.full_name) : (almaUser.name ? almaUser.name : ''),
-                addresses: almaUser.contact_info.address.map(
+                receivers_addresses: almaUser.contact_info.address.map(
                     address => ({
                         type: address.address_type[0].value,
                         address: this.convertToPrintableAddress(addressFormat, showCountry,address)
@@ -40,7 +41,7 @@ export class ConvertService {
                     ? almaUser.contact_info.address.find(address => address.preferred === true).address_type[0].value
                     : almaUser.contact_info.address.length > 0 ? almaUser.contact_info.address[0].address_type[0].value : 'none',
                 checked: false
-            };
+            } as User;
     };
 
     partnerFromAlmaPartner = (addressFormat, showCountry, almaPartner, senders_address, index) => {
