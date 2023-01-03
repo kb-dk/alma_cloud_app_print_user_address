@@ -9,9 +9,9 @@ import {
 } from '@exlibris/exl-cloudapp-angular-lib';
 import {UserService} from "./user.service";
 import {PartnerService} from "./partner.service";
-import {FixConfigService} from "./config/fix-config.service";
 import {AddressFormats} from "./config/address-format";
 import {ConvertService} from "./convert.service";
+import {ToolboxService} from "./toolbox.service";
 
 @Injectable({
     providedIn: 'root'
@@ -31,7 +31,7 @@ export class ScanService {
                 private eventsService: CloudAppEventsService,
                 private userService: UserService,
                 private partnerService: PartnerService,
-                private fixConfigService: FixConfigService,
+                private toolboxService: ToolboxService,
                 private convertService: ConvertService,
     ) {
     }
@@ -39,7 +39,7 @@ export class ScanService {
     scan = (barcode) => {
 
         this.configService.get().pipe(
-            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
+            map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
             tap(config => this.showCountry = config.addressFormat.showCountry),
             tap(config => this.showRecipient = config.addressFormat.showRecipient),

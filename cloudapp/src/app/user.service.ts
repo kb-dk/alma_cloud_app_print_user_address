@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {AddressFormats} from "./config/address-format";
 import {ConvertService} from "./convert.service";
-import {FixConfigService} from "./config/fix-config.service";
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType,} from "@exlibris/exl-cloudapp-angular-lib";
 import {forkJoin, iif, of, throwError} from "rxjs";
 import {catchError, map, switchMap, tap} from "rxjs/operators";
+import {ToolboxService} from "./toolbox.service";
 
 @Injectable({
     providedIn: 'root'
@@ -22,7 +22,7 @@ export class UserService {
     users$ = (entities: Entity[]) => {
 
         let config = this.configService.get().pipe(
-            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
+            map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
             tap(config => this.showCountry = config.addressFormat.showCountry),
             tap(config => this.showRecipient = config.addressFormat.showRecipient),
@@ -75,7 +75,7 @@ export class UserService {
 
     constructor(private restService: CloudAppRestService,
                 private configService: CloudAppConfigService,
-                private fixConfigService: FixConfigService,
+                private toolboxService: ToolboxService,
                 private convertService: ConvertService,
     ) {
     }

@@ -10,8 +10,7 @@ import {emptyConfig} from "../config/emptyConfig";
 import {emptySettings} from "./emptySettings";
 import {Settings} from './settings';
 import {AddressFormats} from "../config/address-format";
-import {FixConfigService} from "../config/fix-config.service";
-import {FixSettingsService} from "./fix-settings.service";
+import {ToolboxService} from "../toolbox.service";
 
 @Component({
     selector: 'app-settings',
@@ -27,7 +26,7 @@ export class SettingsComponent {
     config: Config = emptyConfig;
 
     config$: Observable<Config> = this.configService.get().pipe(
-        map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
+        map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
         tap(config => this.config = Object.assign(this.config, config)),
         catchError(error => {
             console.log('Error getting configuration:', error);
@@ -38,7 +37,7 @@ export class SettingsComponent {
     settings$ = this.settingsService.get().pipe(
         map(settings => Object.keys(settings).length === 0 ? this.settings : settings),
         tap(settings => this.settings = Object.assign(this.settings, settings)),
-        tap(() => this.settings = Object.assign(this.settings, this.fixSettingsService.fixSettings(this.settings, this.config))),
+        tap(() => this.settings = Object.assign(this.settings, this.toolboxService.fixSettings(this.settings, this.config))),
         catchError(error => {
             console.log('Error getting settings:', error);
             return EMPTY;
@@ -66,11 +65,9 @@ export class SettingsComponent {
         private settingsService: CloudAppSettingsService,
         private configService: CloudAppConfigService,
         private toastr: ToastrService,
-        private fixConfigService: FixConfigService,
-        private fixSettingsService: FixSettingsService,
+        public toolboxService: ToolboxService,
         public dialog: MatDialog
-    ) {
-    }
+    ) {}
 
     saveSettings = (toastMessage: string) => {
         this.settingsService.set(this.settings).subscribe(
@@ -80,14 +77,6 @@ export class SettingsComponent {
             err => this.toastr.error(err.message, '', {timeOut: 1000}),
             () => this.saving = false
         );
-    };
-
-    // Replace commas with line-break and bold the first line
-    replaceComma = (string) => {
-        let title = string.substring(0, string.indexOf(','));
-        let address = string.substring(string.indexOf(','));
-        string = '<strong>' + title + '</strong>' + address;
-        return string.replace(/,/g, '<br/>')
     };
 
     onSelectDefaultTab = (event, message) => {

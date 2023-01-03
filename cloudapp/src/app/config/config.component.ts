@@ -5,7 +5,7 @@ import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
 import {emptyConfig} from "./emptyConfig";
 import {ToastrService} from 'ngx-toastr';
-import {FixConfigService} from "./fix-config.service";
+import {ToolboxService} from "../toolbox.service";
 
 @Component({
     selector: 'app-config',
@@ -21,7 +21,7 @@ export class ConfigComponent {
 
     config$: Observable<Config> = this.configService.get()
         .pipe(
-            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
+            map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.config = Object.assign(this.config, config)),
             tap(() => this.loading = false),
             catchError(error => {
@@ -31,7 +31,7 @@ export class ConfigComponent {
         );
 
     constructor(private configService: CloudAppConfigService,
-                private fixConfigService: FixConfigService,
+                public toolboxService: ToolboxService,
                 private toastr: ToastrService) {
     }
 
@@ -85,13 +85,6 @@ export class ConfigComponent {
     onRemoveAddress = (i) => {
         this.config.partner.addresses.splice(i, 1);
         this.saveConfig('The address is removed.');
-    };
-
-    replaceComma = (string) => {
-        let title = string.substring(0, string.indexOf(','));
-        let address = string.substring(string.indexOf(','));
-        string = '<strong>' + title + '</strong>' + address;
-        return string.replaceAll(',', '<br/>')
     };
 }
 

@@ -1,17 +1,38 @@
 import {Injectable} from "@angular/core";
-import {AddressFormats} from "./address-format";
-import {Config} from "./config";
+import {Settings} from "./settings/settings";
+import {Config} from "./config/config";
+import {AddressFormats} from "./config/address-format";
 
 @Injectable({
     providedIn: 'root'
 })
 
-export class FixConfigService {
+export class ToolboxService {
     addressFormats = AddressFormats;
 
     constructor(
     ) {
     }
+
+    fixSettings = (settings, config: Config): Settings => {
+        settings.numAddressPerRow = parseInt(settings.numAddressPerRow.toString());
+        settings.numAddressPerColumn = parseInt(settings.numAddressPerColumn.toString());
+        settings.cellPaddingLeft = parseFloat(settings.cellPaddingLeft.toString());
+        settings.cellPaddingRight = parseFloat(settings.cellPaddingRight.toString());
+        if (!settings.myAddress && config.partner.addresses.length) {
+            settings.myAddress = config.partner.addresses[0];
+        }
+        return settings;
+    }
+
+
+    // Replace commas with line-break and bold the first line
+    replaceComma = (string) => {
+        let title = string.substring(0, string.indexOf(','));
+        let address = string.substring(string.indexOf(','));
+        string = '<strong>' + title + '</strong>' + address;
+        return string.replace(/,/g, '<br/>')
+    };
 
     fixOldOrEmptyConfigElements = (config): Config => {
         // Fix it if config is an empty object
@@ -53,4 +74,5 @@ export class FixConfigService {
 
         return config;
     };
+
 }

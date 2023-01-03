@@ -9,12 +9,9 @@ import {UserService} from '../user.service';
 import {PartnerService} from '../partner.service';
 import {ScanService} from "../scan.service";
 import {HtmlService} from "./shared/html.service";
-
 import {emptySettings} from "../settings/emptySettings"
 import {emptyConfig} from "../config/emptyConfig";
-
-import {FixConfigService} from "../config/fix-config.service";
-import {FixSettingsService} from "../settings/fix-settings.service";
+import {ToolboxService} from "../toolbox.service";
 import {
     CloudAppEventsService,
     CloudAppRestService,
@@ -147,8 +144,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 private partnerService: PartnerService,
                 private htmlService: HtmlService,
                 private scanService: ScanService,
-                private fixConfigService: FixConfigService,
-                private fixSettingsService: FixSettingsService
+                private toolboxService: ToolboxService
     ) {
     }
 
@@ -158,7 +154,7 @@ export class MainComponent implements OnInit, OnDestroy {
 
         this.configService.get().subscribe(
             (config: Config) => {
-                config = this.fixConfigService.fixOldOrEmptyConfigElements(config);
+                config = this.toolboxService.fixOldOrEmptyConfigElements(config);
                 this.config = Object.assign(this.config, config);
                 if (this.config.partner.addresses.length && !this.settings.myAddress) {
                     this.settings.myAddress = this.config.partner.addresses[0];
@@ -170,7 +166,7 @@ export class MainComponent implements OnInit, OnDestroy {
             (settings: Settings) => {
                 this.settings = Object.assign(this.settings, settings);
                 this.userFontSize = this.partnerFontSize = this.settings.addressDefaultFontSize;
-                this.settings = Object.assign(this.settings, this.fixSettingsService.fixSettings(this.settings, this.config));
+                this.settings = Object.assign(this.settings, this.toolboxService.fixSettings(this.settings, this.config));
             },
             err => console.error(err.message)
         );
@@ -269,13 +265,6 @@ export class MainComponent implements OnInit, OnDestroy {
         }
     };
 
-    replaceCommaWithLineBreak = (string) => {
-        let title = string.substring(0, string.indexOf(','));
-        let address = string.substring(string.indexOf(','));
-        string = '<strong>' + title + '</strong>' + address;
-        return string.replaceAll(',', '<br/>')
-    };
-
     getNumberOfSelectedAddresses = (partnerOrUsers) => {
         let count = 0;
         partnerOrUsers.forEach(partnerOrUser => {
@@ -302,7 +291,7 @@ export class MainComponent implements OnInit, OnDestroy {
             let addresses: string;
             switch (this.settings.partnerPrintType) {
                 case 'label': {
-                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.replaceCommaWithLineBreak(this.settings.myAddress));
+                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.toolboxService.replaceComma(this.settings.myAddress));
                     break;
                 }
                 case 'paper': {
@@ -310,7 +299,7 @@ export class MainComponent implements OnInit, OnDestroy {
                     break;
                 }
                 default: {
-                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.replaceCommaWithLineBreak(this.settings.myAddress));
+                    addresses = this.htmlService.getHtmlForLabel(this.scannedPartner, this.scannedPartner.receivers_addresses, this.config.addressFormat.showRecipient, this.toolboxService.replaceComma(this.settings.myAddress));
                     break;
                 }
             }
@@ -327,7 +316,7 @@ export class MainComponent implements OnInit, OnDestroy {
                 let addresses: string;
                 switch (this.settings.partnerPrintType) {
                     case 'label': {
-                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.replaceCommaWithLineBreak(this.settings.myAddress));
+                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.toolboxService.replaceComma(this.settings.myAddress));
                         break;
                     }
                     case 'paper': {
@@ -335,7 +324,7 @@ export class MainComponent implements OnInit, OnDestroy {
                         break;
                     }
                     default: {
-                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.replaceCommaWithLineBreak(this.settings.myAddress));
+                        addresses = this.htmlService.getHtmlForLabel(partner, partner.receivers_addresses, this.config.addressFormat.showRecipient, this.toolboxService.replaceComma(this.settings.myAddress));
                         break;
                     }
                 }

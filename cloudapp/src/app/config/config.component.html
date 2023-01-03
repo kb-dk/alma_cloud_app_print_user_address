@@ -22,7 +22,7 @@
                     <td>
                         <mat-icon matListIcon (click)="onRemoveAddress(i)" color="primary">delete</mat-icon>
                     </td>
-                    <td [innerHTML]=replaceComma(address)></td>
+                    <td [innerHTML]=toolboxService.replaceComma(address)></td>
                 </tr>
                 <tr *ngIf="!configuration.partner.addresses.length">
                     <td></td>

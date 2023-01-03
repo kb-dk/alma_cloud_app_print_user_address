@@ -361,7 +361,7 @@
                                       checked="{{configAndSettings.settings.myAddress===address}}">
                     </mat-radio-button>
                 </td>
-                <td [innerHTML]=replaceComma(address)></td>
+                <td [innerHTML]=toolboxService.replaceComma(address)></td>
             </tr>
             <tr *ngIf="!configAndSettings.config.partner.addresses.length">
                 <td class="mat-error">No address is added. Please contact your general system administrator.
