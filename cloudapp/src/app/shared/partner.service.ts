@@ -26,9 +26,7 @@ export class PartnerService {
             tap(config => this.showRecipient = config.addressFormat.showRecipient),
             catchError(err => this.handleError(err))
         );
-        // TODO In exl-cloudapp-angular-lib / public-interface.d.ts PARTNER is not added as an entityType yet
-        // When it is added by Exlibris, the last part needs to be removed and EntityType.PARTNER be added to the array of EntityTypes
-        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.BORROWING_REQUEST, EntityType.LENDING_REQUEST].includes(entity.type) || entity.type.toString() === 'PARTNER')
+        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.BORROWING_REQUEST, EntityType.LENDING_REQUEST, EntityType.PARTNER].includes(entity.type))
             .map(
                 entity => {
                     switch (entity.type) {
