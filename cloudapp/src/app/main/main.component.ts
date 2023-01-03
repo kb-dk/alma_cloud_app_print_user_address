@@ -3,7 +3,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 
 import {Config} from "../config/config";
 import {Settings} from "../settings/settings";
-import {User} from "../shared/user";
+import {User} from "../shared/receiver";
 
 import {UserService} from '../shared/user.service';
 import {PartnerService} from '../shared/partner.service';
