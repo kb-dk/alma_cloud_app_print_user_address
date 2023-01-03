@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {Address} from "./address";
-import {User} from "./receiver";
+import {User} from "./interfaces";
 
 @Injectable({
     providedIn: 'root'
@@ -44,9 +44,9 @@ export class ConvertService {
             } as User;
     };
 
-    partnerFromAlmaPartner = (addressFormat, showCountry, almaPartner, senders_address, index) => {
+    partnerFromAlmaPartner = (addressFormat, showCountry, almaPartner, senders_address, index) : User => {
         return almaPartner === null ?
-            {id: index, name: 'N/A', receivers_addresses: [], senders_address: ''} :
+            {id: index, name: 'N/A', receivers_addresses: [{}], senders_address: ''} as User:
             {
                 id: index,
                 name: almaPartner.partner_details.name,
@@ -61,6 +61,6 @@ export class ConvertService {
                     ? almaPartner.contact_info.address.find(address => address.preferred === true).address_type.join()
                     : almaPartner.contact_info.address.length > 0 ? almaPartner.contact_info.address[0].address_type.join() : true,
                 checked: false
-            };
+            } as User;
     }
 }

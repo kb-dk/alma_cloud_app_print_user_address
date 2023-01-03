@@ -3,7 +3,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 
 import {Config} from "../config/config";
 import {Settings} from "../settings/settings";
-import {User, Partner} from "../shared/receiver";
+import {User} from "../shared/interfaces";
 
 import {UserService} from '../shared/user.service';
 import {PartnerService} from '../shared/partner.service';
@@ -39,7 +39,7 @@ export class MainComponent implements OnInit, OnDestroy {
     barcode: number;  // Borrowing request, status: "Returned by patron" for scan in items
     errorMessage: string = '';
     barcodeError: boolean = false;
-    scannedPartner: Partner;
+    scannedPartner: User;
     loading: boolean = false;
     scannedPartnerReady: boolean = false;
     numUsersToPrint: number = 0;
@@ -82,7 +82,7 @@ export class MainComponent implements OnInit, OnDestroy {
     private partnerAddressSelectedSubject = new BehaviorSubject<{ id: number, value: string }>({id: -1, value: ''});
     partnerAddressSelectedAction$ = this.partnerAddressSelectedSubject.asObservable();
 
-    partnerActions$: Observable<Partner[]>= combineLatest([
+    partnerActions$: Observable<User[]>= combineLatest([
         this.partnerAction$,
         this.partnerToggledAction$,
         this.partnerAddressSelectedAction$
@@ -99,7 +99,7 @@ export class MainComponent implements OnInit, OnDestroy {
                         ...partner,
                         selectedAddress: partner.id === selectedAddressType.id ? selectedAddressType.value : this.currentPartnerActions[requestIndex].selectedAddress,
                         checked: partner.id === selectedPartner.id ? selectedPartner.checked : this.currentPartnerActions[requestIndex].checked,
-                    }) as Partner),
+                    }) as User),
                 toArray(),
             ),
             tap(currentPartnerActions => this.currentPartnerActions = currentPartnerActions),
@@ -215,7 +215,7 @@ export class MainComponent implements OnInit, OnDestroy {
             this.scanService.scan(this.barcode).subscribe(
                 (data) => {
                     this.loading = false;
-                    this.scannedPartner = data as Partner;
+                    this.scannedPartner = data as User;
                     this.scannedPartnerReady = true;
                     this.onScannedPartnerPrint();
                 },
