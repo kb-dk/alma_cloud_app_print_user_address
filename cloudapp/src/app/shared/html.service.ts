@@ -103,19 +103,7 @@ export class HtmlService {
                 }  
                `;
 
-    getContent = (innerHtml, context, settings: Settings, fontSize) => `
-                <html dir = '${settings.languageDirection}'>
-                    <style>                                                                     
-                        ${this.getGeneralStyling()}
-                        ${this.getLogoStyling(settings.logoWidth)}
-                        ${settings.partnerPrintType === 'paper' || context === 'user' ? this.getPageStyling(context, settings, fontSize) : this.getLabelStyling(settings.labelWidth, settings.labelHeight)}                        
-                    </style>
-                        
-                    <body onload='window.print();'>
-                        ${innerHtml}
-                    </body>
-                </html>
-                `;
+    getContent = (innerHtml, context, settings: Settings, fontSize) => `\n<html dir = '${settings.languageDirection}'>\n<style>\n${this.getGeneralStyling()}\n${this.getLogoStyling(settings.logoWidth)}\n${settings.partnerPrintType === 'paper' || context === 'user' ? this.getPageStyling(context, settings, fontSize) : this.getLabelStyling(settings.labelWidth, settings.labelHeight)}\n</style>\n<body onload='window.print();'>\n${innerHtml}\n</body>\n</html>`;
 
     getPageStyling = (context, settings:Settings, fontSize) => ` 
                 ${settings.multiAddressPerPage ? this.getMultiAddressPerPageStyling(settings) : this.getOneAddressPerPageStyling(settings.addressTopMargin, settings.addressWidth)}
@@ -134,6 +122,7 @@ export class HtmlService {
                 }  
                 .paper:last-child {
                     page-break-after: avoid;
+                    height: ${this.getPaperHeight(settings.paperSize, settings.paperMarginTop, settings.paperMarginBottom) - 0.1}cm; 
                 }                 
                 .flex-container{
                     display: flex;
@@ -156,6 +145,7 @@ export class HtmlService {
                     float: right; 
                     width:${settings.logoWidth}cm; 
                     ${settings.logoInBottom ? 'margin-top: 18cm;' : ''}
+                }
                `;
 
     getHtmlForLabel = (partner, addresses, showRecipient, senderAddress) => `
