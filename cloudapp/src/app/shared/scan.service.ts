@@ -50,7 +50,7 @@ export class ScanService {
             concatMap(item => this.getRequests(item.link)),
             map(item => item.user_request[0].resource_sharing.partner.link),
             concatMap(partner_link => this.restService.call(partner_link)),
-            map(partner => this.convertService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address, '0')),
+            map(partner => this.convertService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address, 0)),
             tap(partner => partner.checked = true),
             catchError(err => this.handleError(err))
         )

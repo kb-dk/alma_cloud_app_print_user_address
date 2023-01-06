@@ -1,6 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Address} from "./address";
-import {User} from "./interfaces";
+import {User, AlmaUser, AlmaPartner, Address} from "./interfaces";
 
 @Injectable({
     providedIn: 'root'
@@ -25,7 +24,7 @@ export class ConvertService {
         return address;
     };
 
-    userFromAlmaUser = (addressFormat, showCountry, almaUser, index: number): User => {
+    userFromAlmaUser = (addressFormat, showCountry, almaUser: AlmaUser, index: number): User => {
         return almaUser === null ?
             {id: index, name: 'N/A', receivers_addresses: [{}]} as User :
             {
@@ -44,7 +43,7 @@ export class ConvertService {
             } as User;
     };
 
-    partnerFromAlmaPartner = (addressFormat, showCountry, almaPartner, senders_address, index) : User => {
+    partnerFromAlmaPartner = (addressFormat, showCountry: boolean, almaPartner: AlmaPartner, senders_address: String, index: Number) : User => {
         return almaPartner === null ?
             {id: index, name: 'N/A', receivers_addresses: [{}], senders_address: ''} as User:
             {
