@@ -34,13 +34,9 @@ export class PartnerService {
                         case EntityType.BORROWING_REQUEST:
                         case EntityType.LENDING_REQUEST:
                             return this.partnerAddressFromBorrowingOrLendingRequest(entity.link);
+                        case EntityType.PARTNER:
+                            return this.getLoanOrPartnerFromAlma(entity.link);
                     }
-                    // TODO In exl-cloudapp-angular-lib / public-interface.d.ts PARTNER is not added as an entityType yet
-                    // When it is added by Exlibris, this line needs to move inside the switch
-                    if (entity.type.toString() === 'PARTNER'){
-                        return this.getLoanOrPartnerFromAlma(entity.link);
-                    }
-
                 });
 
         // TODO Find a better way to ensure having the config before piping the addresses into partnerAddressFromLoan
