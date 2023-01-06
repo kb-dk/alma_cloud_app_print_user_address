@@ -35,10 +35,9 @@ export class UserService {
                         return this.userFromLoan(entity.link);
                     case EntityType.REQUEST:
                         return this.userFromRequest(entity.link);
-                    case EntityType.USER:
-                        return this.getRequestFromAlma(entity.link);
                     case EntityType.BORROWING_REQUEST:
                         return this.getRequesterFromAlma(entity.link);
+                    case EntityType.USER:
                     case EntityType.VENDOR:
                         return this.getRequestFromAlma(entity.link);
                 }
