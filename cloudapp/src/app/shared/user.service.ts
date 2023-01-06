@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {AddressFormats} from "../config/address-format";
-import {ConvertService} from "./convert.service";
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType,} from "@exlibris/exl-cloudapp-angular-lib";
 import {forkJoin, iif, of, throwError} from "rxjs";
 import {catchError, map, switchMap, tap} from "rxjs/operators";
@@ -51,7 +50,7 @@ export class UserService {
             forkJoin(calls).pipe(
                 catchError(err => this.handleError(err)),
                 tap(users => users.pop()), // Pulling the config off of the array of results
-                map(users => users.map((user, index) => this.convertService.userFromAlmaUser(this.addressFormat, this.showCountry, user, index))),
+                map(users => users.map((user, index) => this.toolboxService.userFromAlmaUser(this.addressFormat, this.showCountry, user, index))),
             );
     };
 
@@ -76,9 +75,7 @@ export class UserService {
     constructor(private restService: CloudAppRestService,
                 private configService: CloudAppConfigService,
                 private toolboxService: ToolboxService,
-                private convertService: ConvertService,
-    ) {
-    }
+    ) {}
 
     private getRequestFromAlma = link => this.restService.call(link);
 

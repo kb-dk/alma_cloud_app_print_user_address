@@ -3,7 +3,6 @@ import {CloudAppConfigService, CloudAppRestService, Entity, EntityType} from "@e
 import {forkJoin, of, throwError} from "rxjs";
 import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
 import {AddressFormats} from "../config/address-format";
-import {ConvertService} from "./convert.service";
 import {ToolboxService} from "./toolbox.service";
 
 @Injectable({
@@ -50,7 +49,7 @@ export class PartnerService {
             of([]) :
             forkJoin(calls).pipe(
                 tap(partners => partners.pop()),// Pulling the config off of the array of results
-                map(partners => partners.map((partner, index) => this.convertService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address, index))),
+                map(partners => partners.map((partner, index) => this.toolboxService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address, index))),
                 catchError(err => this.handleError(err))
             );
     };
@@ -71,7 +70,6 @@ export class PartnerService {
     constructor(private restService: CloudAppRestService,
                 private configService: CloudAppConfigService,
                 private toolboxService: ToolboxService,
-                private convertService: ConvertService,
     ){}
 
     private getLoanOrPartnerFromAlma = link => this.restService.call(link);
