@@ -49,7 +49,7 @@ export class ToolboxService {
         if (!config.hasOwnProperty('partner')) {
             config.partner = {}
         }
-        // Fix the config if there is not addresses in partner
+        // Fix the config if there aren't addresses in partner
         if (!config.partner.hasOwnProperty('addresses')) {
             config.partner.addresses = []
         }
@@ -92,7 +92,7 @@ export class ToolboxService {
 
     userFromAlmaUser = (addressFormat, showCountry, almaUser: AlmaUser, index: number): User => {
         return almaUser === null ?
-            {id: index, name: 'N/A', receivers_addresses: [{}]} as User :
+            {id: index, name: 'N/A', receivers_addresses: []} as User :
             {
                 id: index,
                 name: almaUser.full_name ? (almaUser.full_name.search('null ') === 0 ? almaUser.full_name.replace('null ', '') : almaUser.full_name) : (almaUser.name ? almaUser.name : ''),
@@ -111,7 +111,7 @@ export class ToolboxService {
 
     partnerFromAlmaPartner = (addressFormat, showCountry: boolean, almaPartner: AlmaPartner, senders_address: String, index: Number) : User => {
         return almaPartner === null ?
-            {id: index, name: 'N/A', receivers_addresses: [{}], senders_address: ''} as User:
+            {id: index, name: 'N/A', receivers_addresses: [], senders_address: ''} as User:
             {
                 id: index,
                 name: almaPartner.partner_details.name,
