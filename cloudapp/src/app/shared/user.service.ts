@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
 import {AddressFormats} from "../config/address-format";
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType,} from "@exlibris/exl-cloudapp-angular-lib";
-import {forkJoin, iif, of, throwError} from "rxjs";
+import {forkJoin, iif, Observable, of, throwError} from "rxjs";
 import {catchError, map, switchMap, tap} from "rxjs/operators";
 import {ToolboxService} from "./toolbox.service";
+import {AlmaRequest, AlmaUser} from "./interfaces";
 
 @Injectable({
     providedIn: 'root'
@@ -36,10 +37,10 @@ export class UserService {
                     case EntityType.REQUEST:
                         return this.userFromRequest(entity.link);
                     case EntityType.BORROWING_REQUEST:
-                        return this.getRequesterFromAlma(entity.link);
+                        return this.userFromBorrowingRequest(entity.link);
                     case EntityType.USER:
                     case EntityType.VENDOR:
-                        return this.getRequestFromAlma(entity.link);
+                        return this.userOrVendorFromAlma(entity.link);
                 }
             });
         // TODO Find a better way to ensure having the config before piping the addresses into partnerAddressFromLoan
@@ -53,30 +54,39 @@ export class UserService {
             );
     };
 
-    private getRequesterFromAlma = (link) => this.getRequestFromAlma(link).pipe(
+    private userFromBorrowingRequest = (link) => this.getBorrowingRequestFromAlma(link).pipe(
         switchMap(request => iif(() => request.requester !== null,
-            this.getRequestFromAlma(`/users/${request.requester.value}`),
+            this.userFromAlma(`/users/${request.requester.value}`),
             of(null),
         ))
     );
 
-    private userFromLoan = (link) => this.getRequestFromAlma(link).pipe(
-        switchMap(loan => this.getRequestFromAlma(`/users/${loan.user_id}`))
+    private userFromLoan = (link) => this.getLoanFromAlma(link).pipe(
+        switchMap(loan => this.userFromAlma(`/users/${loan.user_id}`))
     );
 
-    private userFromRequest = (link) => this.getRequestFromAlma(link).pipe(
-        switchMap(request => iif(() => request.user_primary_id !== undefined,
-            this.getRequestFromAlma(`/users/${request.user_primary_id}`),
+    private userFromRequest = (link) => this.requestFromAlma(link).pipe(
+        switchMap((request): Observable<AlmaRequest> => iif(() => ('user_primary_id' in request && request.user_primary_id !== null),
+            this.userFromAlma(`/users/${request.user_primary_id}`),
             of(null)
         ))
     );
 
-    constructor(private restService: CloudAppRestService,
-                private configService: CloudAppConfigService,
-                private toolboxService: ToolboxService,
-    ) {}
+    private requestFromAlma = (link): Observable<AlmaRequest> => this.restService.call(link);
 
-    private getRequestFromAlma = link => this.restService.call(link);
+    private userFromAlma = (link): Observable<AlmaUser> => this.restService.call(link);
+
+    private getBorrowingRequestFromAlma = (link) => {
+        if (this.userNotNull(link)){
+            return this.restService.call(link);
+        } else {
+            return of(null);
+        }
+    }
+
+    private getLoanFromAlma = (link) => this.restService.call(link);
+
+    private userOrVendorFromAlma = (link): Observable<AlmaUser> => this.restService.call(link);
 
     private handleError = (err: any) => {
         console.error(err);
@@ -86,4 +96,11 @@ export class UserService {
         }
         return throwError(err);
     };
+
+    constructor(private restService: CloudAppRestService,
+                private configService: CloudAppConfigService,
+                private toolboxService: ToolboxService,
+    ) {}
+
+    private userNotNull = (link) => !link.includes("/users/null/");
 }

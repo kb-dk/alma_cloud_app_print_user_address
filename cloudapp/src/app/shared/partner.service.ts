@@ -1,9 +1,10 @@
 import {Injectable} from '@angular/core';
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
-import {forkJoin, of, throwError} from "rxjs";
+import {forkJoin, Observable, of, throwError} from "rxjs";
 import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
 import {AddressFormats} from "../config/address-format";
 import {ToolboxService} from "./toolbox.service";
+import {AlmaPartner} from "./interfaces";
 
 @Injectable({
     providedIn: 'root'
@@ -18,6 +19,7 @@ export class PartnerService {
 
 
     partners$ = (entities: Entity[]) => {
+
         let config = this.configService.get().pipe(
             map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
@@ -25,7 +27,7 @@ export class PartnerService {
             tap(config => this.showRecipient = config.addressFormat.showRecipient),
             catchError(err => this.handleError(err))
         );
-        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.BORROWING_REQUEST, EntityType.LENDING_REQUEST, EntityType.PARTNER].includes(entity.type))
+        let calls = entities.filter(entity => [EntityType.LOAN,  EntityType.LENDING_REQUEST, EntityType.PARTNER].includes(entity.type))
             .map(
                 entity => {
                     switch (entity.type) {
@@ -35,7 +37,7 @@ export class PartnerService {
                         case EntityType.LENDING_REQUEST:
                             return this.partnerAddressFromBorrowingOrLendingRequest(entity.link);
                         case EntityType.PARTNER:
-                            return this.getLoanOrPartnerFromAlma(entity.link);
+                            return this.getPartnerFromAlma(entity.link);
                     }
                 });
 
@@ -50,7 +52,7 @@ export class PartnerService {
             );
     };
 
-    private partnerAddressFromLoan = (link) => this.getLoanOrPartnerFromAlma(link).pipe(
+    private partnerAddressFromLoan = (link) => this.getLoanFromAlma(link).pipe(
         filter(loan => loan.location_code.name === 'Borrowing Resource Sharing Requests'),
         tap(loan => this.user_id = loan.user_id),
         switchMap(loan => this.getRequestFromLoan(loan)),
@@ -59,7 +61,7 @@ export class PartnerService {
         switchMap(resourceSharingRequest => this.getPartnerFromResourceSharingRequest(resourceSharingRequest)),
     );
 
-    private partnerAddressFromBorrowingOrLendingRequest = (link) => this.getLoanOrPartnerFromAlma(link).pipe(
+    private partnerAddressFromBorrowingOrLendingRequest = (link) => this.getLoanFromAlma(link).pipe(
         switchMap(loan => this.getPartnerFromResourceSharingRequest(loan)),
     );
 
@@ -68,7 +70,9 @@ export class PartnerService {
                 private toolboxService: ToolboxService,
     ){}
 
-    private getLoanOrPartnerFromAlma = link => this.restService.call(link);
+    private getPartnerFromAlma = (link): Observable<AlmaPartner> => this.restService.call(link);
+
+    private getLoanFromAlma = (link) => this.restService.call(link);
 
     private getRequestFromLoan = loan => this.restService.call(loan.request_id.link);
 
