@@ -9,9 +9,8 @@ import {
 } from '@exlibris/exl-cloudapp-angular-lib';
 import {UserService} from "./user.service";
 import {PartnerService} from "./partner.service";
-import {FixConfigService} from "./fix-config.service";
-import {AddressFormats} from "./config/address-format";
-import {ConvertService} from "./convert.service";
+import {AddressFormats} from "../config/address-format";
+import {ToolboxService} from "./toolbox.service";
 
 @Injectable({
     providedIn: 'root'
@@ -31,15 +30,14 @@ export class ScanService {
                 private eventsService: CloudAppEventsService,
                 private userService: UserService,
                 private partnerService: PartnerService,
-                private fixConfigService: FixConfigService,
-                private convertService: ConvertService,
+                private toolboxService: ToolboxService,
     ) {
     }
 
     scan = (barcode) => {
 
         this.configService.get().pipe(
-            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
+            map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
             tap(config => this.showCountry = config.addressFormat.showCountry),
             tap(config => this.showRecipient = config.addressFormat.showRecipient),
@@ -50,7 +48,7 @@ export class ScanService {
             concatMap(item => this.getRequests(item.link)),
             map(item => item.user_request[0].resource_sharing.partner.link),
             concatMap(partner_link => this.restService.call(partner_link)),
-            map(partner => this.convertService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address, '0')),
+            map(partner => this.toolboxService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address, 0)),
             tap(partner => partner.checked = true),
             catchError(err => this.handleError(err))
         )

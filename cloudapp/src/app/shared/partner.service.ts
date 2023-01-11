@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType} from "@exlibris/exl-cloudapp-angular-lib";
-import {forkJoin, of, throwError} from "rxjs";
+import {forkJoin, Observable, of, throwError} from "rxjs";
 import {catchError, filter, map, switchMap, tap} from "rxjs/operators";
-import {AddressFormats} from "./config/address-format";
-import {FixConfigService} from "./fix-config.service";
-import {ConvertService} from "./convert.service";
+import {AddressFormats} from "../config/address-format";
+import {ToolboxService} from "./toolbox.service";
+import {AlmaPartner} from "./interfaces";
 
 @Injectable({
     providedIn: 'root'
@@ -19,16 +19,15 @@ export class PartnerService {
 
 
     partners$ = (entities: Entity[]) => {
+
         let config = this.configService.get().pipe(
-            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
+            map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
             tap(config => this.showCountry = config.addressFormat.showCountry),
             tap(config => this.showRecipient = config.addressFormat.showRecipient),
             catchError(err => this.handleError(err))
         );
-        // TODO In exl-cloudapp-angular-lib / public-interface.d.ts PARTNER is not added as an entityType yet
-        // When it is added by Exlibris, the last part needs to be removed and EntityType.PARTNER be added to the array of EntityTypes
-        let calls = entities.filter(entity => [EntityType.LOAN, EntityType.BORROWING_REQUEST, EntityType.LENDING_REQUEST].includes(entity.type) || entity.type.toString() === 'PARTNER')
+        let calls = entities.filter(entity => [EntityType.LOAN,  EntityType.LENDING_REQUEST, EntityType.PARTNER].includes(entity.type))
             .map(
                 entity => {
                     switch (entity.type) {
@@ -37,13 +36,9 @@ export class PartnerService {
                         case EntityType.BORROWING_REQUEST:
                         case EntityType.LENDING_REQUEST:
                             return this.partnerAddressFromBorrowingOrLendingRequest(entity.link);
+                        case EntityType.PARTNER:
+                            return this.getPartnerFromAlma(entity.link);
                     }
-                    // TODO In exl-cloudapp-angular-lib / public-interface.d.ts PARTNER is not added as an entityType yet
-                    // When it is added by Exlibris, this line needs to move inside the switch
-                    if (entity.type.toString() === 'PARTNER'){
-                        return this.getLoanOrPartnerFromAlma(entity.link);
-                    }
-
                 });
 
         // TODO Find a better way to ensure having the config before piping the addresses into partnerAddressFromLoan
@@ -52,12 +47,12 @@ export class PartnerService {
             of([]) :
             forkJoin(calls).pipe(
                 tap(partners => partners.pop()),// Pulling the config off of the array of results
-                map(partners => partners.map((partner, index) => this.convertService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address, index))),
+                map(partners => partners.map((partner, index) => this.toolboxService.partnerFromAlmaPartner(this.addressFormat, this.showCountry, partner, this.senders_address, index))),
                 catchError(err => this.handleError(err))
             );
     };
 
-    private partnerAddressFromLoan = (link) => this.getLoanOrPartnerFromAlma(link).pipe(
+    private partnerAddressFromLoan = (link) => this.getLoanFromAlma(link).pipe(
         filter(loan => loan.location_code.name === 'Borrowing Resource Sharing Requests'),
         tap(loan => this.user_id = loan.user_id),
         switchMap(loan => this.getRequestFromLoan(loan)),
@@ -66,17 +61,18 @@ export class PartnerService {
         switchMap(resourceSharingRequest => this.getPartnerFromResourceSharingRequest(resourceSharingRequest)),
     );
 
-    private partnerAddressFromBorrowingOrLendingRequest = (link) => this.getLoanOrPartnerFromAlma(link).pipe(
+    private partnerAddressFromBorrowingOrLendingRequest = (link) => this.getLoanFromAlma(link).pipe(
         switchMap(loan => this.getPartnerFromResourceSharingRequest(loan)),
     );
 
     constructor(private restService: CloudAppRestService,
                 private configService: CloudAppConfigService,
-                private fixConfigService: FixConfigService,
-                private convertService: ConvertService,
+                private toolboxService: ToolboxService,
     ){}
 
-    private getLoanOrPartnerFromAlma = link => this.restService.call(link);
+    private getPartnerFromAlma = (link): Observable<AlmaPartner> => this.restService.call(link);
+
+    private getLoanFromAlma = (link) => this.restService.call(link);
 
     private getRequestFromLoan = loan => this.restService.call(loan.request_id.link);
 

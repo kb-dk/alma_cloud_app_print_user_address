@@ -5,8 +5,7 @@ import {EMPTY, Observable} from "rxjs";
 import {Config} from "./config";
 import {emptyConfig} from "./emptyConfig";
 import {ToastrService} from 'ngx-toastr';
-import {AddressFormats} from "./address-format";
-import {FixConfigService} from "../fix-config.service";
+import {ToolboxService} from "../shared/toolbox.service";
 
 @Component({
     selector: 'app-config',
@@ -22,8 +21,8 @@ export class ConfigComponent {
 
     config$: Observable<Config> = this.configService.get()
         .pipe(
-            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
-            tap(config => this.config = config),
+            map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
+            tap(config => this.config = Object.assign(this.config, config)),
             tap(() => this.loading = false),
             catchError(error => {
                 console.log('Error getting configuration:', error);
@@ -32,20 +31,22 @@ export class ConfigComponent {
         );
 
     constructor(private configService: CloudAppConfigService,
-                private fixConfigService: FixConfigService,
+                public toolboxService: ToolboxService,
                 private toastr: ToastrService) {
     }
 
-    onLogoChanged = (images: File[]) => {
-        let logo = images[0];
-        let logoReader = new FileReader();
-        logoReader.readAsDataURL(logo);
-        logoReader.onload = () => {
-            this.config.user.logo = logoReader.result.toString();
-            this.saveConfig('Your logo is set.');
-        };
-        logoReader.onerror = error => console.log('Error reading image' + error);
+    onLogoChanged = (event: Event) => {
+        let files: FileList = (<HTMLInputElement>event.target).files;
+        if (files && this.isFileImage(files[0])) {
+            this.loadAndSaveLogo(files[0]);
+        } else {
+            this.toastr.error('The selected file must be an image.', 'Please select an image', {timeOut: 2000})
+        }
     };
+
+    isFileImage = (file) => {
+        return file && file['type'].split('/')[0] === 'image';
+    }
 
     saveConfig = (toastMessage) => {
         this.configService.set(this.config).pipe(
@@ -88,11 +89,14 @@ export class ConfigComponent {
         this.saveConfig('The address is removed.');
     };
 
-    replaceComma = (string) => {
-        let title = string.substring(0, string.indexOf(','));
-        let address = string.substring(string.indexOf(','));
-        string = '<strong>' + title + '</strong>' + address;
-        return string.replaceAll(',', '<br/>')
-    };
+    private loadAndSaveLogo = (logo: File): void => {
+        let logoReader = new FileReader();
+        logoReader.readAsDataURL(logo);
+        logoReader.onload = () => {
+            this.config.user.logo = logoReader.result.toString();
+            this.saveConfig('Your logo is set.');
+        };
+        logoReader.onerror = error => console.log('Error reading image' + error);
+    }
 }
 

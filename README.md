@@ -15,7 +15,8 @@ Current node version: v16.19.0
 2. Install Exlibris' CLI in the node package: `npm install -g @exlibris/exl-cloudapp-cli`
 3. Sometimes it is better to delete `node_modules` folder and `package-lock.json` before the next step.
 4. Run: `npm install`
-5. Update cloudapp-sdk: `eca update`
+5. Run `npm update`
+6. Update cloudapp-sdk: `eca update`
 
 ## Install
 1. Install node: `nvm install node`

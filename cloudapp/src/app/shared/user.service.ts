@@ -1,10 +1,10 @@
 import {Injectable} from '@angular/core';
-import {AddressFormats} from "./config/address-format";
-import {ConvertService} from "./convert.service";
-import {FixConfigService} from "./fix-config.service";
+import {AddressFormats} from "../config/address-format";
 import {CloudAppConfigService, CloudAppRestService, Entity, EntityType,} from "@exlibris/exl-cloudapp-angular-lib";
-import {forkJoin, iif, of, throwError} from "rxjs";
+import {forkJoin, iif, Observable, of, throwError} from "rxjs";
 import {catchError, map, switchMap, tap} from "rxjs/operators";
+import {ToolboxService} from "./toolbox.service";
+import {AlmaRequest, AlmaUser} from "./interfaces";
 
 @Injectable({
     providedIn: 'root'
@@ -22,7 +22,7 @@ export class UserService {
     users$ = (entities: Entity[]) => {
 
         let config = this.configService.get().pipe(
-            map(config => this.fixConfigService.fixOldOrEmptyConfigElements(config)),
+            map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
             tap(config => this.showCountry = config.addressFormat.showCountry),
             tap(config => this.showRecipient = config.addressFormat.showRecipient),
@@ -36,12 +36,11 @@ export class UserService {
                         return this.userFromLoan(entity.link);
                     case EntityType.REQUEST:
                         return this.userFromRequest(entity.link);
-                    case EntityType.USER:
-                        return this.getRequestFromAlma(entity.link);
                     case EntityType.BORROWING_REQUEST:
-                        return this.getRequesterFromAlma(entity.link);
+                        return this.userFromBorrowingRequest(entity.link);
+                    case EntityType.USER:
                     case EntityType.VENDOR:
-                        return this.getRequestFromAlma(entity.link);
+                        return this.userOrVendorFromAlma(entity.link);
                 }
             });
         // TODO Find a better way to ensure having the config before piping the addresses into partnerAddressFromLoan
@@ -51,36 +50,43 @@ export class UserService {
             forkJoin(calls).pipe(
                 catchError(err => this.handleError(err)),
                 tap(users => users.pop()), // Pulling the config off of the array of results
-                map(users => users.map((user, index) => this.convertService.userFromAlmaUser(this.addressFormat, this.showCountry, user, index))),
+                map(users => users.map((user, index) => this.toolboxService.userFromAlmaUser(this.addressFormat, this.showCountry, user, index))),
             );
     };
 
-    private getRequesterFromAlma = (link) => this.getRequestFromAlma(link).pipe(
+    private userFromBorrowingRequest = (link) => this.getBorrowingRequestFromAlma(link).pipe(
         switchMap(request => iif(() => request.requester !== null,
-            this.getRequestFromAlma(`/users/${request.requester.value}`),
+            this.userFromAlma(`/users/${request.requester.value}`),
             of(null),
         ))
     );
 
-    private userFromLoan = (link) => this.getRequestFromAlma(link).pipe(
-        switchMap(loan => this.getRequestFromAlma(`/users/${loan.user_id}`))
+    private userFromLoan = (link) => this.getLoanFromAlma(link).pipe(
+        switchMap(loan => this.userFromAlma(`/users/${loan.user_id}`))
     );
 
-    private userFromRequest = (link) => this.getRequestFromAlma(link).pipe(
-        switchMap(request => iif(() => request.user_primary_id !== undefined,
-            this.getRequestFromAlma(`/users/${request.user_primary_id}`),
+    private userFromRequest = (link) => this.requestFromAlma(link).pipe(
+        switchMap((request): Observable<AlmaRequest> => iif(() => ('user_primary_id' in request && request.user_primary_id !== null),
+            this.userFromAlma(`/users/${request.user_primary_id}`),
             of(null)
         ))
     );
 
-    constructor(private restService: CloudAppRestService,
-                private configService: CloudAppConfigService,
-                private fixConfigService: FixConfigService,
-                private convertService: ConvertService,
-    ) {
+    private requestFromAlma = (link): Observable<AlmaRequest> => this.restService.call(link);
+
+    private userFromAlma = (link): Observable<AlmaUser> => this.restService.call(link);
+
+    private getBorrowingRequestFromAlma = (link) => {
+        if (this.userNotNull(link)){
+            return this.restService.call(link);
+        } else {
+            return of(null);
+        }
     }
 
-    private getRequestFromAlma = link => this.restService.call(link);
+    private getLoanFromAlma = (link) => this.restService.call(link);
+
+    private userOrVendorFromAlma = (link): Observable<AlmaUser> => this.restService.call(link);
 
     private handleError = (err: any) => {
         console.error(err);
@@ -90,4 +96,11 @@ export class UserService {
         }
         return throwError(err);
     };
+
+    constructor(private restService: CloudAppRestService,
+                private configService: CloudAppConfigService,
+                private toolboxService: ToolboxService,
+    ) {}
+
+    private userNotNull = (link) => !link.includes("/users/null/");
 }
