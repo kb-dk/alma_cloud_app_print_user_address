@@ -19,7 +19,6 @@ export class PartnerService {
 
 
     partners$ = (entities: Entity[]) => {
-console.log(entities);
         let config = this.configService.get().pipe(
             map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
