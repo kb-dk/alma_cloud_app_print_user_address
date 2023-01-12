@@ -19,7 +19,7 @@ export class PartnerService {
 
 
     partners$ = (entities: Entity[]) => {
-
+console.log(entities);
         let config = this.configService.get().pipe(
             map(config => this.toolboxService.fixOldOrEmptyConfigElements(config)),
             tap(config => this.addressFormat = config.addressFormat.addresses[config.addressFormat.default]),
@@ -27,7 +27,7 @@ export class PartnerService {
             tap(config => this.showRecipient = config.addressFormat.showRecipient),
             catchError(err => this.handleError(err))
         );
-        let calls = entities.filter(entity => [EntityType.LOAN,  EntityType.LENDING_REQUEST, EntityType.PARTNER].includes(entity.type))
+        let calls = entities.filter(entity => [EntityType.LOAN,  EntityType.LENDING_REQUEST, EntityType.BORROWING_REQUEST, EntityType.PARTNER].includes(entity.type))
             .map(
                 entity => {
                     switch (entity.type) {
